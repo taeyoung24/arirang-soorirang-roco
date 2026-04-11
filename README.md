@@ -68,6 +68,7 @@ hotfix: 배포 후 500 에러 응급 조치
 
 - [Frontend 세팅 가이드](#)
 - [Backend 세팅 가이드](#)
+- [Content Data 세팅 가이드 (uv)](docs/content-data-instruction.md)
 
 
 ## 협업 규칙

@@ -1,28 +1,45 @@
+import { useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import mascot from '../../assets/landing-mascot.svg'
 import header from '../../assets/landing-header.svg'
 
 function LandingPage() {
   const navigate = useNavigate()
-  return (
-    <div className="flex flex-col min-h-screen bg-primary px-6 pt-12 pb-10">
-      <img src={header} alt="아리랑 수리랑" className="w-64 mx-auto" />
 
-      <div className="flex-1 flex items-center justify-center">
-        <img src={mascot} alt="mascot" className="w-72" />
+  useEffect(() => {
+    document.body.style.backgroundColor = '#5E58FB'
+    return () => {
+      document.body.style.backgroundColor = ''
+    }
+  }, [])
+
+  return (
+    <div className="bg-landing-page-primary h-screen overflow-hidden relative px-6">
+
+      {/* Header (top) */}
+      <div className="absolute top-24 left-1/2 -translate-x-1/2">
+        <img src={header} alt="아리랑 수리랑" className="max-w-max" />
       </div>
 
-      <div className="w-full flex flex-col items-center gap-4">
-        <p className="text-white text-xs text-center opacity-70">
+      {/* Mascot (middle-ish, slightly above center) */}
+      <div className=" absolute top-[50%] left-1/2 -translate-x-1/2 -translate-y-1/2">
+        <img src={mascot} alt="mascot" className="max-w-dvw" />
+      </div>
+
+      {/* Bottom section */}
+      <div className="absolute bottom-10 left-0 w-full flex flex-col items-center gap-14 px-6">
+        <p className="w-10/12 text-white text-s text-center opacity-70">
           시작하기 버튼을 누르면 이용약관 및 개인정보 처리방침에 동의하는 것으로 간주합니다.
         </p>
+
         <button
           onClick={() => navigate('/home')}
-          className="w-full bg-bg-light rounded-full py-4 text-lg font-semibold text-text-main"
+          className="w-10/12 bg-bg-light rounded-full h-14 py-5 text-lg font-semibold text-text-main border-4 border-black"
         >
           로그인 없이 시작
         </button>
       </div>
+
     </div>
   )
 }

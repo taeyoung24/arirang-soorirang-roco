@@ -19,9 +19,9 @@
   --color-green-primary: #79b766;
 
   /* Global numeric values */
-  --global-border-width: 2.4px;
-  --global-round: 20px;
-  --global-round-hard: 32px;
+  --border-width: 2.4px;
+  --radius-card: 20px;
+  --radius-hard: 32px;
 
   /* Font settings */
   --color-landing-page-primary: #5e58fb;
@@ -32,10 +32,12 @@
   --font-sans: "Pretendard", sans-serif;
 }
 
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
+@layer base {
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
 }
 
 body {

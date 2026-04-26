@@ -2,6 +2,7 @@ import { useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import mascot from '../../assets/landing-mascot.svg'
 import header from '../../assets/landing-header.svg'
+import Layout from '../../components/Layout'
 
 function LandingPage() {
   const navigate = useNavigate()
@@ -14,7 +15,8 @@ function LandingPage() {
   }, [])
 
   return (
-    <div className="bg-landing-page-primary h-screen overflow-hidden relative px-6">
+    <Layout>
+    <div className="bg-landing-page-primary h-screen overflow-hidden relative -mx-[36px] -my-[52px]">
 
       {/* Header (top) */}
       <div className="absolute top-24 left-1/2 -translate-x-1/2">
@@ -34,13 +36,13 @@ function LandingPage() {
 
         <button
           onClick={() => navigate('/home')}
-          className="w-10/12 bg-bg-light rounded-full h-14 py-5 text-lg font-semibold text-text-main border-4 border-black"
+          className="flex items-center justify-center w-10/12 bg-bg-light rounded-full h-14 py-5 text-lg font-semibold text-text-main border-4 border-black"
         >
           로그인 없이 시작
         </button>
       </div>
-
     </div>
+    </Layout>
   )
 }
 

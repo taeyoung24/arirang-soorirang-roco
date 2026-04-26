@@ -1,0 +1,9 @@
+libfl_lib_audio.so
+libfl_lib_common.so
+libfl_lib_sequence.so
+libfl_lib_set.so
+libfl_lib_text.so
+flashlight/lib/audio/flashlight_lib_audio_feature.cpython-39-x86_64-linux-gnu.so
+flashlight/lib/sequence/flashlight_lib_sequence_criterion.cpython-39-x86_64-linux-gnu.so
+flashlight/lib/text/flashlight_lib_text_decoder.cpython-39-x86_64-linux-gnu.so
+flashlight/lib/text/flashlight_lib_text_dictionary.cpython-39-x86_64-linux-gnu.so

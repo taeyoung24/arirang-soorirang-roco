@@ -1,0 +1,65 @@
+FROM nvidia/cuda:11.1.1-cudnn8-runtime-ubuntu20.04
+
+ENV DEBIAN_FRONTEND=noninteractive
+ENV PYTHONDONTWRITEBYTECODE=1
+ENV PYTHONUNBUFFERED=1
+ENV PIP_NO_CACHE_DIR=1
+ENV MDD_SERVICE_MODE=inference
+ENV MDD_MODEL_PATH=/opt/mdd/checkpoints/checkpoint_mdd_sjr.pt
+ENV MDD_INFER_SCRIPT_PATH=/opt/fairseq/examples/speech_recognition/infer.py
+ENV MDD_DICT_PATH=/opt/mdd/service/assets/dict.phn.txt
+ENV MDD_TEMP_ROOT=/tmp/mdd-inference
+ENV MDD_HOST=0.0.0.0
+ENV MDD_PORT=8080
+ENV CONDA_DIR=/opt/conda
+ENV CONDA_ENV_NAME=main
+ENV PATH=/opt/conda/envs/main/bin:/opt/conda/bin:${PATH}
+ENV PYTHONPATH=/opt/fairseq
+ENV LD_LIBRARY_PATH=/opt/conda/envs/main/lib/python3.9/site-packages/flashlight-1.0.0-py3.9-linux-x86_64.egg:${LD_LIBRARY_PATH}
+
+WORKDIR /opt/mdd/service
+
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    bash \
+    build-essential \
+    ca-certificates \
+    curl \
+    git \
+    libgomp1 \
+    libsndfile1 \
+    sox \
+    && rm -rf /var/lib/apt/lists/*
+
+RUN curl -fsSL https://repo.anaconda.com/miniconda/Miniconda3-py39_23.3.1-0-Linux-x86_64.sh -o /tmp/miniconda.sh \
+    && bash /tmp/miniconda.sh -b -p ${CONDA_DIR} \
+    && rm /tmp/miniconda.sh \
+    && conda config --system --set auto_update_conda false \
+    && conda create -y -n ${CONDA_ENV_NAME} python=3.9.12 pip=21.2.4 \
+    && conda run -n ${CONDA_ENV_NAME} python -m pip install setuptools==59.5.0 wheel==0.37.1 \
+    && conda clean -afy
+
+COPY requirements.inference.runtime.txt ./
+COPY requirements.inference.service.txt ./
+COPY vendor/flashlight/flashlight-1.0.0-py3.9-linux-x86_64.egg /opt/vendor/flashlight-1.0.0-py3.9-linux-x86_64.egg
+
+RUN conda run -n ${CONDA_ENV_NAME} python -m pip install --extra-index-url https://download.pytorch.org/whl/cu111 -r requirements.inference.runtime.txt
+
+RUN conda run -n ${CONDA_ENV_NAME} python -m pip install -r requirements.inference.service.txt
+
+RUN git clone https://github.com/facebookresearch/fairseq.git /opt/fairseq \
+    && cd /opt/fairseq \
+    && git checkout a075481d0de112aee2d79f40ac3ab0eca37214d8 \
+    && conda run -n ${CONDA_ENV_NAME} python setup.py build_ext --inplace \
+    && conda run -n ${CONDA_ENV_NAME} python -m pip install --no-deps .
+
+RUN cp -R /opt/vendor/flashlight-1.0.0-py3.9-linux-x86_64.egg /opt/conda/envs/main/lib/python3.9/site-packages/flashlight-1.0.0-py3.9-linux-x86_64.egg \
+    && printf "/opt/conda/envs/main/lib/python3.9/site-packages/flashlight-1.0.0-py3.9-linux-x86_64.egg\n" > /opt/conda/envs/main/lib/python3.9/site-packages/flashlight-vendored.pth
+
+COPY app ./app
+COPY assets ./assets
+
+RUN conda run -n ${CONDA_ENV_NAME} python -c "import nltk; nltk.download('cmudict')"
+
+EXPOSE 8080
+
+CMD ["python", "-m", "uvicorn", "app.inference_server:app", "--host", "0.0.0.0", "--port", "8080"]

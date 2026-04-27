@@ -1,1 +1,32 @@
-[]
+[
+    {
+        "id": "3c9979ce",
+        "meaning_id": "8dfa7526",
+        "content": "저는  매일 저녁에 일기를 써요.",
+        "highlight": "써요"
+    },
+    {
+        "id": "2e427ab5",
+        "meaning_id": "8dfa7526",
+        "content": "글씨 쓰는 연습을 하세요.",
+        "highlight": "쓰는"
+    },
+    {
+        "id": "42d142e9",
+        "meaning_id": "f7a4b128",
+        "content": "어제 쓴 우산을 말리고 있어요.",
+        "highlight": "쓴"
+    },
+    {
+        "id": "d19cd710",
+        "meaning_id": "03c7ae56",
+        "content": "모자 쓴 사람을 보았어요.",
+        "highlight": "쓴"
+    },
+    {
+        "id": "a2944059",
+        "meaning_id": "2a00e9ac",
+        "content": "이 소스는 조금 쓰네요.",
+        "highlight": "쓰네요"
+    }
+]

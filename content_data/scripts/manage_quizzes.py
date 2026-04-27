@@ -23,6 +23,10 @@ def main():
         op_ids = prompt_for_list(args.option_ids, "Enter Option IDs")
         
         q_id = generate_short_id()
+        if inst is None or t_id is None or not op_ids:
+            logger.error("Instruction, target ID, and at least one option ID are required to create a Quiz.")
+            return
+        
         model = Quiz(id=q_id, instruction=inst, target_id=t_id, option_ids=op_ids)
         quizzes.append(model.model_dump())
         repo.save_all()
@@ -39,7 +43,7 @@ def main():
     elif args.action == "update":
         target_id = prompt_if_missing(args.id, "Enter Quiz ID to update")
         target = next((q for q in quizzes if q["id"] == target_id), None)
-        if not target:
+        if not target or target_id is None:
             logger.error(f"Quiz with id {target_id} not found."); return
             
         inst = prompt_if_missing(args.instruction, f"Enter instruction (current: {target['instruction']})")
@@ -49,6 +53,10 @@ def main():
             op_ids = args.option_ids
         else:
             op_ids = prompt_for_list(None, f"Enter Option IDs (current: {target['option_ids']})")
+
+        if inst is None or t_id is None:
+            logger.error("Instruction, target ID, and at least one option ID are required to update a Quiz.")
+            return
             
         model = Quiz(id=target_id, instruction=inst, target_id=t_id, option_ids=op_ids)
         target.update(model.model_dump())

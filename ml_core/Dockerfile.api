@@ -1,0 +1,18 @@
+FROM python:3.11-slim
+
+ENV PYTHONDONTWRITEBYTECODE=1
+ENV PYTHONUNBUFFERED=1
+ENV PIP_NO_CACHE_DIR=1
+ENV MDD_SERVICE_MODE=api
+ENV MDD_HOST=0.0.0.0
+ENV MDD_PORT=8000
+
+WORKDIR /opt/mdd/service
+
+COPY app ./app
+
+RUN pip install fastapi httpx python-multipart pydantic "uvicorn[standard]"
+
+EXPOSE 8000
+
+CMD ["uvicorn", "app.server:app", "--host", "0.0.0.0", "--port", "8000"]

@@ -1,0 +1,20 @@
+[project]
+name = "mddproj"
+version = "0.2.0"
+description = "Service wrapper for the original NIA-13 SJR MDD model"
+readme = "README.md"
+requires-python = ">=3.9"
+dependencies = [
+    "fastapi",
+    "g2pk2",
+    "httpx",
+    "python-Levenshtein",
+    "python-multipart",
+    "pydantic>=2",
+    "soundfile",
+    "uvicorn[standard]",
+]
+
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"

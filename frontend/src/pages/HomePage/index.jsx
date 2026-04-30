@@ -1,5 +1,5 @@
 import Layout from 'src/components/Layout'
-import mascot from 'srcO/assets/landing-mascot.svg'
+import mascot from 'src/assets/landing-mascot.svg'
 import searchIcon from 'src/assets/search.svg'
 import normalMascot from 'src/assets/mascot/normal_mascot.png'
 import winterMascot from 'src/assets/mascot/winter_mascot.png'

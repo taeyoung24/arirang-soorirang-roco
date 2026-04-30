@@ -1,0 +1,36 @@
+services:
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile.api
+    container_name: mdd-api
+    ports:
+      - "8000:8000"
+    environment:
+      MDD_SERVICE_MODE: api
+      MDD_INFERENCE_BASE_URL: http://inference:8080
+      MDD_INFERENCE_TIMEOUT_SECONDS: 120
+    depends_on:
+      - inference
+    restart: unless-stopped
+
+  inference:
+    build:
+      context: .
+      dockerfile: Dockerfile.inference
+    container_name: mdd-inference
+    environment:
+      MDD_SERVICE_MODE: inference
+      MDD_MODEL_PATH: /opt/mdd/checkpoints/checkpoint_mdd_sjr.pt
+      MDD_INFER_SCRIPT_PATH: /opt/fairseq/examples/speech_recognition/infer.py
+      MDD_DICT_PATH: /opt/mdd/service/assets/dict.phn.txt
+      MDD_TEMP_ROOT: /tmp/mdd-inference
+      PYTHONPATH: /opt/fairseq
+      LD_LIBRARY_PATH: /opt/conda/envs/main/lib/python3.9/site-packages/flashlight-1.0.0-py3.9-linux-x86_64.egg:/usr/local/nvidia/lib:/usr/local/nvidia/lib64
+      NVIDIA_VISIBLE_DEVICES: all
+      NVIDIA_DRIVER_CAPABILITIES: compute,utility
+    volumes:
+      - "./models:/opt/mdd/checkpoints:ro"
+    runtime: nvidia
+    ipc: host
+    restart: unless-stopped

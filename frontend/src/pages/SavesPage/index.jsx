@@ -1,5 +1,5 @@
 function SavesPage() {
-    return <div>Save Page</div>
+  return <div>Save Page</div>
 }
 
-export default SavesPage
+export default SavesPage;

@@ -1,9 +1,9 @@
-import { BrowserRouter, Routes, Route } from 'react-router-dom'
-import LandingPage from './pages/LandingPage'
-import HomePage from './pages/HomePage'
-import SelectionPage from './pages/SelectionPage'
-import IngamePage from './pages/IngamePage'
-import SavesPage from './pages/SavesPage'
+import { BrowserRouter, Route, Routes } from 'react-router-dom'
+import HomePage from 'src/pages/HomePage'
+import IngamePage from 'src/pages/IngamePage'
+import LandingPage from 'src/pages/LandingPage'
+import SavesPage from 'src/pages/SavesPage'
+import SelectionPage from 'src/pages/SelectionPage'
 
 function App() {
   return (
@@ -19,4 +19,4 @@ function App() {
   )
 }
 
-export default App
+export default App;

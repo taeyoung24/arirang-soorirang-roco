@@ -1,5 +1,5 @@
 function SelectionPage() {
-    return <div>Selection Page</div>
+  return <div>Selection Page</div>
 }
 
-export default SelectionPage
+export default SelectionPage;

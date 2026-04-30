@@ -1,11 +1,11 @@
-import Layout from '../../components/Layout'
-import mascot from '../../assets/landing-mascot.svg'
-import searchIcon from '../../assets/search.svg'
-import normalMascot from '../../assets/mascot/normal_mascot.png'
-import winterMascot from '../../assets/mascot/winter_mascot.png'
-import houseIcon from '../../assets/house.svg'
-import playIcon from '../../assets/play.svg'
-import heartIcon from '../../assets/heart.svg'
+import Layout from 'src/components/Layout'
+import mascot from 'srcO/assets/landing-mascot.svg'
+import searchIcon from 'src/assets/search.svg'
+import normalMascot from 'src/assets/mascot/normal_mascot.png'
+import winterMascot from 'src/assets/mascot/winter_mascot.png'
+import houseIcon from 'src/assets/house.svg'
+import playIcon from 'src/assets/play.svg'
+import heartIcon from 'src/assets/heart.svg'
 
 function ContentCard({ title, image }) {
   return (
@@ -25,7 +25,7 @@ function ContentSection({ label, bg, cards }) {
       <div className="flex gap-2 overflow-x-auto scrollbar-none">
         {cards.map((card, i) => (
           <ContentCard key={i} title={card.title} image={card.image} />
-        ))} 
+        ))}
       </div>
     </div>
   )
@@ -98,4 +98,4 @@ function HomePage() {
   )
 }
 
-export default HomePage
+export default HomePage;;

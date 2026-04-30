@@ -2,6 +2,7 @@ import { useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import header from 'src/assets/landing-header.svg'
 import mascot from 'src/assets/landing-mascot.svg'
+import { PageButton } from 'src/components/Button'
 import Layout from 'src/components/Layout'
 
 function LandingPage() {
@@ -34,12 +35,12 @@ function LandingPage() {
             시작하기 버튼을 누르면 이용약관 및 개인정보 처리방침에 동의하는 것으로 간주합니다.
           </p>
 
-          <button
+          <PageButton
             onClick={() => navigate('/home')}
-            className="flex items-center justify-center w-10/12 bg-bg-light rounded-full h-14 py-5 text-lg font-semibold text-text-main border-4 border-black"
+            className="w-10/12"
           >
             로그인 없이 시작
-          </button>
+          </PageButton>
         </div>
       </div>
     </Layout>

@@ -16,7 +16,7 @@ function App() {
         <Route path="/saves" element={<SavesPage />} />
       </Routes>
     </BrowserRouter>
-  )
+  );
 }
 
 export default App;

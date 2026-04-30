@@ -23,4 +23,3 @@ export const GLOBAL_CONFIG = {
   MODE: import.meta.env.MODE,
   IS_DEV: import.meta.env.DEV,
 };
-

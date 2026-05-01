@@ -2,9 +2,13 @@ export const PageButton = ({ children, onClick, className = "" }) => {
   return (
     <button
       onClick={onClick}
-      className={`flex items-center justify-center bg-bg-light rounded-global-round-hard h-14 py-5 text-lg font-semibold text-text-main border-border-main border-black ${className}`}
+      className={`w-80 h-12 px-5 bg-bg rounded-[32px] outline outline-[2.40px] outline-offset-[-1.20px] outline-text inline-flex justify-center items-center gap-2.5 overflow-hidden transition-all hover:opacity-90 active:scale-[0.98] cursor-pointer ${className}`}
     >
-      {children}
+      <div className="justify-start text-text text-lg font-extrabold font-sans">
+        {children}
+      </div>
     </button>
   );
 };
+
+

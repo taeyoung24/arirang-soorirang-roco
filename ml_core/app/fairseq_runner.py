@@ -318,6 +318,22 @@ class FairseqInferenceRunner:
             ]
             target_logprob = self._ctc_sequence_logprob(frame_probs, target_sequence)
             alternative_logprob = self._ctc_sequence_logprob(frame_probs, alternative_sequence)
+            if not self._valid_ctc_logprob(target_logprob) or not self._valid_ctc_logprob(alternative_logprob):
+                result.append(
+                    SyllableCandidateScore(
+                        syllable=syllable,
+                        syllable_index=syllable_index,
+                        start_phoneme_index=start,
+                        end_phoneme_index=end,
+                        target_sequence=target_sequence,
+                        alternative_sequence=alternative_sequence,
+                        note=(
+                            "CTC likelihood comparison was skipped because the aligned frame window is too short "
+                            "or one candidate path is not feasible."
+                        ),
+                    )
+                )
+                continue
             margin = alternative_logprob - target_logprob
             confidence = 1.0 / (1.0 + math.exp(-max(-30.0, min(30.0, margin))))
             result.append(
@@ -339,6 +355,12 @@ class FairseqInferenceRunner:
                 )
             )
         return result
+
+    @staticmethod
+    def _valid_ctc_logprob(value: float) -> bool:
+        import math
+
+        return math.isfinite(value) and value > -1e8
 
     def _competing_posterior(self, frame_probs, target_id: int) -> float:
         import torch
@@ -382,7 +404,8 @@ class FairseqInferenceRunner:
             alpha = new_alpha
         if states == 1:
             return float(alpha[0].item())
-        return float(torch.logsumexp(torch.stack([alpha[-1], alpha[-2]]), dim=0).item())
+        final = torch.logsumexp(torch.stack([alpha[-1], alpha[-2]]), dim=0)
+        return float(final.item())
 
     @classmethod
     def _canonical_syllable_groups(cls, canonical_units: list[str]) -> list[tuple[int, str, int, int, list[str]]]:

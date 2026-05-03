@@ -70,7 +70,7 @@ export const SimpleIconButton = ({ type, onClick }) => {
   return (
     <button 
       onClick={onClick}
-      className="w-12 h-12 flex justify-center items-center bg-bg rounded-[32px] outline outline-[2.40px] outline-offset-[-1.20px] outline-text overflow-hidden transition-all active:scale-95 cursor-pointer shrink-0"
+      className="w-[52px] h-[52px] flex justify-center items-center bg-bg rounded-[32px] outline outline-[2.40px] outline-offset-[-1.20px] outline-text overflow-hidden transition-all active:scale-95 cursor-pointer shrink-0"
     >
       {getIcon()}
     </button>

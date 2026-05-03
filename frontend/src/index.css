@@ -1,0 +1,67 @@
+@import url("https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css");
+@import "tailwindcss";
+
+@theme {
+  /* Colors from design guide */
+  --color-text: #2c2c2c;
+  --color-text-dimmed: #7d7d7d;
+  --color-text-light: #c7c7c7;
+
+  --color-ari-primary: #d95b7a;
+  --color-soori-primary: #5e58fb;
+  --color-soori-primary-dimmed: #443eea;
+
+  --color-bg: #f2ede7;
+  --color-bg-softdark: #e8ddd0;
+
+  --color-white-primary: #ffffff;
+  --color-yellow-primary: #f2ce40;
+  --color-green-primary: #79b766;
+
+  /* Global numeric values */
+  --spacing-border-main: 2.4px;
+  --radius-global-round: 20px;
+  --radius-global-round-hard: 32px;
+
+  /* Font settings */
+  --color-landing-page-primary: #5e58fb;
+  --color-primary: #7b6ff0;
+  --color-bg-light: #f5f0e8;
+  --color-yellow-accent: #f5c842;
+  --color-text-main: #2d2d2d;
+  --font-sans: "Pretendard", sans-serif;
+}
+
+@layer base {
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+}
+
+body {
+  background-color: #e5e5e5;
+  display: flex;
+  justify-content: center;
+  min-height: 100vh;
+}
+
+#root {
+  width: 100%;
+  max-width: 490px;
+  min-height: 100vh;
+  background-color: rgb(255, 255, 255);
+  position: relative;
+  font-family: "Pretendard", sans-serif;
+}
+
+/* Hide scrollbar utility */
+.scrollbar-none {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+.scrollbar-none::-webkit-scrollbar {
+  display: none;
+}
+

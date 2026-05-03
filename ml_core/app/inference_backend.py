@@ -6,7 +6,7 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Protocol
 
-from app.schemas import PredictedPhonemeScore, TargetPhonemeScore
+from app.schemas import PredictedPhonemeScore, SyllableCandidateScore, TargetPhonemeScore
 
 
 @dataclass(frozen=True)
@@ -17,6 +17,7 @@ class InferenceResult:
     score_source: str | None = None
     predicted_phoneme_scores: list[PredictedPhonemeScore] | None = None
     target_phoneme_scores: list[TargetPhonemeScore] | None = None
+    syllable_candidate_scores: list[SyllableCandidateScore] | None = None
 
 
 class InferenceBackend(Protocol):

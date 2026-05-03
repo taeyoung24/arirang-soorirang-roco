@@ -6,7 +6,21 @@ import threading
 from pathlib import Path
 
 from app.inference_backend import InferenceResult
-from app.schemas import PredictedPhonemeScore, TargetPhonemeScore
+from app.schemas import PredictedPhonemeScore, SyllableCandidateScore, TargetPhonemeScore
+
+CHOSEONG = [
+    "ㄱ", "ㄲ", "ㄴ", "ㄷ", "ㄸ", "ㄹ", "ㅁ", "ㅂ", "ㅃ", "ㅅ",
+    "ㅆ", "ㅇ", "ㅈ", "ㅉ", "ㅊ", "ㅋ", "ㅌ", "ㅍ", "ㅎ",
+]
+JUNGSEONG = [
+    "ㅏ", "ㅐ", "ㅑ", "ㅒ", "ㅓ", "ㅔ", "ㅕ", "ㅖ", "ㅗ", "ㅘ",
+    "ㅙ", "ㅚ", "ㅛ", "ㅜ", "ㅝ", "ㅞ", "ㅟ", "ㅠ", "ㅡ", "ㅢ", "ㅣ",
+]
+JONGSEONG = [
+    "", "ㄱ", "ㄲ", "ㄳ", "ㄴ", "ㄵ", "ㄶ", "ㄷ", "ㄹ", "ㄺ",
+    "ㄻ", "ㄼ", "ㄽ", "ㄾ", "ㄿ", "ㅀ", "ㅁ", "ㅂ", "ㅄ", "ㅅ",
+    "ㅆ", "ㅇ", "ㅈ", "ㅊ", "ㅋ", "ㅌ", "ㅍ", "ㅎ",
+]
 
 
 class FairseqInferenceRunner:
@@ -137,6 +151,7 @@ class FairseqInferenceRunner:
                 predicted_scores = self._predicted_phoneme_scores(emissions[0])
                 canonical_units = self._read_canonical_units(manifest_dir)
                 target_scores = self._target_phoneme_scores(canonical_units, predicted_scores, emissions[0])
+                syllable_scores = self._syllable_candidate_scores(canonical_units, predicted_scores, emissions[0])
                 return InferenceResult(
                     raw_line=self._tgt_dict.string(tokens),
                     decoder_score=decoder_score,
@@ -144,6 +159,7 @@ class FairseqInferenceRunner:
                     score_source="fairseq_hypothesis_score" if decoder_score is not None else None,
                     predicted_phoneme_scores=predicted_scores,
                     target_phoneme_scores=target_scores,
+                    syllable_candidate_scores=syllable_scores,
                 )
 
         raise RuntimeError("No valid sample was produced for inference.")
@@ -254,6 +270,76 @@ class FairseqInferenceRunner:
             )
         return result
 
+    def _syllable_candidate_scores(
+        self,
+        canonical_units: list[str],
+        predicted_scores: list[PredictedPhonemeScore],
+        emissions,
+    ) -> list[SyllableCandidateScore]:
+        import math
+        import torch
+
+        probabilities = torch.softmax(emissions.float(), dim=-1)
+        syllables = self._canonical_syllable_groups(canonical_units)
+        predicted_units = [score.phoneme for score in predicted_scores]
+        pairs = self._align_units(canonical_units, predicted_units)
+        aligned_actual_by_expected = {
+            expected_index: actual_index
+            for edit_type, _expected, _actual, expected_index, actual_index in pairs
+            if edit_type in {"match", "substitution"} and expected_index is not None and actual_index is not None
+        }
+        result: list[SyllableCandidateScore] = []
+        for syllable_index, syllable, start, end, target_sequence in syllables:
+            if len(target_sequence) < 2:
+                continue
+            deleted = [
+                index
+                for edit_type, _expected, _actual, index, actual_index in pairs
+                if edit_type == "deletion" and index is not None and start <= index < end and actual_index is None
+            ]
+            if not deleted:
+                continue
+            actual_indices = [
+                actual_index
+                for expected_index, actual_index in aligned_actual_by_expected.items()
+                if start <= expected_index < end
+            ]
+            if actual_indices:
+                frame_start = min(predicted_scores[index].frame_start for index in actual_indices)
+                frame_end = max(predicted_scores[index].frame_end for index in actual_indices)
+            else:
+                frame_start, frame_end = self._fallback_frame_window(start, end, len(canonical_units), emissions.size(0))
+            frame_end = max(frame_start + 1, frame_end)
+            frame_probs = probabilities[frame_start:frame_end]
+            alternative_sequence = [
+                unit
+                for offset, unit in enumerate(target_sequence)
+                if start + offset not in set(deleted)
+            ]
+            target_logprob = self._ctc_sequence_logprob(frame_probs, target_sequence)
+            alternative_logprob = self._ctc_sequence_logprob(frame_probs, alternative_sequence)
+            margin = alternative_logprob - target_logprob
+            confidence = 1.0 / (1.0 + math.exp(-max(-30.0, min(30.0, margin))))
+            result.append(
+                SyllableCandidateScore(
+                    syllable=syllable,
+                    syllable_index=syllable_index,
+                    start_phoneme_index=start,
+                    end_phoneme_index=end,
+                    target_sequence=target_sequence,
+                    alternative_sequence=alternative_sequence,
+                    target_ctc_logprob=round(target_logprob, 4),
+                    alternative_ctc_logprob=round(alternative_logprob, 4),
+                    logprob_margin=round(margin, 4),
+                    confidence=round(confidence, 4),
+                    note=(
+                        "Positive margin means the deletion alternative is more likely than the full target "
+                        "within the MDD posterior window aligned to this syllable."
+                    ),
+                )
+            )
+        return result
+
     def _competing_posterior(self, frame_probs, target_id: int) -> float:
         import torch
 
@@ -264,6 +350,82 @@ class FairseqInferenceRunner:
         if 0 <= blank < masked.size(1):
             masked[:, blank] = 0.0
         return float(torch.max(masked, dim=-1).values.mean().item())
+
+    def _ctc_sequence_logprob(self, frame_probs, sequence: list[str]) -> float:
+        import math
+        import torch
+
+        if not sequence:
+            blank = int(self._generator.blank)
+            return float(torch.log(frame_probs[:, blank].clamp_min(1e-8)).sum().item())
+        labels = [self._tgt_dict.index(unit) for unit in sequence]
+        blank = int(self._generator.blank)
+        extended: list[int] = [blank]
+        for label in labels:
+            extended.extend([label, blank])
+        states = len(extended)
+        neg_inf = -1e9
+        log_probs = torch.log(frame_probs[:, extended].clamp_min(1e-8))
+        alpha = torch.full((states,), neg_inf, dtype=log_probs.dtype)
+        alpha[0] = log_probs[0, 0]
+        if states > 1:
+            alpha[1] = log_probs[0, 1]
+        for frame in range(1, log_probs.size(0)):
+            new_alpha = torch.full((states,), neg_inf, dtype=log_probs.dtype)
+            for state in range(states):
+                candidates = [alpha[state]]
+                if state - 1 >= 0:
+                    candidates.append(alpha[state - 1])
+                if state - 2 >= 0 and extended[state] != blank and extended[state] != extended[state - 2]:
+                    candidates.append(alpha[state - 2])
+                new_alpha[state] = torch.logsumexp(torch.stack(candidates), dim=0) + log_probs[frame, state]
+            alpha = new_alpha
+        if states == 1:
+            return float(alpha[0].item())
+        return float(torch.logsumexp(torch.stack([alpha[-1], alpha[-2]]), dim=0).item())
+
+    @classmethod
+    def _canonical_syllable_groups(cls, canonical_units: list[str]) -> list[tuple[int, str, int, int, list[str]]]:
+        groups: list[tuple[int, str, int, int, list[str]]] = []
+        index = 0
+        syllable_index = 0
+        while index < len(canonical_units):
+            start = index
+            if (
+                canonical_units[index] not in CHOSEONG
+                or index + 1 >= len(canonical_units)
+                or canonical_units[index + 1] not in JUNGSEONG
+            ):
+                groups.append((syllable_index, canonical_units[index], start, index + 1, [canonical_units[index]]))
+                index += 1
+                syllable_index += 1
+                continue
+            choseong = canonical_units[index]
+            jungseong = canonical_units[index + 1]
+            index += 2
+            jongseong = ""
+            if index < len(canonical_units) and canonical_units[index] in JONGSEONG[1:]:
+                next_is_vowel = index + 1 < len(canonical_units) and canonical_units[index + 1] in JUNGSEONG
+                if not next_is_vowel:
+                    jongseong = canonical_units[index]
+                    index += 1
+            sequence = canonical_units[start:index]
+            groups.append((syllable_index, cls._compose_syllable(choseong, jungseong, jongseong), start, index, sequence))
+            syllable_index += 1
+        return groups
+
+    @staticmethod
+    def _compose_syllable(choseong: str, jungseong: str, jongseong: str) -> str:
+        jong_index = JONGSEONG.index(jongseong) if jongseong else 0
+        return chr(0xAC00 + (CHOSEONG.index(choseong) * 588) + (JUNGSEONG.index(jungseong) * 28) + jong_index)
+
+    @staticmethod
+    def _fallback_frame_window(start: int, end: int, total_units: int, total_frames: int) -> tuple[int, int]:
+        if total_units <= 0:
+            return 0, max(1, total_frames)
+        frame_start = int(round(total_frames * start / total_units))
+        frame_end = int(round(total_frames * end / total_units))
+        return max(0, frame_start), min(total_frames, max(frame_start + 1, frame_end))
 
     @staticmethod
     def _align_units(

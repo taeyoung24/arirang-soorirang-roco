@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from app.acoustic_schemas import AudioQualitySummary, DiagnosticCandidate, PhonemeEdit, ProsodySummary, SegmentFeatureBundle
+from app.schemas import SyllableCandidateScore
 
 
 class DiagnosticEngine:
@@ -25,21 +26,27 @@ class DiagnosticEngine:
         canonical: str,
         predicted: str,
         phoneme_edits: list[PhonemeEdit],
+        syllable_candidate_scores: list[SyllableCandidateScore],
         segment_features: list[SegmentFeatureBundle],
         prosody: ProsodySummary,
         quality: AudioQualitySummary,
     ) -> list[DiagnosticCandidate]:
         diagnostics = []
-        diagnostics.extend(self._phoneme_mismatch_diagnostics(phoneme_edits))
+        diagnostics.extend(self._phoneme_mismatch_diagnostics(phoneme_edits, syllable_candidate_scores))
         diagnostics.extend(self._vowel_reference_signals(segment_features))
         diagnostics.extend(self._quality_diagnostics(quality))
         return sorted(diagnostics, key=lambda item: (self._severity_rank(item.severity), item.confidence), reverse=True)
 
-    def _phoneme_mismatch_diagnostics(self, phoneme_edits: list[PhonemeEdit]) -> list[DiagnosticCandidate]:
+    def _phoneme_mismatch_diagnostics(
+        self,
+        phoneme_edits: list[PhonemeEdit],
+        syllable_candidate_scores: list[SyllableCandidateScore],
+    ) -> list[DiagnosticCandidate]:
         diagnostics: list[DiagnosticCandidate] = []
         for edit in phoneme_edits:
             expected = edit.expected or ""
             observed = edit.actual or ""
+            syllable_score = self._syllable_score_for_edit(edit, syllable_candidate_scores)
             if expected in self.ASPIRATED_TO_LENIS and observed == self.ASPIRATED_TO_LENIS[expected]:
                 diagnostics.append(
                     DiagnosticCandidate(
@@ -59,9 +66,16 @@ class DiagnosticEngine:
                         category="segmental",
                         target_unit=expected,
                         severity="medium",
-                        confidence=0.72,
-                        evidence_keys=["phoneme_edit_alignment", "predicted_phoneme_mismatch"],
-                        rationale=self._rationale(edit, f"Expected {expected}, but MDD alignment found it missing rather than shifted."),
+                        confidence=self._deletion_confidence(syllable_score),
+                        evidence_keys=[
+                            "phoneme_edit_alignment",
+                            "predicted_phoneme_mismatch",
+                            "syllable_ctc_likelihood_comparison",
+                        ],
+                        rationale=self._rationale(
+                            edit,
+                            self._deletion_rationale(expected, syllable_score),
+                        ),
                     )
                 )
             elif edit.edit_type == "insertion":
@@ -174,6 +188,35 @@ class DiagnosticEngine:
     @staticmethod
     def _severity_rank(severity: str) -> int:
         return {"low": 1, "medium": 2, "high": 3}.get(severity, 0)
+
+    @staticmethod
+    def _syllable_score_for_edit(
+        edit: PhonemeEdit,
+        syllable_candidate_scores: list[SyllableCandidateScore],
+    ) -> SyllableCandidateScore | None:
+        if edit.expected_index is None:
+            return None
+        for score in syllable_candidate_scores:
+            if score.start_phoneme_index <= edit.expected_index < score.end_phoneme_index:
+                return score
+        return None
+
+    @staticmethod
+    def _deletion_confidence(score: SyllableCandidateScore | None) -> float:
+        if score is None or score.confidence is None:
+            return 0.72
+        return round(max(0.5, min(0.95, score.confidence)), 4)
+
+    @staticmethod
+    def _deletion_rationale(expected: str, score: SyllableCandidateScore | None) -> str:
+        base = f"Expected {expected}, but MDD edit alignment found it missing rather than shifted."
+        if score is None or score.logprob_margin is None:
+            return base
+        return (
+            f"{base} Syllable-level CTC comparison favored the deletion alternative "
+            f"{score.alternative_sequence} over target {score.target_sequence} "
+            f"with margin={score.logprob_margin}."
+        )
 
     @staticmethod
     def _rationale(edit: PhonemeEdit, base: str) -> str:

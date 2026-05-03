@@ -4,7 +4,7 @@ from typing import Literal, Optional
 
 from pydantic import BaseModel, Field
 
-from app.schemas import ModelScoreSummary, PredictedPhonemeScore, TargetPhonemeScore
+from app.schemas import ModelScoreSummary, PredictedPhonemeScore, SyllableCandidateScore, TargetPhonemeScore
 
 
 class TimeInterval(BaseModel):
@@ -95,6 +95,7 @@ class AcousticEvidencePacket(BaseModel):
     model_score: Optional[ModelScoreSummary] = None
     predicted_phoneme_scores: list[PredictedPhonemeScore] = Field(default_factory=list)
     target_phoneme_scores: list[TargetPhonemeScore] = Field(default_factory=list)
+    syllable_candidate_scores: list[SyllableCandidateScore] = Field(default_factory=list)
     audio_quality: AudioQualitySummary
     phoneme_edits: list[PhonemeEdit] = Field(default_factory=list)
     alignments: list[AlignmentUnit] = Field(default_factory=list)
@@ -128,6 +129,7 @@ class PronunciationAnalysisResponse(BaseModel):
     model_score: Optional[ModelScoreSummary] = None
     predicted_phoneme_scores: list[PredictedPhonemeScore] = Field(default_factory=list)
     target_phoneme_scores: list[TargetPhonemeScore] = Field(default_factory=list)
+    syllable_candidate_scores: list[SyllableCandidateScore] = Field(default_factory=list)
     audio_quality: AudioQualitySummary
     phoneme_edits: list[PhonemeEdit] = Field(default_factory=list)
     alignments: list[AlignmentUnit] = Field(default_factory=list)

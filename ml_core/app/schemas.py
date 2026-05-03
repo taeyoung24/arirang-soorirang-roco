@@ -63,6 +63,20 @@ class TargetPhonemeScore(BaseModel):
     note: Optional[str] = None
 
 
+class SyllableCandidateScore(BaseModel):
+    syllable: str
+    syllable_index: int = Field(ge=0)
+    start_phoneme_index: int = Field(ge=0)
+    end_phoneme_index: int = Field(ge=0)
+    target_sequence: list[str] = Field(default_factory=list)
+    alternative_sequence: list[str] = Field(default_factory=list)
+    target_ctc_logprob: Optional[float] = None
+    alternative_ctc_logprob: Optional[float] = None
+    logprob_margin: Optional[float] = None
+    confidence: Optional[float] = Field(default=None, ge=0.0, le=1.0)
+    note: Optional[str] = None
+
+
 class PredictResponse(BaseModel):
     script: str
     canonical_phonemes: str
@@ -74,4 +88,5 @@ class PredictResponse(BaseModel):
     model_score: Optional[ModelScoreSummary] = None
     predicted_phoneme_scores: list[PredictedPhonemeScore] = Field(default_factory=list)
     target_phoneme_scores: list[TargetPhonemeScore] = Field(default_factory=list)
+    syllable_candidate_scores: list[SyllableCandidateScore] = Field(default_factory=list)
     raw_hypothesis_line: str

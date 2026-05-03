@@ -286,6 +286,7 @@ class MDDPipeline:
                 model_score=self._build_model_score(inference_result, predicted),
                 predicted_phoneme_scores=inference_result.predicted_phoneme_scores or [],
                 target_phoneme_scores=inference_result.target_phoneme_scores or [],
+                syllable_candidate_scores=inference_result.syllable_candidate_scores or [],
                 raw_hypothesis_line=inference_result.raw_line,
             )
         finally:

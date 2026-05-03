@@ -12,10 +12,7 @@ from app.acoustic_schemas import (
 class LLMEvidenceBuilder:
     RELEVANT_FEATURES = {
         "duration_ms",
-        "f1_hz",
-        "f2_hz",
         "pitch_hz",
-        "intensity_db",
         "spectral_centroid_hz",
         "zero_cross_rate",
         "high_frequency_ratio",
@@ -63,9 +60,9 @@ class LLMEvidenceBuilder:
     ) -> list[DiagnosticCandidate]:
         severity_rank = {"low": 1, "medium": 2, "high": 3}
         evidence_rank = {
+            "phoneme_edit_alignment": 2,
             "predicted_phoneme_mismatch": 2,
-            "f1_hz": 1,
-            "f2_hz": 1,
+            "syllable_ctc_likelihood_comparison": 1,
         }
         ranked = sorted(
             diagnostics,

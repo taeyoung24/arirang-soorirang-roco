@@ -10,16 +10,6 @@ class DiagnosticEngine:
         "ㅙ", "ㅚ", "ㅛ", "ㅜ", "ㅝ", "ㅞ", "ㅟ", "ㅠ", "ㅡ", "ㅢ", "ㅣ",
     }
     ASPIRATED_TO_LENIS = {"ㅋ": "ㄱ", "ㅌ": "ㄷ", "ㅍ": "ㅂ", "ㅊ": "ㅈ"}
-    VOWEL_BASELINES = {
-        "ㅏ": {"f1": 750.0, "f2": 1400.0},
-        "ㅓ": {"f1": 620.0, "f2": 1150.0},
-        "ㅗ": {"f1": 430.0, "f2": 900.0},
-        "ㅜ": {"f1": 360.0, "f2": 980.0},
-        "ㅡ": {"f1": 380.0, "f2": 1350.0},
-        "ㅣ": {"f1": 300.0, "f2": 2300.0},
-        "ㅔ": {"f1": 470.0, "f2": 1900.0},
-        "ㅐ": {"f1": 520.0, "f2": 1750.0},
-    }
 
     def build(
         self,
@@ -33,7 +23,6 @@ class DiagnosticEngine:
     ) -> list[DiagnosticCandidate]:
         diagnostics = []
         diagnostics.extend(self._phoneme_mismatch_diagnostics(phoneme_edits, syllable_candidate_scores))
-        diagnostics.extend(self._vowel_reference_signals(segment_features))
         diagnostics.extend(self._quality_diagnostics(quality))
         return sorted(diagnostics, key=lambda item: (self._severity_rank(item.severity), item.confidence), reverse=True)
 
@@ -98,7 +87,7 @@ class DiagnosticEngine:
                         target_unit=expected,
                         severity="medium",
                         confidence=0.7,
-                        evidence_keys=["predicted_phoneme_mismatch", "vowel_formant_features"],
+                        evidence_keys=["phoneme_edit_alignment", "predicted_phoneme_mismatch"],
                         rationale=self._rationale(edit, f"Expected vowel {expected}, but MDD decoded the vowel as {observed}."),
                     )
                 )
@@ -112,52 +101,6 @@ class DiagnosticEngine:
                         confidence=0.65,
                         evidence_keys=["phoneme_edit_alignment", "predicted_phoneme_mismatch"],
                         rationale=self._rationale(edit, f"Expected {expected}, but MDD decoded {observed}."),
-                    )
-                )
-        return diagnostics
-
-    def _vowel_reference_signals(self, segment_features: list[SegmentFeatureBundle]) -> list[DiagnosticCandidate]:
-        diagnostics: list[DiagnosticCandidate] = []
-        for bundle in segment_features:
-            if bundle.label not in self.VOWELS:
-                continue
-            f1 = self._feature_value(bundle, "f1_hz")
-            f2 = self._feature_value(bundle, "f2_hz")
-            baseline = self.VOWEL_BASELINES.get(bundle.label)
-            if baseline is None or f1 is None or f2 is None:
-                continue
-            f1_delta = f1 - baseline["f1"]
-            f2_delta = f2 - baseline["f2"]
-            if abs(f2_delta) > 700:
-                direction = "fronted" if f2_delta > 0 else "backed"
-                diagnostics.append(
-                    DiagnosticCandidate(
-                        diagnosis_code="vowel_front_back_reference_signal",
-                        category="segmental",
-                        target_unit=bundle.label,
-                        severity="low",
-                        confidence=0.45,
-                        evidence_keys=["f2_hz", "vowel_formant_baseline"],
-                        rationale=(
-                            f"Praat F2 for {bundle.label} is strongly {direction} relative to the baseline. "
-                            "Treat this as a reference signal, not a standalone error diagnosis."
-                        ),
-                    )
-                )
-            if abs(f1_delta) > 360:
-                direction = "more open" if f1_delta > 0 else "more closed"
-                diagnostics.append(
-                    DiagnosticCandidate(
-                        diagnosis_code="vowel_height_reference_signal",
-                        category="segmental",
-                        target_unit=bundle.label,
-                        severity="low",
-                        confidence=0.42,
-                        evidence_keys=["f1_hz", "vowel_formant_baseline"],
-                        rationale=(
-                            f"Praat F1 for {bundle.label} suggests a strongly {direction} vowel quality. "
-                            "Treat this as a reference signal, not a standalone error diagnosis."
-                        ),
                     )
                 )
         return diagnostics
@@ -177,13 +120,6 @@ class DiagnosticEngine:
                 rationale="Audio quality limits the confidence of phonetic interpretation.",
             )
         ]
-
-    @staticmethod
-    def _feature_value(bundle: SegmentFeatureBundle, name: str) -> float | None:
-        for feature in bundle.features:
-            if feature.name == name:
-                return feature.value
-        return None
 
     @staticmethod
     def _severity_rank(severity: str) -> int:

@@ -97,11 +97,9 @@ curl -X POST http://localhost:8000/analyze-pronunciation-llm `
 - 기존 MDD 추론으로 `predicted_phonemes` 생성
 - `Qwen/Qwen3-ForcedAligner-0.6B`로 word/character timestamp 정렬
 - 정렬 결과를 바탕으로 음절/음소 구간 생성
-- 교체 가능한 acoustic feature extractor로 구간별 feature 추출
-- 기본 API 컨테이너에서는 Praat/parselmouth 기반 `f1_hz`, `f2_hz`, `pitch_hz`, `intensity_db` 추정값을 포함
+- lightweight acoustic feature extractor로 구간별 debug feature 추출
 - in-process fairseq backend에서는 hypothesis decoder score를 `model_score`로 노출
 - MDD 음소 mismatch를 중심으로 오류 후보 생성
-- Praat 측정값이 크게 벗어난 경우에만 낮은 confidence의 참고 신호 생성
 - `/analyze-pronunciation-llm`에서는 `MDD_GEMINI_API_KEY`가 있으면 상위 진단과 관련 feature만 압축해 Gemini API로 한국어 피드백 생성
 - `/analyze-pronunciation-basic`은 Gemini 키가 있어도 LLM을 호출하지 않음
 
@@ -113,9 +111,7 @@ curl -X POST http://localhost:8000/analyze-pronunciation-llm `
 
 - 강제정렬은 별도 `aligner` 컨테이너에서 수행됩니다.
 - 음소 경계는 강제정렬된 음절 구간 내부에서 분할한 값이라, word/syllable보다 신뢰도가 낮습니다.
-- 모음 formant는 구간 전체가 아니라 중앙부 위주로 측정해 전이음 영향을 줄입니다.
-- Praat F1/F2, pitch, intensity는 오류 판정보다 보조 측정값으로 취급합니다.
-- `praat-parselmouth`가 설치되지 않은 환경에서는 내부 LPC 기반 extractor로 fallback합니다.
+- acoustic feature는 debug/evidence 용도이며, 발음 오류 판정은 MDD phoneme edit alignment를 우선합니다.
 - `model_score`는 calibrated GOP가 아니라 decoder hypothesis score이므로, 음소별 confidence로 쓰려면 추가 calibration/후처리가 필요합니다.
 
 ## CLI

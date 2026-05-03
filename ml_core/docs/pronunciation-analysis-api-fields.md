@@ -190,8 +190,6 @@ Common codes:
 | `segmental_substitution` | Expected phoneme was decoded as another phoneme. |
 | `aspiration_insufficient` | Aspirated consonant was decoded closer to a lenis consonant. |
 | `vowel_quality_shift` | Vowel was decoded as another vowel. |
-| `vowel_front_back_reference_signal` | Praat F2 strongly deviated from a rough baseline. Reference only, not a standalone error. |
-| `vowel_height_reference_signal` | Praat F1 strongly deviated from a rough baseline. Reference only, not a standalone error. |
 | `audio_quality_limited` | Audio quality limits interpretation. |
 
 ## `segment_features`
@@ -202,17 +200,14 @@ Each bundle contains acoustic measurements for a phoneme segment:
 
 - `duration_ms`
 - `rms_energy`
-- `f1_hz`
-- `f2_hz`
 - `pitch_hz`
-- `intensity_db`
 - `spectral_centroid_hz`
 - `zero_cross_rate`
 - `high_frequency_ratio`
 - `burst_peak`
 - `frication_ms`
 
-Praat-based formant, pitch, and intensity features are supporting measurements. They should not be treated as standalone pronunciation errors.
+These features are lightweight debug measurements. They should not be treated as standalone pronunciation errors.
 
 ## `llm_feedback`
 
@@ -234,7 +229,6 @@ For learner-facing UI:
 - Use `debug=false`.
 - Display `llm_feedback` if available.
 - Display top `diagnostic_candidates` only when LLM feedback is unavailable.
-- Treat `*_reference_signal` diagnostics as optional low-priority hints.
 
 For debugging or research:
 

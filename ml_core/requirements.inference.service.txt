@@ -10,7 +10,6 @@ numpy==2.3.4; python_version >= "3.10"
 numpy==1.22.3; python_version < "3.10"
 pydantic==2.13.3
 pydantic_core==2.46.3
-praat-parselmouth==0.4.6
 python-Levenshtein==0.12.2; python_version >= "3.10"
 python-mecab-ko==1.3.7
 python-mecab-ko-dic==2.1.1.post2

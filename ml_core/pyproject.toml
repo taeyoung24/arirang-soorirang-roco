@@ -9,7 +9,6 @@ dependencies = [
     "g2pk2",
     "httpx",
     "numpy",
-    "praat-parselmouth",
     "python-Levenshtein",
     "python-multipart",
     "pydantic>=2",

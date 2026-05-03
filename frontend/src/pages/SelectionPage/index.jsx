@@ -5,20 +5,21 @@ import { SearchTopContainer } from 'src/components/TopContainer'
 
 const FilterChip = ({ label, active }) => (
   <div className={`px-2.5 py-1 ${active ? 'bg-yellow-primary' : 'bg-bg'} rounded-[32px] outline outline-[2.40px] outline-offset-[-1.20px] outline-text inline-flex justify-center items-center gap-4 overflow-hidden cursor-pointer active:scale-95 transition-all`}>
-    <div className="justify-start text-text text-base font-semibold font-sans">{label}</div>
+    <div className="justify-start text-text text-base font-semibold font-['Pretendard'] leading-none">{label}</div>
   </div>
 )
 
 const ResultItem = ({ label, hasBorderTop }) => (
   <div className={`self-stretch h-11 ${hasBorderTop ? 'border-t-[2.40px] border-text' : ''} flex justify-center items-center gap-2.5 cursor-pointer hover:bg-black/5 active:bg-black/10 transition-colors`}>
-    <div className="text-center justify-start text-text text-base font-semibold font-sans">{label}</div>
+    <div className="text-center justify-start text-text text-base font-semibold font-['Pretendard'] select-text">{label}</div>
   </div>
 )
+
 
 const ResultSection = ({ title, count, items }) => (
   <div className="self-stretch rounded-[20px] flex flex-col justify-start items-start gap-2.5">
     <div className="self-stretch px-0.5 inline-flex justify-between items-center">
-      <div className="text-center justify-start text-text text-base font-semibold font-sans">{title} ({count})</div>
+      <div className="text-center justify-start text-text text-base font-semibold font-['Pretendard']">{title} ({count})</div>
       <div className="relative">
         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
           <path d="M16 10L12 14L8 10" stroke="var(--color-text, #2C2C2C)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
@@ -35,6 +36,12 @@ const ResultSection = ({ title, count, items }) => (
 
 export default function SelectionPage() {
   const navigate = useNavigate()
+
+  // 임시 데이터 (실제 연동 시 상태로 관리)
+  const results = [
+    { title: "고등학교", count: 2, items: ["쓰다", "눈"] },
+    { title: "병원", count: 5, items: ["쓰다", "맞다", "내리다", "나다", "보다"] }
+  ]
 
   return (
     <Layout className="bg-bg h-[770px] !overflow-visible">
@@ -55,12 +62,21 @@ export default function SelectionPage() {
         </div>
 
         {/* Results Area */}
-        <div className="ResultsArea self-stretch inline-flex flex-col justify-start items-center gap-4 overflow-y-auto scrollbar-none py-2 px-[1.2px]">
-          <ResultSection title="고등학교" count={2} items={["쓰다", "눈"]} />
-          <ResultSection title="병원" count={5} items={["쓰다", "맞다", "내리다", "나다", "보다"]} />
+        <div className="ResultsArea self-stretch flex-1 px-4 py-4 flex flex-col justify-center items-center gap-1 overflow-y-auto scrollbar-none">
+          {results.length > 0 ? (
+            results.map((section, idx) => (
+              <ResultSection key={idx} title={section.title} count={section.count} items={section.items} />
+            ))
+          ) : (
+            <div className="self-stretch text-center justify-start text-text-dimmed text-lg font-semibold font-['Pretendard']">
+              정보 없음
+            </div>
+          )}
         </div>
+
 
       </div>
     </Layout>
   )
 }
+

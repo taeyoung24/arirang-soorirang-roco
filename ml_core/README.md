@@ -78,6 +78,7 @@ curl -X POST http://localhost:8000/predict `
 curl -X POST http://localhost:8000/analyze-pronunciation-basic `
   -F "script=옷을 입어요" `
   -F "feedback_language=ko" `
+  -F "debug=false" `
   -F "audio=@.\sample.wav"
 ```
 
@@ -87,6 +88,7 @@ LLM 피드백 포함 분석 요청:
 curl -X POST http://localhost:8000/analyze-pronunciation-llm `
   -F "script=옷을 입어요" `
   -F "feedback_language=ko" `
+  -F "debug=false" `
   -F "audio=@.\sample.wav"
 ```
 
@@ -105,6 +107,7 @@ curl -X POST http://localhost:8000/analyze-pronunciation-llm `
 
 `language`는 forced aligner에 넘기는 발화 언어이며 기본값은 `Korean`입니다.
 `feedback_language`는 LLM 피드백 언어이며 기본값은 `ko`입니다. 예: `ko`, `en`, `ja`, `zh-CN`, `Spanish`.
+`debug`는 상세 응답 여부이며 기본값은 `false`입니다. `debug=true`이면 전체 alignment, segment feature, phoneme score를 포함합니다.
 
 주의:
 

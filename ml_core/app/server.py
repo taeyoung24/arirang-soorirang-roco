@@ -77,12 +77,14 @@ async def analyze_pronunciation_basic(
     script: str = Form(...),
     language: str | None = Form(None),
     feedback_language: str = Form("ko"),
+    debug: bool = Form(False),
     audio: UploadFile = File(...),
 ) -> PronunciationAnalysisResponse:
     return await _analyze_pronunciation(
         script=script,
         language=language,
         feedback_language=feedback_language,
+        debug=debug,
         audio=audio,
         include_llm_feedback=False,
     )
@@ -97,12 +99,14 @@ async def analyze_pronunciation_llm(
     script: str = Form(...),
     language: str | None = Form(None),
     feedback_language: str = Form("ko"),
+    debug: bool = Form(False),
     audio: UploadFile = File(...),
 ) -> PronunciationAnalysisResponse:
     return await _analyze_pronunciation(
         script=script,
         language=language,
         feedback_language=feedback_language,
+        debug=debug,
         audio=audio,
         include_llm_feedback=True,
     )
@@ -112,6 +116,7 @@ async def _analyze_pronunciation(
     script: str,
     language: str | None,
     feedback_language: str,
+    debug: bool,
     audio: UploadFile,
     include_llm_feedback: bool,
 ) -> PronunciationAnalysisResponse:
@@ -128,13 +133,16 @@ async def _analyze_pronunciation(
             )
         except httpx.HTTPError:
             forced_alignment = None
-        return analysis_service.analyze(
+        response = analysis_service.analyze(
             payload,
             prediction,
             forced_alignment=forced_alignment,
             include_llm_feedback=include_llm_feedback,
             feedback_language=feedback_language,
         )
+        if not debug:
+            _compact_analysis_response(response)
+        return response
     except ValueError as exc:
         raise HTTPException(status_code=400, detail=str(exc)) from exc
     except httpx.HTTPStatusError as exc:
@@ -143,3 +151,34 @@ async def _analyze_pronunciation(
         raise HTTPException(status_code=502, detail=f"inference service unavailable: {exc}") from exc
     except RuntimeError as exc:
         raise HTTPException(status_code=500, detail=str(exc)) from exc
+
+
+def _compact_analysis_response(response: PronunciationAnalysisResponse) -> None:
+    target_units = {item.target_unit for item in response.diagnostic_candidates[:3] if item.target_unit}
+    response.diagnostic_candidates = response.diagnostic_candidates[:3]
+    response.alignments = _compact_alignments(response.alignments, target_units)
+    response.segment_features = []
+    response.predicted_phoneme_scores = [
+        score for score in response.predicted_phoneme_scores if score.phoneme in target_units
+    ][:3]
+    response.target_phoneme_scores = [
+        score for score in response.target_phoneme_scores if score.phoneme in target_units
+    ][:3]
+    response.syllable_candidate_scores = [
+        score
+        for score in response.syllable_candidate_scores
+        if any(unit in target_units for unit in score.target_sequence)
+    ][:3]
+    response.prosody = None
+    response.model_score = None
+
+
+def _compact_alignments(alignments, target_units: set[str]):
+    if not target_units:
+        return [unit for unit in alignments if unit.unit_type == "word"][:6]
+    result = [
+        unit
+        for unit in alignments
+        if unit.unit_type in {"phoneme", "syllable"} and (unit.label in target_units or unit.expected_label in target_units)
+    ]
+    return result[:8]

@@ -32,6 +32,16 @@ class LLMEvidenceBuilder:
             canonical_phonemes="",
             predicted_phonemes=None,
             model_score=None,
+            predicted_phoneme_scores=[
+                score
+                for score in evidence.predicted_phoneme_scores
+                if score.phoneme in target_units
+            ][:max_diagnostics],
+            target_phoneme_scores=[
+                score
+                for score in evidence.target_phoneme_scores
+                if score.phoneme in target_units
+            ][:max_diagnostics],
             audio_quality=evidence.audio_quality,
             phoneme_edits=phoneme_edits,
             alignments=self._relevant_alignments(evidence.alignments, target_units),

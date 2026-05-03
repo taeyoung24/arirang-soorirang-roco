@@ -41,6 +41,28 @@ class ModelScoreSummary(BaseModel):
     note: Optional[str] = None
 
 
+class PredictedPhonemeScore(BaseModel):
+    phoneme: str
+    predicted_index: int = Field(ge=0)
+    confidence: float = Field(ge=0.0, le=1.0)
+    frame_start: int = Field(ge=0)
+    frame_end: int = Field(ge=0)
+    frame_count: int = Field(ge=0)
+
+
+class TargetPhonemeScore(BaseModel):
+    phoneme: str
+    canonical_index: int = Field(ge=0)
+    edit_type: Literal["match", "substitution", "deletion", "insertion"]
+    predicted_phoneme: Optional[str] = None
+    predicted_index: Optional[int] = Field(default=None, ge=0)
+    target_posterior: Optional[float] = Field(default=None, ge=0.0, le=1.0)
+    competing_posterior: Optional[float] = Field(default=None, ge=0.0, le=1.0)
+    gop_like_score: Optional[float] = None
+    confidence: Optional[float] = Field(default=None, ge=0.0, le=1.0)
+    note: Optional[str] = None
+
+
 class PredictResponse(BaseModel):
     script: str
     canonical_phonemes: str
@@ -50,4 +72,6 @@ class PredictResponse(BaseModel):
     issues: list[PronunciationIssue]
     summary: Summary
     model_score: Optional[ModelScoreSummary] = None
+    predicted_phoneme_scores: list[PredictedPhonemeScore] = Field(default_factory=list)
+    target_phoneme_scores: list[TargetPhonemeScore] = Field(default_factory=list)
     raw_hypothesis_line: str

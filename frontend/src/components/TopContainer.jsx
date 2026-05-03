@@ -46,7 +46,7 @@ export const SearchTopContainer = ({ onBack, onSearch }) => {
       {/* Back Button */}
       <button 
         onClick={onBack}
-        className="w-12 h-12 relative bg-bg rounded-[32px] outline outline-[2.40px] outline-offset-[-1.20px] outline-text overflow-hidden transition-all active:scale-95 cursor-pointer"
+        className="w-12 h-12 shrink-0 relative bg-bg rounded-[32px] outline outline-[2.40px] outline-offset-[-1.20px] outline-text overflow-hidden transition-all active:scale-95 cursor-pointer"
       >
         <div className="left-[14px] top-[14px] absolute">
           <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -56,14 +56,14 @@ export const SearchTopContainer = ({ onBack, onSearch }) => {
       </button>
 
       {/* Search Input Area */}
-      <div className="flex-1 h-12 px-5 bg-white-primary rounded-[32px] outline outline-[2.40px] outline-offset-[-1.20px] outline-text flex justify-center items-center gap-4 overflow-hidden">
+      <div className="flex-1 self-stretch px-5 bg-white-primary rounded-[32px] outline outline-[2.40px] outline-offset-[-1.20px] outline-text flex justify-center items-center gap-4 overflow-hidden">
         <input 
           type="text"
           placeholder="대화 검색"
           onChange={onSearch}
-          className="flex-1 bg-transparent border-none outline-none text-text-light text-lg font-extrabold font-sans placeholder:text-text-light"
+          className="flex-1 min-w-0 bg-transparent border-none outline-none text-text text-lg font-extrabold font-sans placeholder:text-text-light"
         />
-        <div className="relative">
+        <div className="relative shrink-0 flex items-center justify-center">
           <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
             <path d="M15 15L21 21M10 17C6.13401 17 3 13.866 3 10C3 6.13401 6.13401 3 10 3C13.866 3 17 6.13401 17 10C17 13.866 13.866 17 10 17Z" stroke="var(--text, #2C2C2C)" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" />
           </svg>

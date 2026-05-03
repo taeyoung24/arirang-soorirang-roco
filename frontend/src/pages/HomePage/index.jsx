@@ -1,3 +1,4 @@
+import { useNavigate } from 'react-router-dom'
 import mascot from 'src/assets/landing-mascot.svg'
 import normalMascot from 'src/assets/mascot/word-image-snow.png'
 import winterMascot from 'src/assets/mascot/word-image-write.png'
@@ -41,6 +42,8 @@ function ContentSection({ label, bg, cards }) {
 
 
 function HomePage() {
+  const navigate = useNavigate()
+
   return (
     <Layout className="h-[770px]">
       <div className="w-80 h-[718px] mx-auto flex flex-col justify-start items-center gap-4">
@@ -71,7 +74,10 @@ function HomePage() {
         </div>
 
         {/* Search */}
-        <div className="self-stretch h-12 px-5 bg-white-primary rounded-[32px] outline outline-[2.40px] outline-offset-[-1.20px] outline-text inline-flex justify-center items-center gap-4 overflow-hidden">
+        <div 
+          onClick={() => navigate('/selection')}
+          className="self-stretch h-12 px-5 bg-white-primary rounded-[32px] outline outline-[2.40px] outline-offset-[-1.20px] outline-text inline-flex justify-center items-center gap-4 overflow-hidden cursor-pointer active:scale-95 transition-all"
+        >
           <p className="flex-1 justify-start text-text-light text-lg font-extrabold font-sans">대화 검색</p>
           <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
             <path d="M15 15L21 21M10 17C6.13401 17 3 13.866 3 10C3 6.13401 6.13401 3 10 3C13.866 3 17 6.13401 17 10C17 13.866 13.866 17 10 17Z" stroke="var(--text, #2C2C2C)" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" />

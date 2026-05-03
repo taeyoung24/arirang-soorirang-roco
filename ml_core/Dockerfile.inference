@@ -39,12 +39,16 @@ RUN curl -fsSL https://repo.anaconda.com/miniconda/Miniconda3-py39_23.3.1-0-Linu
     && conda clean -afy
 
 COPY requirements.inference.runtime.txt ./
-COPY requirements.inference.service.txt ./
 COPY vendor/flashlight/flashlight-1.0.0-py3.9-linux-x86_64.egg /opt/vendor/flashlight-1.0.0-py3.9-linux-x86_64.egg
 
-RUN conda run -n ${CONDA_ENV_NAME} python -m pip install --extra-index-url https://download.pytorch.org/whl/cu111 -r requirements.inference.runtime.txt
+RUN grep -Ev '^(torch|torchaudio|torchvision)==.*\\+cu111$' requirements.inference.runtime.txt > requirements.inference.runtime.base.txt
 
-RUN conda run -n ${CONDA_ENV_NAME} python -m pip install -r requirements.inference.service.txt
+RUN conda run -n ${CONDA_ENV_NAME} python -m pip install --extra-index-url https://download.pytorch.org/whl/cu111 \
+    torch==1.10.1+cu111 \
+    torchaudio==0.10.1+cu111 \
+    torchvision==0.11.2+cu111
+
+RUN conda run -n ${CONDA_ENV_NAME} python -m pip install --extra-index-url https://download.pytorch.org/whl/cu111 -r requirements.inference.runtime.base.txt
 
 RUN git clone https://github.com/facebookresearch/fairseq.git /opt/fairseq \
     && cd /opt/fairseq \
@@ -55,10 +59,14 @@ RUN git clone https://github.com/facebookresearch/fairseq.git /opt/fairseq \
 RUN cp -R /opt/vendor/flashlight-1.0.0-py3.9-linux-x86_64.egg /opt/conda/envs/main/lib/python3.9/site-packages/flashlight-1.0.0-py3.9-linux-x86_64.egg \
     && printf "/opt/conda/envs/main/lib/python3.9/site-packages/flashlight-1.0.0-py3.9-linux-x86_64.egg\n" > /opt/conda/envs/main/lib/python3.9/site-packages/flashlight-vendored.pth
 
-COPY app ./app
-COPY assets ./assets
+COPY requirements.inference.service.txt ./
+
+RUN conda run -n ${CONDA_ENV_NAME} python -m pip install -r requirements.inference.service.txt
 
 RUN conda run -n ${CONDA_ENV_NAME} python -c "import nltk; nltk.download('cmudict')"
+
+COPY app ./app
+COPY assets ./assets
 
 EXPOSE 8080
 

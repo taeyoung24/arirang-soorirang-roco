@@ -17,6 +17,13 @@ class Settings:
     port: int
     inference_base_url: str
     inference_timeout_seconds: float
+    aligner_base_url: str
+    aligner_timeout_seconds: float
+    aligner_language: str
+    aligner_model_id: str
+    gemini_api_key: str
+    gemini_model: str
+    gemini_timeout_seconds: float
 
     @classmethod
     def from_env(cls) -> "Settings":
@@ -34,4 +41,11 @@ class Settings:
             port=int(os.getenv("MDD_PORT", "8080")),
             inference_base_url=os.getenv("MDD_INFERENCE_BASE_URL", "http://localhost:8080"),
             inference_timeout_seconds=float(os.getenv("MDD_INFERENCE_TIMEOUT_SECONDS", "120")),
+            aligner_base_url=os.getenv("MDD_ALIGNER_BASE_URL", "http://localhost:8090"),
+            aligner_timeout_seconds=float(os.getenv("MDD_ALIGNER_TIMEOUT_SECONDS", "120")),
+            aligner_language=os.getenv("MDD_ALIGNER_LANGUAGE", "Korean"),
+            aligner_model_id=os.getenv("MDD_ALIGNER_MODEL_ID", "Qwen/Qwen3-ForcedAligner-0.6B"),
+            gemini_api_key=os.getenv("MDD_GEMINI_API_KEY", ""),
+            gemini_model=os.getenv("MDD_GEMINI_MODEL", "gemini-2.5-flash"),
+            gemini_timeout_seconds=float(os.getenv("MDD_GEMINI_TIMEOUT_SECONDS", "30")),
         )

@@ -55,3 +55,13 @@ body {
   position: relative;
   font-family: "Pretendard", sans-serif;
 }
+
+/* Hide scrollbar utility */
+.scrollbar-none {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+.scrollbar-none::-webkit-scrollbar {
+  display: none;
+}
+

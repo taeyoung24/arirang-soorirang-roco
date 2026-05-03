@@ -49,11 +49,9 @@ function LandingPage() {
       {/* Absolute Positioned Button */}
       <div className="absolute bottom-10 left-1/2 -translate-x-1/2">
         <PageButton
+          label="로그인 없이 시작"
           onClick={() => navigate('/home')}
-          className="w-80"
-        >
-          로그인 없이 시작
-        </PageButton>
+        />
       </div>
     </Layout>
   )

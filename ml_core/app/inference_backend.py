@@ -2,12 +2,21 @@ from __future__ import annotations
 
 import subprocess
 import sys
+from dataclasses import dataclass
 from pathlib import Path
 from typing import Protocol
 
 
+@dataclass(frozen=True)
+class InferenceResult:
+    raw_line: str
+    decoder_score: float | None = None
+    token_count: int | None = None
+    score_source: str | None = None
+
+
 class InferenceBackend(Protocol):
-    def predict(self, manifest_dir: Path, results_dir: Path) -> str:
+    def predict(self, manifest_dir: Path, results_dir: Path) -> InferenceResult:
         ...
 
 
@@ -15,7 +24,7 @@ class SubprocessInferenceBackend:
     def __init__(self, settings):
         self.settings = settings
 
-    def predict(self, manifest_dir: Path, results_dir: Path) -> str:
+    def predict(self, manifest_dir: Path, results_dir: Path) -> InferenceResult:
         command = [
             sys.executable,
             self.settings.infer_script_path,
@@ -48,12 +57,12 @@ class SubprocessInferenceBackend:
         lines = [line.strip() for line in result_file.read_text(encoding="utf-8").splitlines() if line.strip()]
         if not lines:
             raise RuntimeError("Inference output file is empty.")
-        return lines[0]
+        return InferenceResult(raw_line=lines[0])
 
 
 class InProcessFairseqBackend:
     def __init__(self, runner):
         self.runner = runner
 
-    def predict(self, manifest_dir: Path, results_dir: Path) -> str:
+    def predict(self, manifest_dir: Path, results_dir: Path) -> InferenceResult:
         return self.runner.predict_units(manifest_dir)

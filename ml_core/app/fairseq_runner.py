@@ -5,6 +5,8 @@ import sys
 import threading
 from pathlib import Path
 
+from app.inference_backend import InferenceResult
+
 
 class FairseqInferenceRunner:
     def __init__(self, model_path: str, infer_script_path: str, max_tokens: int):
@@ -85,7 +87,7 @@ class FairseqInferenceRunner:
             return W2lFairseqLMDecoder(args, target_dictionary)
         raise RuntimeError(f"Unsupported decoder: {w2l_decoder}")
 
-    def predict_units(self, manifest_dir: Path) -> str:
+    def predict_units(self, manifest_dir: Path) -> InferenceResult:
         import torch
 
         with self._lock:
@@ -126,6 +128,25 @@ class FairseqInferenceRunner:
                 hypos = self._task.inference_step(self._generator, self._models, sample, prefix_tokens)
                 if not hypos or not hypos[0]:
                     raise RuntimeError("Fairseq returned no hypotheses.")
-                return self._tgt_dict.string(hypos[0][0]["tokens"].int().cpu())
+                hypo = hypos[0][0]
+                tokens = hypo["tokens"].int().cpu()
+                decoder_score = self._score_to_float(hypo.get("score"))
+                return InferenceResult(
+                    raw_line=self._tgt_dict.string(tokens),
+                    decoder_score=decoder_score,
+                    token_count=int(tokens.numel()),
+                    score_source="fairseq_hypothesis_score" if decoder_score is not None else None,
+                )
 
         raise RuntimeError("No valid sample was produced for inference.")
+
+    @staticmethod
+    def _score_to_float(value) -> float | None:
+        if value is None:
+            return None
+        if hasattr(value, "item"):
+            return float(value.item())
+        try:
+            return float(value)
+        except (TypeError, ValueError):
+            return None

@@ -9,9 +9,15 @@ ENV MDD_PORT=8000
 
 WORKDIR /opt/mdd/service
 
-COPY app ./app
+COPY requirements.inference.service.txt ./
 
-RUN pip install fastapi httpx python-multipart pydantic "uvicorn[standard]"
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends build-essential libsndfile1 \
+    && rm -rf /var/lib/apt/lists/*
+
+RUN python -m pip install -r requirements.inference.service.txt
+
+COPY app ./app
 
 EXPOSE 8000
 

@@ -8,9 +8,11 @@ dependencies = [
     "fastapi",
     "g2pk2",
     "httpx",
+    "numpy",
     "python-Levenshtein",
     "python-multipart",
     "pydantic>=2",
+    "scipy",
     "soundfile",
     "uvicorn[standard]",
 ]

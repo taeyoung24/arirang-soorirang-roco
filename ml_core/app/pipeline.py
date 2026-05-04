@@ -12,8 +12,8 @@ import soundfile
 from g2pk2 import G2p
 
 from app.config import Settings
-from app.inference_backend import InferenceBackend, SubprocessInferenceBackend
-from app.schemas import PredictResponse, PronunciationIssue, Summary
+from app.inference_backend import InferenceBackend, InferenceResult, SubprocessInferenceBackend
+from app.schemas import ModelScoreSummary, PredictResponse, PronunciationIssue, Summary
 
 
 class MDDInferenceError(RuntimeError):
@@ -57,6 +57,26 @@ class MDDPipeline:
                 if jong:
                     result.append(jong)
             else:
+                    result.append(char)
+        return "".join(result)
+
+    @classmethod
+    def decompose_hangul_for_target(cls, text: str) -> str:
+        result: list[str] = []
+        for char in text:
+            code = ord(char)
+            if 0xAC00 <= code <= 0xD7A3:
+                syllable_index = code - 0xAC00
+                choseong_index = syllable_index // 588
+                jungseong_index = (syllable_index % 588) // 28
+                jongseong_index = syllable_index % 28
+                if cls.CHOSEONG[choseong_index] != "ㅇ":
+                    result.append(cls.CHOSEONG[choseong_index])
+                result.append(cls.JUNGSEONG[jungseong_index])
+                jong = cls.JONGSEONG[jongseong_index]
+                if jong:
+                    result.append(jong)
+            else:
                 result.append(char)
         return "".join(result)
 
@@ -91,9 +111,15 @@ class MDDPipeline:
     @classmethod
     def normalize_canonical_phonemes(cls, raw_value: str) -> str:
         normalized = re.sub(r"\s+", "", raw_value.strip())
+        normalized = "".join(char for char in normalized if cls._is_korean_or_jamo(char))
         if not normalized:
             raise ValueError("canonical_phonemes must not be empty.")
-        return cls.decompose_hangul(normalized)
+        return cls.decompose_hangul_for_target(normalized)
+
+    @staticmethod
+    def _is_korean_or_jamo(char: str) -> bool:
+        code = ord(char)
+        return 0xAC00 <= code <= 0xD7A3 or 0x3131 <= code <= 0x318E
 
     def script_to_canonical_phonemes(self, script: str) -> str:
         normalized_script = re.sub(r"\s+", " ", script.strip())
@@ -149,11 +175,30 @@ class MDDPipeline:
         shutil.copyfile(self.settings.dict_path, manifest_dir / "dict.phn.txt")
         return manifest_dir
 
-    def _run_inference(self, manifest_dir: Path, results_dir: Path) -> str:
+    def _run_inference(self, manifest_dir: Path, results_dir: Path) -> InferenceResult:
         try:
             return self.inference_backend.predict(manifest_dir, results_dir)
         except RuntimeError as exc:
             raise MDDInferenceError(str(exc)) from exc
+
+    @staticmethod
+    def _build_model_score(result: InferenceResult, predicted: str) -> ModelScoreSummary | None:
+        if result.decoder_score is None:
+            return ModelScoreSummary(
+                note="Decoder score is not available from the configured inference backend.",
+            )
+        token_count = result.token_count or len(predicted)
+        normalized = result.decoder_score / max(token_count, 1)
+        return ModelScoreSummary(
+            decoder_score=round(result.decoder_score, 4),
+            normalized_decoder_score=round(normalized, 4),
+            token_count=token_count,
+            score_source=result.score_source,
+            note=(
+                "This is a decoder hypothesis score, not calibrated phoneme-level GOP. "
+                "Use it as model evidence only after backend-specific calibration."
+            ),
+        )
 
     @staticmethod
     def _parse_prediction(raw_line: str) -> str:
@@ -212,7 +257,11 @@ class MDDPipeline:
         return issues, summary
 
     def predict(self, audio_bytes: bytes, original_filename: str, script: str) -> PredictResponse:
-        normalized = self.script_to_canonical_phonemes(script)
+        normalized_script = re.sub(r"\s+", " ", script.strip())
+        if not normalized_script:
+            raise ValueError("script must not be empty.")
+        g2p_text = self.g2p(normalized_script)
+        normalized = self.normalize_canonical_phonemes(g2p_text)
         workdir = self._build_workdir()
         source_suffix = Path(original_filename or "input.wav").suffix or ".wav"
         source_path = workdir / f"input{source_suffix}"
@@ -223,8 +272,8 @@ class MDDPipeline:
             source_path.write_bytes(audio_bytes)
             num_frames = self._convert_audio(source_path, converted_path)
             manifest_dir = self._prepare_manifest(workdir, converted_name, num_frames, normalized)
-            raw_line = self._run_inference(manifest_dir, workdir / "results")
-            predicted = self._parse_prediction(raw_line)
+            inference_result = self._run_inference(manifest_dir, workdir / "results")
+            predicted = self._parse_prediction(inference_result.raw_line)
             issues, summary = self._build_issues(normalized, predicted)
             return PredictResponse(
                 script=script,
@@ -234,7 +283,11 @@ class MDDPipeline:
                 predicted_text=self.compose_jamo(predicted),
                 issues=issues,
                 summary=summary,
-                raw_hypothesis_line=raw_line,
+                model_score=self._build_model_score(inference_result, predicted),
+                predicted_phoneme_scores=inference_result.predicted_phoneme_scores or [],
+                target_phoneme_scores=inference_result.target_phoneme_scores or [],
+                syllable_candidate_scores=inference_result.syllable_candidate_scores or [],
+                raw_hypothesis_line=inference_result.raw_line,
             )
         finally:
             shutil.rmtree(workdir, ignore_errors=True)

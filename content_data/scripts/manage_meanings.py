@@ -25,6 +25,10 @@ def main():
             
         df = prompt_if_missing(args.definition, "Enter Meaning definition")
         m_id = generate_short_id()
+        if w_val is None or df is None:
+            logger.error("Word and definition are required to create a Meaning.")
+            return
+        
         model = Meaning(id=m_id, word=w_val, definition=df)
         meanings.append(model.model_dump())
         repo.save_all()
@@ -41,7 +45,7 @@ def main():
     elif args.action == "update":
         target_id = prompt_if_missing(args.id, "Enter Meaning ID to update")
         target = next((m for m in meanings if m["id"] == target_id), None)
-        if not target:
+        if not target or target_id is None:
             logger.error(f"Meaning with id {target_id} not found.")
             return
             
@@ -50,6 +54,10 @@ def main():
             logger.error(f"Word '{w_val}' does not exist."); return
             
         df = prompt_if_missing(args.definition, f"Enter definition (current: {target['definition']})")
+        if df is None:
+            logger.error("Definition is required to update a Meaning.")
+            return
+        
         model = Meaning(id=target_id, word=w_val, definition=df)
         target.update(model.model_dump())
         repo.save_all()

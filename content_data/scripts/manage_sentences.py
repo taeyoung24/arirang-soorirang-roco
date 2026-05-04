@@ -20,13 +20,17 @@ def main():
     
     if args.action == "create":
         m_id = prompt_if_missing(args.meaning_id, "Enter Meaning ID")
-        if not any(m["id"] == m_id for m in meanings):
+        if not any(m["id"] == m_id for m in meanings) or m_id is None:
             logger.error(f"Meaning with id {m_id} does not exist.")
             return
             
         ct = prompt_if_missing(args.content, "Enter Sentence content")
         hl = prompt_if_missing(args.highlight, "Enter Highlight part")
         s_id = generate_short_id()
+        if m_id is None or ct is None or hl is None:
+            logger.error("Meaning ID, content, and highlight are required to create a Sentence.")
+            return
+        
         model = Sentence(id=s_id, meaning_id=m_id, content=ct, highlight=hl)
         sentences.append(model.model_dump())
         repo.save_all()
@@ -43,7 +47,7 @@ def main():
     elif args.action == "update":
         target_id = prompt_if_missing(args.id, "Enter Sentence ID to update")
         target = next((s for s in sentences if s["id"] == target_id), None)
-        if not target:
+        if not target or target_id is None:
             logger.error(f"Sentence with id {target_id} not found."); return
             
         m_id = args.meaning_id or target["meaning_id"]
@@ -52,6 +56,9 @@ def main():
             
         ct = prompt_if_missing(args.content, f"Enter content (current: {target['content']})")
         hl = prompt_if_missing(args.highlight, f"Enter highlight (current: {target['highlight']})")
+        if ct is None or hl is None:
+            logger.error("Content and highlight are required to update a Sentence.")
+            return
         
         model = Sentence(id=target_id, meaning_id=m_id, content=ct, highlight=hl)
         target.update(model.model_dump())

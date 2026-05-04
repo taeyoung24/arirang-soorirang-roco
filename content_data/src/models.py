@@ -18,7 +18,6 @@ class DataRepository:
             "words": DATA_DIR / "words.json",
             "meanings": DATA_DIR / "meanings.json",
             "sentences": DATA_DIR / "sentences.json",
-            "quizzes": DATA_DIR / "quizzes.json"
         }
         self.cached_data = {}
         for key, path in self.files.items():
@@ -43,7 +42,7 @@ class DataRepository:
             tmp_path = path.with_suffix('.json.tmp')
             tmp_files[key] = tmp_path
             with open(tmp_path, "w", encoding="utf-8") as f:
-                json.dump(self.cached_data[key], f, ensure_ascii=False, indent=4)
+                json.dump(self.cached_data[key], f, ensure_ascii=False, indent=2)
                 
         for key, path in self.files.items():
             tmp_path = tmp_files[key]
@@ -64,9 +63,3 @@ class Sentence(BaseModel):
     meaning_id: str
     content: str
     highlight: str
-
-class Quiz(BaseModel):
-    id: str
-    instruction: str
-    target_id: str
-    option_ids: List[str]

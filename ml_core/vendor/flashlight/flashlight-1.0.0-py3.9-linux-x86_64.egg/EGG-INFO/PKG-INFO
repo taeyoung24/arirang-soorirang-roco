@@ -1,0 +1,12 @@
+Metadata-Version: 2.1
+Name: flashlight
+Version: 1.0.0
+Summary: Flashlight bindings for python
+Author: Flashlight Contributors
+Author-email: oncall+fair_speech@xmail.facebook.com
+License: BSD licensed, as found in the LICENSE file
+Platform: UNKNOWN
+Requires-Python: >=3.6
+
+UNKNOWN
+

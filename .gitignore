@@ -142,3 +142,7 @@ vite.config.ts.timestamp-*
 .venv/
 __pycache__/
 *.pyc
+.idea/
+.tmp/
+ml_core/docs/original-image-dump/
+ml_core/models/*.pt

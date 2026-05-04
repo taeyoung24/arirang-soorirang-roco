@@ -17,6 +17,9 @@ def main():
     
     if args.action == "create":
         word_val = prompt_if_missing(args.word, "Enter new word")
+        if word_val is None:
+            logger.error("Word is required to create a new Word entry.")
+            return
         
         # Check uniqueness
         if any(w["word"] == word_val for w in words):

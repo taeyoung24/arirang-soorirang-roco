@@ -11,7 +11,7 @@ export default function HeartButton({ initialCount = 25, active: initialActive =
   return (
     <div 
       onClick={handleClick}
-      className={`p-3.5 bg-bg rounded-[32px] outline outline-[2.40px] outline-offset-[-2.40px] outline-text inline-flex justify-start items-center gap-6 overflow-hidden cursor-pointer transition-all active:scale-95 ${className}`}
+      className={`h-[52px] px-3.5 bg-bg rounded-[32px] outline outline-[2.40px] outline-offset-[-2.40px] outline-text inline-flex justify-start items-center gap-6 overflow-hidden cursor-pointer transition-all active:scale-95 ${className}`}
     >
       <div className="flex justify-start items-center gap-1">
         <div className="relative">

@@ -16,7 +16,7 @@ export default function PronounceArea({ onFinish }) {
   }, [step, onFinish]);
 
   return (
-    <div className="w-80 h-80 relative bg-bg rounded-[20px] outline outline-[2.40px] outline-offset-[-1.20px] outline-text overflow-hidden">
+    <div className="w-80 h-80 relative bg-bg rounded-[20px] outline outline-[2.40px] outline-offset-[-2.40px] outline-text overflow-hidden">
       
       {step === 1 && (
         <div className="w-80 h-80 p-7 absolute inset-0 flex flex-col justify-center items-center">

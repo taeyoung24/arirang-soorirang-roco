@@ -20,12 +20,12 @@ export default function QuizView({ onStageUnlock }) {
 
   const getButtonStatus = (index) => {
     if (!isAnswered) return 'Default'; // 답변 전
-    
+
     // 답변 후
     if (index === 0) return 'Correct'; // 정답은 항상 Correct (초록색)
     if (index === initialWrongIdx) return 'Incorrect'; // 처음 고른 오답은 영구적으로 Incorrect (빨간색)
     if (index === selectedIdx) return 'Selected-Incorrect'; // 현재 탐색 중인 다른 오답은 활성화 (흰색 배경에 X)
-    
+
     return 'Disable'; // 선택되지 않은 오답은 비활성화
   };
 
@@ -45,7 +45,7 @@ export default function QuizView({ onStageUnlock }) {
             같은 의미로 사용된 문장을 고르세요.
           </div>
         </div>
-        
+
         {/* Question Sentence */}
         {isAnswered && selectedIdx !== 0 && selectedIdx !== null ? (
           <div className="self-stretch flex-1 pt-2 inline-flex justify-center items-center gap-1 flex-wrap content-center">
@@ -79,7 +79,7 @@ export default function QuizView({ onStageUnlock }) {
         ) : (
           <div className="relative self-stretch">
             <img
-              className="w-full h-80 object-cover rounded-[20px] outline outline-[2.40px] outline-offset-[-1.20px] outline-text"
+              className="w-full flex-1 min-h-0 object-cover rounded-[20px] outline outline-[2.40px] outline-offset-[-2.40px] outline-text"
               src={selectedIdx !== null && selectedIdx !== 0 ? `https://placehold.co/330x330?text=Option+${selectedIdx + 1}` : "https://placehold.co/330x330?text=Initial+Image"}
               alt="feed"
             />
@@ -91,17 +91,15 @@ export default function QuizView({ onStageUnlock }) {
       </div>
 
       {/* Footer (Answers) */}
-      <div className="self-stretch h-60 flex flex-col justify-center items-center gap-2.5">
-        <div className="self-stretch flex flex-col justify-end items-center gap-2.5">
-          {answers.map((answer, index) => (
-            <AnswerButton 
-              key={index}
-              parts={answer.parts}
-              status={getButtonStatus(index)}
-              onClick={() => handleAnswerClick(index)}
-            />
-          ))}
-        </div>
+      <div data-testid="footer" className="self-stretch flex-1 min-h-[240px] max-h-[240px] flex flex-col justify-between items-center gap-2.5 mt-2 shrink-0">
+        {answers.map((answer, index) => (
+          <AnswerButton
+            key={index}
+            parts={answer.parts}
+            status={getButtonStatus(index)}
+            onClick={() => handleAnswerClick(index)}
+          />
+        ))}
       </div>
     </>
   );

@@ -65,7 +65,7 @@ export default function AnswerButton({ parts, status = 'Default', onClick }) {
   return (
     <button 
       onClick={onClick}
-      className={`self-stretch h-[52px] w-full ${bgClass} ${opacityClass} rounded-[20px] outline outline-[2.40px] outline-offset-[-1.20px] outline-text inline-flex justify-between items-center transition-transform active:scale-[0.98] cursor-pointer`}
+      className={`self-stretch h-[52px] shrink-0 w-full ${bgClass} ${opacityClass} rounded-[20px] outline outline-[2.40px] outline-offset-[-2.40px] outline-text inline-flex justify-between items-center transition-transform active:scale-[0.98] cursor-pointer`}
     >
 
 

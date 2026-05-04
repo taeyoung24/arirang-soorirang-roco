@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { PronounceButton } from 'src/components/Button';
+import { PronounceButton, SimpleIconButton } from 'src/components/Button';
+
 
 export default function PronounceArea({ onFinish }) {
   const [step, setStep] = useState(1); // 1: 준비, 2: 녹음중, 3: 분석중, 4: 결과
@@ -25,16 +26,9 @@ export default function PronounceArea({ onFinish }) {
           <div className="self-stretch flex-1 flex flex-col justify-center items-center gap-2.5">
             <PronounceButton word="쓰는" onClick={() => console.log('Play sound')} />
           </div>
-          <button 
-            onClick={() => setStep(2)}
-            className="w-12 h-12 flex justify-center items-center bg-bg rounded-[32px] outline outline-[2.40px] outline-offset-[-1.20px] outline-text overflow-hidden transition-all active:scale-95 cursor-pointer shrink-0"
-          >
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path d="M12 17V21M12 21H9M12 21H15" stroke="var(--text, #2C2C2C)" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round"/>
-              <path d="M14 5C14 3.89543 13.1046 3 12 3C10.8954 3 10 3.89543 10 5V11C10 12.1046 10.8954 13 12 13C13.1046 13 14 12.1046 14 11V5Z" stroke="var(--text, #2C2C2C)" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round"/>
-              <path d="M17.7378 12.7542C17.3674 13.9659 16.6228 15.0292 15.6109 15.7917C14.599 16.5543 13.3716 16.9769 12.1047 16.999C10.8378 17.0211 9.59648 16.6417 8.55855 15.9149C7.52062 15.1881 6.73942 14.1514 6.3269 12.9534" stroke="var(--text, #2C2C2C)" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round"/>
-            </svg>
-          </button>
+          <SimpleIconButton type="record" onClick={() => setStep(2)} />
+
+
         </div>
       )}
 
@@ -48,14 +42,9 @@ export default function PronounceArea({ onFinish }) {
               <path fillRule="evenodd" clipRule="evenodd" d="M9.58639 24.625C8.64514 24.6247 8.0142 24.6231 7.58139 24.7994C7.12072 24.9865 6.6046 24.9831 6.14643 24.7899C5.68826 24.5968 5.32554 24.2296 5.13796 23.7691C4.9508 23.3084 4.95419 22.7923 5.14738 22.3341C5.34058 21.8759 5.70777 21.5132 6.16827 21.3256C6.92046 21.0197 8.01264 20.875 9.68733 20.875C10.587 20.875 11.4151 20.9884 12.1873 21.2081C13.6523 19.8175 15.4039 19 17.8123 19C20.6801 19 22.7139 20.4369 24.257 22.3953C25.5151 23.9925 26.4142 25.9556 27.2586 27.4547L27.2708 27.4772L29.1336 30.8925C29.6117 31.7313 30.107 32.7806 30.7167 33.7881C30.7608 33.74 30.8039 33.6913 30.8461 33.6425C31.5236 32.86 32.0451 31.9969 32.5623 31.3125L34.4351 28.8153C35.233 27.7447 36.1326 26.2619 37.372 25.0362C38.8608 23.5637 40.7842 22.4375 43.4373 22.4375C44.7955 22.4375 45.8973 22.6437 46.8423 23.0219C48.2105 22.0041 49.738 21.5 51.5623 21.5C52.4645 21.5 53.1345 21.6991 53.7573 21.9225C54.2253 22.0904 54.6075 22.4373 54.8199 22.8868C55.0322 23.3364 55.0574 23.8519 54.8898 24.32C54.7219 24.788 54.3751 25.1702 53.9255 25.3825C53.4759 25.5949 52.9604 25.6201 52.4923 25.4525C52.227 25.3575 51.9467 25.25 51.5623 25.25C51.0389 25.25 50.5648 25.3306 50.1267 25.4856C50.968 26.43 51.7802 27.5528 52.7355 28.7938L52.7498 28.8125L54.6248 31.3125C54.923 31.7104 55.0509 32.2104 54.9806 32.7026C54.9103 33.1948 54.6474 33.639 54.2498 33.9375C53.8519 34.2356 53.3519 34.3636 52.8597 34.2933C52.3675 34.223 51.9234 33.9601 51.6248 33.5625L49.7626 31.0794C48.8486 29.8916 48.1176 28.8041 47.3236 27.9234C47.0771 28.2774 46.8422 28.6392 46.6192 29.0084L44.4708 32.8444C43.7251 34.3241 42.3364 36.6962 40.313 38.3819C38.7811 39.6578 36.9055 40.5481 34.6995 40.5625C32.7014 40.5756 31.1242 39.8262 29.8483 38.6797C29.152 38.8872 28.372 39.0044 27.4904 39C22.6573 38.9759 19.3451 34.6866 18.1273 32.8525L14.4233 27.2969C14.0133 26.7925 13.5983 26.3444 13.1601 25.9662C12.4067 27.1331 11.683 28.4922 10.8414 29.9394L8.4989 33.9994C8.25029 34.43 7.84088 34.7442 7.36067 34.8731C6.88046 35.0019 6.36873 34.9349 5.93796 34.6866C5.50738 34.438 5.19312 34.0286 5.06426 33.5483C4.9354 33.0681 5.00248 32.5564 5.25076 32.1256L7.59451 28.0631C7.59554 28.0611 7.5967 28.0591 7.59796 28.0572C8.3089 26.835 8.94889 25.6744 9.58639 24.625ZM27.2367 35.2416C26.732 34.355 26.2914 33.4778 25.8714 32.7419C25.8654 32.7315 25.8595 32.7209 25.8539 32.7103L23.9864 29.2866C23.2264 27.9356 22.4436 26.1534 21.3114 24.7162C20.4611 23.6372 19.3923 22.75 17.8123 22.75C17.0008 22.75 16.3273 22.9262 15.742 23.2378C16.3145 23.7525 16.8626 24.3459 17.3989 25.0128C17.4336 25.0563 17.4667 25.1012 17.4973 25.1475L21.2473 30.7725L21.2492 30.7753C22.0639 32.0019 24.0745 35.0584 27.2367 35.2416ZM43.9598 26.2062C43.793 26.1937 43.6189 26.1875 43.4373 26.1875C41.587 26.1875 40.3861 27.2075 39.457 28.3009C38.6498 29.2509 38.0214 30.2791 37.4405 31.0581L37.4373 31.0625L35.5623 33.5625C35.5611 33.5643 35.5597 33.5661 35.5583 33.5678C34.8845 34.4597 34.1783 35.5406 33.2605 36.5025C33.702 36.7129 34.1861 36.8189 34.6751 36.8125C36.313 36.8019 37.6058 35.8934 38.6201 34.8391C39.8192 33.5931 40.648 32.1013 41.1364 31.1278C41.1493 31.1025 41.1626 31.0774 41.1764 31.0525L43.3639 27.1462C43.5549 26.8282 43.7536 26.5147 43.9598 26.2062Z" fill="var(--text, #2C2C2C)"/>
             </svg>
           </div>
-          <button 
-            onClick={() => setStep(3)}
-            className="w-12 h-12 flex justify-center items-center bg-bg rounded-[32px] outline outline-[2.40px] outline-offset-[-1.20px] outline-text overflow-hidden transition-all active:scale-95 cursor-pointer shrink-0"
-          >
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path d="M5 8.2002V15.8002C5 16.9203 5 17.4796 5.21799 17.9074C5.40973 18.2837 5.71547 18.5905 6.0918 18.7822C6.5192 19 7.07899 19 8.19691 19H15.8036C16.9215 19 17.4805 19 17.9079 18.7822C18.2842 18.5905 18.5905 18.2837 18.7822 17.9074C19 17.48 19 16.921 19 15.8031V8.19691C19 7.07899 19 6.5192 18.7822 6.0918C18.5905 5.71547 18.2842 5.40973 17.9079 5.21799C17.4801 5 16.9203 5 15.8002 5H8.2002C7.08009 5 6.51962 5 6.0918 5.21799C5.71547 5.40973 5.40973 5.71547 5.21799 6.0918C5 6.51962 5 7.08009 5 8.2002Z" stroke="var(--text, #2C2C2C)" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round"/>
-            </svg>
-          </button>
+          <SimpleIconButton type="stop" onClick={() => setStep(3)} />
+
+
         </div>
       )}
 
@@ -81,19 +70,15 @@ export default function PronounceArea({ onFinish }) {
             “쓰다”에 대한 발음 정확성
           </div>
           <div className="self-stretch flex-1 flex flex-col justify-center items-center gap-4">
-            <div className="text-center text-text text-3xl font-extrabold font-[Montserrat]">89점</div>
-            <div className="self-stretch text-justify text-text text-base font-semibold font-sans leading-tight">
+            <div className="text-center text-text text-3xl font-extrabold font-[Montserrat] select-text">89점</div>
+            <div className="self-stretch text-justify text-text text-base font-semibold font-sans leading-tight select-text">
               전체적인 발음의 정확도는 우수하나, 문장 끝부분의 억양 처리가 다소 부자연스러웠습니다. 특히 특정 단어의 모음 발음이 짧게 처리되어 명확도가 조금 떨어졌습니다.
             </div>
           </div>
-          <button 
-            onClick={() => setStep(1)}
-            className="w-12 h-12 flex justify-center items-center bg-bg rounded-[32px] outline outline-[2.40px] outline-offset-[-1.20px] outline-text overflow-hidden transition-all active:scale-95 cursor-pointer shrink-0"
-          >
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path d="M10 8H5V3M5.29102 16.3569C6.22284 17.7918 7.59014 18.8902 9.19218 19.4907C10.7942 20.0913 12.547 20.1624 14.1925 19.6937C15.8379 19.225 17.2893 18.2413 18.3344 16.8867C19.3795 15.5321 19.963 13.878 19.9989 12.1675C20.0347 10.4569 19.5211 8.78001 18.5337 7.38281C17.5462 5.98561 16.1366 4.942 14.5122 4.40479C12.8878 3.86757 11.1341 3.86499 9.5083 4.39795C7.88252 4.93091 6.47059 5.97095 5.47949 7.36556" stroke="var(--text, #2C2C2C)" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round"/>
-            </svg>
-          </button>
+
+          <SimpleIconButton type="retry" onClick={() => setStep(1)} />
+
+
         </div>
       )}
       

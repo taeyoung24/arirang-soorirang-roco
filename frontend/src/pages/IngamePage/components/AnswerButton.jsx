@@ -65,8 +65,11 @@ export default function AnswerButton({ parts, status = 'Default', onClick }) {
   return (
     <button 
       onClick={onClick}
-      className={`self-stretch h-12 w-full ${bgClass} ${opacityClass} rounded-[20px] outline outline-[2.40px] outline-offset-[-1.20px] outline-text inline-flex justify-between items-center transition-transform active:scale-[0.98] cursor-pointer`}
+      className={`self-stretch h-[52px] w-full ${bgClass} ${opacityClass} rounded-[20px] outline outline-[2.40px] outline-offset-[-1.20px] outline-text inline-flex justify-between items-center transition-transform active:scale-[0.98] cursor-pointer`}
     >
+
+
+
       <div className="flex-1 self-stretch pl-4 inline-flex flex-col justify-center items-start gap-2.5">
         <div className="self-stretch inline-flex justify-start items-center gap-0.5 flex-wrap content-center">
           {parts.map((part, index) => {

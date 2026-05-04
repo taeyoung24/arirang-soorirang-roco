@@ -27,10 +27,6 @@ function LandingPage() {
 
         {/* Mascot section with Shadows */}
         <div className="relative flex flex-col items-center justify-center">
-          <div className="absolute bottom-4 flex gap-4">
-            <div className="w-28 h-3 bg-black/20 rounded-full" />
-            <div className="w-28 h-3 bg-black/20 rounded-full" />
-          </div>
           <img src={mascot} alt="mascot" className="w-80 h-auto relative z-10" />
         </div>
 

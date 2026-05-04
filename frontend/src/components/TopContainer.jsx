@@ -1,4 +1,6 @@
 import React from 'react';
+import { SimpleIconButton } from './Button';
+
 
 export const IngameTopContainer = ({ onBack, onHelp, status = 'locked' }) => {
   const isLocked = status === 'locked';
@@ -6,14 +8,9 @@ export const IngameTopContainer = ({ onBack, onHelp, status = 'locked' }) => {
   return (
     <div className="w-80 inline-flex justify-between items-center">
       {/* Back Button */}
-      <button 
-        onClick={onBack}
-        className="w-12 h-12 flex justify-center items-center bg-bg rounded-[32px] outline outline-[2.40px] outline-offset-[-1.20px] outline-text overflow-hidden transition-all active:scale-95 cursor-pointer"
-      >
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <path d="M19 12H5M5 12L11 6M5 12L11 18" stroke="var(--text, #2C2C2C)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-        </svg>
-      </button>
+      <SimpleIconButton type="back" onClick={onBack} />
+
+
 
       {/* Stage Status */}
       <div className="inline-flex justify-start items-center gap-1">
@@ -34,14 +31,9 @@ export const IngameTopContainer = ({ onBack, onHelp, status = 'locked' }) => {
       </div>
 
       {/* Help Button */}
-      <button 
-        onClick={onHelp}
-        className="w-12 h-12 flex justify-center items-center bg-bg rounded-[32px] outline outline-[2.40px] outline-offset-[-1.20px] outline-text overflow-hidden transition-all active:scale-95 cursor-pointer"
-      >
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <path d="M8.19531 8.76498C8.42304 8.06326 8.84053 7.43829 9.40137 6.95899C9.96221 6.47968 10.6444 6.16501 11.373 6.0494C12.1017 5.9338 12.8486 6.02202 13.5303 6.3042C14.2119 6.58637 14.8016 7.05166 15.2354 7.64844C15.6691 8.24521 15.9295 8.95008 15.9875 9.68554C16.0455 10.421 15.8985 11.1581 15.5636 11.8154C15.2287 12.4728 14.7192 13.0251 14.0901 13.4106C13.4611 13.7961 12.7377 14.0002 12 14.0002V14.9998M12.0498 19V19.1L11.9502 19.1002V19H12.0498Z" stroke="var(--text, #2C2C2C)" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" />
-        </svg>
-      </button>
+      <SimpleIconButton type="help" onClick={onHelp} />
+
+
     </div>
   );
 };
@@ -50,16 +42,9 @@ export const SearchTopContainer = ({ onBack, onSearch }) => {
   return (
     <div className="w-80 inline-flex justify-start items-start gap-2">
       {/* Back Button */}
-      <button 
-        onClick={onBack}
-        className="w-12 h-12 shrink-0 relative bg-bg rounded-[32px] outline outline-[2.40px] outline-offset-[-1.20px] outline-text overflow-hidden transition-all active:scale-95 cursor-pointer"
-      >
-        <div className="left-[14px] top-[14px] absolute">
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M19 12H5M5 12L11 18M5 12L11 6" stroke="var(--text, #2C2C2C)" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" />
-          </svg>
-        </div>
-      </button>
+      <SimpleIconButton type="back" onClick={onBack} />
+
+
 
       {/* Search Input Area */}
       <div className="flex-1 self-stretch px-5 bg-white-primary rounded-[32px] outline outline-[2.40px] outline-offset-[-1.20px] outline-text flex justify-center items-center gap-4 overflow-hidden">
@@ -88,16 +73,9 @@ export const HomeTopContainer = ({ mascotSrc, onHelp }) => {
       </div>
 
       {/* Help Button */}
-      <button 
-        onClick={onHelp}
-        className="p-3.5 bg-bg rounded-[32px] outline outline-[2.40px] outline-offset-[-1.20px] outline-text flex justify-start items-center gap-6 overflow-hidden transition-all active:scale-95 cursor-pointer"
-      >
-        <div className="relative">
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M8.19531 8.76498C8.42304 8.06326 8.84053 7.43829 9.40137 6.95899C9.96221 6.47968 10.6444 6.16501 11.373 6.0494C12.1017 5.9338 12.8486 6.02202 13.5303 6.3042C14.2119 6.58637 14.8016 7.05166 15.2354 7.64844C15.6691 8.24521 15.9295 8.95008 15.9875 9.68554C16.0455 10.421 15.8985 11.1581 15.5636 11.8154C15.2287 12.4728 14.7192 13.0251 14.0901 13.4106C13.4611 13.7961 12.7377 14.0002 12 14.0002V14.9998M12.0498 19V19.1L11.9502 19.1002V19H12.0498Z" stroke="var(--text, #2C2C2C)" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" />
-          </svg>
-        </div>
-      </button>
+      <SimpleIconButton type="help" onClick={onHelp} />
+
+
     </div>
   );
 };

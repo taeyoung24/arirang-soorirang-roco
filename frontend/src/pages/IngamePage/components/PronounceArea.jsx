@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { PronounceButton, SimpleIconButton } from 'src/components/Button';
+import styles from './PronounceArea.module.css';
 
 
 export default function PronounceArea({ onFinish }) {
@@ -16,14 +17,14 @@ export default function PronounceArea({ onFinish }) {
   }, [step, onFinish]);
 
   return (
-    <div className="w-80 h-80 relative bg-bg rounded-[20px] outline outline-[2.40px] outline-offset-[-2.40px] outline-text overflow-hidden">
+    <div className={styles.pronounceArea}>
       
       {step === 1 && (
-        <div className="w-80 h-80 p-7 absolute inset-0 flex flex-col justify-center items-center">
-          <div className="self-stretch h-12 flex justify-center items-center text-center text-text text-base font-semibold font-sans">
+        <div className={styles.stepContainer}>
+          <div className={styles.stepHeader}>
             발음을 듣고 녹음을 시작하세요.
           </div>
-          <div className="self-stretch flex-1 flex flex-col justify-center items-center gap-2.5">
+          <div className={styles.centerContent}>
             <PronounceButton word="쓰는" onClick={() => console.log('Play sound')} />
           </div>
           <SimpleIconButton type="record" onClick={() => setStep(2)} />
@@ -33,11 +34,11 @@ export default function PronounceArea({ onFinish }) {
       )}
 
       {step === 2 && (
-        <div className="w-80 h-80 p-7 absolute inset-0 flex flex-col justify-center items-center">
-          <div className="self-stretch h-12 flex justify-center items-center text-center text-text text-base font-semibold font-sans">
+        <div className={styles.stepContainer}>
+          <div className={styles.stepHeader}>
             따라 말해보세요.
           </div>
-          <div className="self-stretch flex-1 flex flex-col justify-center items-center gap-2.5">
+          <div className={styles.centerContent}>
             <svg width="60" height="60" viewBox="0 0 60 60" fill="none" xmlns="http://www.w3.org/2000/svg">
               <path fillRule="evenodd" clipRule="evenodd" d="M9.58639 24.625C8.64514 24.6247 8.0142 24.6231 7.58139 24.7994C7.12072 24.9865 6.6046 24.9831 6.14643 24.7899C5.68826 24.5968 5.32554 24.2296 5.13796 23.7691C4.9508 23.3084 4.95419 22.7923 5.14738 22.3341C5.34058 21.8759 5.70777 21.5132 6.16827 21.3256C6.92046 21.0197 8.01264 20.875 9.68733 20.875C10.587 20.875 11.4151 20.9884 12.1873 21.2081C13.6523 19.8175 15.4039 19 17.8123 19C20.6801 19 22.7139 20.4369 24.257 22.3953C25.5151 23.9925 26.4142 25.9556 27.2586 27.4547L27.2708 27.4772L29.1336 30.8925C29.6117 31.7313 30.107 32.7806 30.7167 33.7881C30.7608 33.74 30.8039 33.6913 30.8461 33.6425C31.5236 32.86 32.0451 31.9969 32.5623 31.3125L34.4351 28.8153C35.233 27.7447 36.1326 26.2619 37.372 25.0362C38.8608 23.5637 40.7842 22.4375 43.4373 22.4375C44.7955 22.4375 45.8973 22.6437 46.8423 23.0219C48.2105 22.0041 49.738 21.5 51.5623 21.5C52.4645 21.5 53.1345 21.6991 53.7573 21.9225C54.2253 22.0904 54.6075 22.4373 54.8199 22.8868C55.0322 23.3364 55.0574 23.8519 54.8898 24.32C54.7219 24.788 54.3751 25.1702 53.9255 25.3825C53.4759 25.5949 52.9604 25.6201 52.4923 25.4525C52.227 25.3575 51.9467 25.25 51.5623 25.25C51.0389 25.25 50.5648 25.3306 50.1267 25.4856C50.968 26.43 51.7802 27.5528 52.7355 28.7938L52.7498 28.8125L54.6248 31.3125C54.923 31.7104 55.0509 32.2104 54.9806 32.7026C54.9103 33.1948 54.6474 33.639 54.2498 33.9375C53.8519 34.2356 53.3519 34.3636 52.8597 34.2933C52.3675 34.223 51.9234 33.9601 51.6248 33.5625L49.7626 31.0794C48.8486 29.8916 48.1176 28.8041 47.3236 27.9234C47.0771 28.2774 46.8422 28.6392 46.6192 29.0084L44.4708 32.8444C43.7251 34.3241 42.3364 36.6962 40.313 38.3819C38.7811 39.6578 36.9055 40.5481 34.6995 40.5625C32.7014 40.5756 31.1242 39.8262 29.8483 38.6797C29.152 38.8872 28.372 39.0044 27.4904 39C22.6573 38.9759 19.3451 34.6866 18.1273 32.8525L14.4233 27.2969C14.0133 26.7925 13.5983 26.3444 13.1601 25.9662C12.4067 27.1331 11.683 28.4922 10.8414 29.9394L8.4989 33.9994C8.25029 34.43 7.84088 34.7442 7.36067 34.8731C6.88046 35.0019 6.36873 34.9349 5.93796 34.6866C5.50738 34.438 5.19312 34.0286 5.06426 33.5483C4.9354 33.0681 5.00248 32.5564 5.25076 32.1256L7.59451 28.0631C7.59554 28.0611 7.5967 28.0591 7.59796 28.0572C8.3089 26.835 8.94889 25.6744 9.58639 24.625ZM27.2367 35.2416C26.732 34.355 26.2914 33.4778 25.8714 32.7419C25.8654 32.7315 25.8595 32.7209 25.8539 32.7103L23.9864 29.2866C23.2264 27.9356 22.4436 26.1534 21.3114 24.7162C20.4611 23.6372 19.3923 22.75 17.8123 22.75C17.0008 22.75 16.3273 22.9262 15.742 23.2378C16.3145 23.7525 16.8626 24.3459 17.3989 25.0128C17.4336 25.0563 17.4667 25.1012 17.4973 25.1475L21.2473 30.7725L21.2492 30.7753C22.0639 32.0019 24.0745 35.0584 27.2367 35.2416ZM43.9598 26.2062C43.793 26.1937 43.6189 26.1875 43.4373 26.1875C41.587 26.1875 40.3861 27.2075 39.457 28.3009C38.6498 29.2509 38.0214 30.2791 37.4405 31.0581L37.4373 31.0625L35.5623 33.5625C35.5611 33.5643 35.5597 33.5661 35.5583 33.5678C34.8845 34.4597 34.1783 35.5406 33.2605 36.5025C33.702 36.7129 34.1861 36.8189 34.6751 36.8125C36.313 36.8019 37.6058 35.8934 38.6201 34.8391C39.8192 33.5931 40.648 32.1013 41.1364 31.1278C41.1493 31.1025 41.1626 31.0774 41.1764 31.0525L43.3639 27.1462C43.5549 26.8282 43.7536 26.5147 43.9598 26.2062Z" fill="var(--text, #2C2C2C)"/>
             </svg>
@@ -49,14 +50,14 @@ export default function PronounceArea({ onFinish }) {
       )}
 
       {step === 3 && (
-        <div className="w-80 h-80 p-7 absolute inset-0 flex flex-col justify-center items-center">
-          <div className="self-stretch h-12 flex justify-center items-center text-center text-text text-base font-semibold font-sans">
+        <div className={styles.stepContainer}>
+          <div className={styles.stepHeader}>
             음성을 분석하는 중입니다.
           </div>
-          <div className="self-stretch flex-1 flex flex-col justify-center items-center gap-2.5">
+          <div className={styles.centerContent}>
             <PronounceButton word="쓰는" onClick={() => console.log('Play sound')} />
           </div>
-          <div className="relative animate-spin">
+          <div className={styles.loadingSpinner}>
             <svg width="52" height="52" viewBox="0 0 52 52" fill="none" xmlns="http://www.w3.org/2000/svg">
               <path d="M43.3335 26C43.3335 28.9924 42.5587 31.9336 41.085 34.5377C39.611 37.1419 37.4881 39.32 34.9228 40.8605C32.3572 42.4008 29.4368 43.2508 26.4455 43.3277C23.4542 43.4044 20.4939 42.7056 17.8528 41.2993" stroke="var(--text, #2C2C2C)" strokeWidth="8.8889" strokeLinecap="round"/>
             </svg>
@@ -65,13 +66,13 @@ export default function PronounceArea({ onFinish }) {
       )}
 
       {step === 4 && (
-        <div className="w-80 h-80 p-7 absolute inset-0 flex flex-col justify-center items-center">
-          <div className="self-stretch h-12 flex justify-center items-center text-center text-text text-base font-semibold font-sans">
+        <div className={styles.stepContainer}>
+          <div className={styles.stepHeader}>
             “쓰다”에 대한 발음 정확성
           </div>
-          <div className="self-stretch flex-1 flex flex-col justify-center items-center gap-4">
-            <div className="text-center text-text text-3xl font-extrabold font-[Montserrat] select-text">89점</div>
-            <div className="self-stretch text-justify text-text text-base font-semibold font-sans leading-tight select-text">
+          <div className={styles.centerContentGap4}>
+            <div className={styles.scoreText}>89점</div>
+            <div className={styles.descText}>
               전체적인 발음의 정확도는 우수하나, 문장 끝부분의 억양 처리가 다소 부자연스러웠습니다. 특히 특정 단어의 모음 발음이 짧게 처리되어 명확도가 조금 떨어졌습니다.
             </div>
           </div>

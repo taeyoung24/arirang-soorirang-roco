@@ -1,0 +1,51 @@
+.layout {
+  background-color: var(--color-yellow-primary);
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+}
+
+.mainContainer {
+  width: 20rem;
+  height: 100%;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: center;
+  gap: 1rem;
+}
+
+.scrollArea {
+  align-self: stretch;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  scroll-snap-type: y mandatory;
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.scrollArea::-webkit-scrollbar {
+  display: none;
+}
+
+.scrollUnlocked {
+  overflow-y: scroll;
+}
+
+.scrollLocked {
+  overflow-y: hidden;
+}
+
+.stageItem {
+  scroll-snap-align: start;
+  scroll-snap-stop: always;
+  width: 100%;
+  height: 100%;
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  padding-bottom: 1rem;
+}

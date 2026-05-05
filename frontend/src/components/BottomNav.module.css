@@ -1,0 +1,35 @@
+.container {
+  position: fixed;
+  bottom: 3.25rem;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 50;
+}
+
+.nav {
+  width: 12rem;
+  height: 2.75rem;
+  padding: 0 1.5rem;
+  background-color: var(--color-yellow-primary, #f2ce40);
+  border-radius: 32px;
+  outline: var(--spacing-border-main) solid var(--color-text, #2c2c2c);
+  outline-offset: -1.2px;
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  gap: 1.5rem;
+  overflow: hidden;
+}
+
+.iconWrapper {
+  position: relative;
+  cursor: pointer;
+  transition: transform 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.iconWrapper:active {
+  transform: scale(0.9);
+}

@@ -1,0 +1,211 @@
+.layout {
+  height: 770px;
+}
+
+.mainContainer {
+  width: 20rem;
+  height: 718px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: center;
+  gap: 1rem;
+}
+
+.title {
+  align-self: stretch;
+  display: flex;
+  justify-content: flex-start;
+  color: var(--color-text);
+  font-size: var(--font-size-h2);
+  font-weight: var(--font-weight-bold);
+  font-family: var(--font-sans);
+}
+
+.loginBanner {
+  align-self: stretch;
+  padding: 1rem;
+  position: relative;
+  background-color: var(--color-bg);
+  border-radius: var(--radius-global-round);
+  outline: var(--spacing-border-main) solid var(--color-text);
+  outline-offset: -1.2px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.loginTitle {
+  align-self: stretch;
+  display: flex;
+  justify-content: flex-start;
+  color: var(--color-text);
+  font-size: var(--font-size-h3);
+  font-weight: var(--font-weight-bold);
+  font-family: var(--font-sans);
+}
+
+.loginDesc {
+  align-self: stretch;
+  display: flex;
+  justify-content: flex-start;
+  color: var(--color-text);
+  font-size: var(--font-size-h5);
+  font-weight: var(--font-weight-semibold);
+  font-family: var(--font-sans);
+}
+
+.loginIconWrapper {
+  position: absolute;
+  left: 262px;
+  top: -26px;
+}
+
+.searchBox {
+  align-self: stretch;
+  height: 52px;
+  min-height: 52px;
+  flex-shrink: 0;
+  padding: 0 1.25rem;
+  background-color: var(--color-white-primary);
+  border-radius: var(--radius-global-round-hard);
+  outline: var(--spacing-border-main) solid var(--color-text);
+  outline-offset: -1.2px;
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  gap: 1rem;
+  overflow: hidden;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.searchBox:active {
+  transform: scale(0.95);
+}
+
+.searchText {
+  flex: 1;
+  display: flex;
+  justify-content: flex-start;
+  color: var(--color-text-light);
+  font-size: var(--font-size-h4);
+  font-weight: var(--font-weight-bold);
+  font-family: var(--font-sans);
+}
+
+.contentSectionWrap {
+  align-self: stretch;
+  padding-top: 1.25rem;
+  position: relative;
+  display: inline-flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 0.625rem;
+}
+
+.contentSectionBlob {
+  align-self: stretch;
+  height: 11rem;
+  padding-top: 1.25rem;
+  border-radius: var(--radius-global-round);
+  outline: var(--spacing-border-main) solid var(--color-text);
+  outline-offset: -1.2px;
+  display: inline-flex;
+  justify-content: flex-start;
+  align-items: center;
+  overflow: hidden;
+}
+
+.bgSooriPrimary {
+  background-color: var(--color-soori-primary);
+}
+
+.bgSoftDark {
+  background-color: var(--color-bg-softdark);
+}
+
+.contentList {
+  padding: 0.25rem 1rem 0;
+  scroll-padding: 0 1rem;
+  height: 100%;
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  gap: 5px;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.contentList::-webkit-scrollbar {
+  display: none;
+}
+
+.contentSectionLabel {
+  height: 2.75rem;
+  padding: 0 1.25rem;
+  position: absolute;
+  left: 16px;
+  top: 0;
+  background-color: var(--color-green-primary);
+  border-radius: var(--radius-global-round-hard);
+  outline: var(--spacing-border-main) solid var(--color-text);
+  outline-offset: -1.2px;
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  gap: 0.625rem;
+  overflow: hidden;
+}
+
+.contentSectionLabelText {
+  color: var(--color-text);
+  font-size: var(--font-size-h4);
+  font-weight: var(--font-weight-bold);
+  font-family: var(--font-sans);
+}
+
+.contentCard {
+  width: 6rem;
+  background-color: var(--color-bg);
+  border-radius: var(--radius-global-round);
+  outline: var(--spacing-border-main) solid var(--color-text);
+  outline-offset: -1.2px;
+  display: inline-flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  overflow: hidden;
+  flex-shrink: 0;
+  scroll-snap-align: start;
+}
+
+.contentCardTitle {
+  align-self: stretch;
+  height: 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-text);
+  font-size: var(--font-size-h5);
+  font-weight: var(--font-weight-semibold);
+  font-family: var(--font-sans);
+  text-align: center;
+}
+
+.contentCardDivider {
+  align-self: stretch;
+  border-top: var(--spacing-border-main) solid var(--color-text);
+}
+
+.contentCardImg {
+  align-self: stretch;
+  height: 6rem;
+  object-fit: cover;
+}

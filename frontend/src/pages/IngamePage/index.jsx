@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import Layout from 'src/components/Layout'
 import { IngameTopContainer } from 'src/components/TopContainer'
 import QuizView from './views/QuizView'
+import styles from './IngamePage.module.css'
 
 export default function IngamePage() {
   const navigate = useNavigate()
@@ -49,8 +50,8 @@ export default function IngamePage() {
   }
 
   return (
-    <Layout className="bg-yellow-primary h-screen flex flex-col justify-start">
-      <div className="w-80 h-[718px] max-h-full mx-auto flex flex-col justify-start items-center gap-4">
+    <Layout className={styles.layout}>
+      <div className={styles.mainContainer}>
 
         {/* Header */}
         <IngameTopContainer 
@@ -62,12 +63,12 @@ export default function IngamePage() {
         {/* View Routing / Scrollable Swipe Area */}
         <div 
           onScroll={handleScroll}
-          className={`self-stretch flex-1 flex flex-col snap-y snap-mandatory ${
-            isStageUnlocked ? 'overflow-y-scroll' : 'overflow-y-hidden'
-          } [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]`}
+          className={`${styles.scrollArea} ${
+            isStageUnlocked ? styles.scrollUnlocked : styles.scrollLocked
+          }`}
         >
           {Array.from({ length: stageCount }).map((_, index) => (
-            <div key={index} className="snap-start snap-always w-full h-full flex-shrink-0 flex flex-col pb-4">
+            <div key={index} className={styles.stageItem}>
               {currentStep === 'quiz' && <QuizView onStageUnlock={handleStageUnlock} />}
             </div>
           ))}

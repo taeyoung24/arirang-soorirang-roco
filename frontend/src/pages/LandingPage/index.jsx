@@ -4,6 +4,7 @@ import header from 'src/assets/landing-header.svg'
 import mascot from 'src/assets/landing-mascot.svg'
 import { PageButton } from 'src/components/Button'
 import Layout from 'src/components/Layout'
+import styles from './LandingPage.module.css'
 
 function LandingPage() {
   const navigate = useNavigate()
@@ -16,34 +17,34 @@ function LandingPage() {
   }, [])
 
   return (
-    <Layout className="bg-soori-primary h-[770px]">
+    <Layout className={styles.layout}>
       {/* Main Content Area (Header, Mascot, Terms) */}
-      <div className="w-80 h-[718px] mx-auto flex flex-col justify-between items-center">
+      <div className={styles.mainContent}>
 
         {/* Header section */}
-        <div className="self-stretch h-48 py-12 flex flex-col justify-center items-center">
-          <img src={header} alt="아리랑 수리랑" className="w-[289px] h-auto" />
+        <div className={styles.header}>
+          <img src={header} alt="아리랑 수리랑" className={styles.headerImg} />
         </div>
 
         {/* Mascot section with Shadows */}
-        <div className="relative flex flex-col items-center justify-center">
-          <img src={mascot} alt="mascot" className="w-80 h-auto relative z-10" />
+        <div className={styles.mascotSection}>
+          <img src={mascot} alt="mascot" className={styles.mascotImg} />
         </div>
 
         {/* Bottom container (Terms Only) */}
-        <div className="self-stretch h-36 flex justify-center items-center">
-          <div className="text-center px-4">
-            <span className="text-white-primary text-xs font-normal font-sans">시작하기 버튼을 누르면 </span>
-            <span className="text-white-primary text-xs font-normal font-sans underline cursor-pointer">이용약관</span>
-            <span className="text-white-primary text-xs font-normal font-sans"> 및 </span>
-            <span className="text-white-primary text-xs font-normal font-sans underline cursor-pointer">개인정보 처리방침</span>
-            <span className="text-white-primary text-xs font-normal font-sans">에 동의하는 것으로 간주합니다.</span>
+        <div className={styles.termsContainer}>
+          <div className={styles.termsTextWrapper}>
+            <span className={styles.termsText}>시작하기 버튼을 누르면 </span>
+            <span className={styles.termsLink}>이용약관</span>
+            <span className={styles.termsText}> 및 </span>
+            <span className={styles.termsLink}>개인정보 처리방침</span>
+            <span className={styles.termsText}>에 동의하는 것으로 간주합니다.</span>
           </div>
         </div>
       </div>
 
       {/* Absolute Positioned Button */}
-      <div className="absolute bottom-10 left-1/2 -translate-x-1/2">
+      <div className={styles.buttonWrapper}>
         <PageButton
           label="로그인 없이 시작"
           onClick={() => navigate('/home')}

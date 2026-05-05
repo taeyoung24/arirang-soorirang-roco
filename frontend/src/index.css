@@ -1,7 +1,6 @@
 @import url("https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css");
-@import "tailwindcss";
 
-@theme {
+:root {
   /* Colors from design guide */
   --color-text: #2c2c2c;
   --color-text-dimmed: #7d7d7d;
@@ -30,14 +29,25 @@
   --color-yellow-accent: #f5c842;
   --color-text-main: #2d2d2d;
   --font-sans: "Pretendard", sans-serif;
+
+  /* Typography */
+  --font-size-h1: 32px;
+  --font-size-h2: 24px;
+  --font-size-h3: 20px;
+  --font-size-h4: 18px;
+  --font-size-h5: 16px;
+  --font-size-p: 12px;
+
+  --font-weight-bold: 800;
+  --font-weight-semibold: 600;
+  --font-weight-medium: 500;
+  --font-weight-regular: 400;
 }
 
-@layer base {
-  * {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-  }
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
 }
 
 body {
@@ -76,7 +86,7 @@ img {
   -ms-overflow-style: none;
   scrollbar-width: none;
 }
+
 .scrollbar-none::-webkit-scrollbar {
   display: none;
 }
-

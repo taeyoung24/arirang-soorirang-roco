@@ -1,0 +1,80 @@
+.layout {
+  background-color: var(--color-soori-primary);
+  height: 770px;
+}
+
+.mainContent {
+  width: 20rem;
+  height: 718px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.header {
+  align-self: stretch;
+  height: 12rem;
+  padding: 3rem 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.headerImg {
+  width: 289px;
+  height: auto;
+}
+
+.mascotSection {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.mascotImg {
+  width: 20rem;
+  height: auto;
+  position: relative;
+  z-index: 10;
+}
+
+.termsContainer {
+  align-self: stretch;
+  height: 9rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.termsTextWrapper {
+  text-align: center;
+  padding: 0 1rem;
+}
+
+.termsText {
+  color: var(--color-white-primary);
+  font-size: var(--font-size-p);
+  font-weight: var(--font-weight-regular);
+  font-family: var(--font-sans);
+}
+
+.termsLink {
+  color: var(--color-white-primary);
+  font-size: var(--font-size-p);
+  font-weight: var(--font-weight-regular);
+  font-family: var(--font-sans);
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.buttonWrapper {
+  position: absolute;
+  bottom: 2.5rem;
+  left: 50%;
+  transform: translateX(-50%);
+}

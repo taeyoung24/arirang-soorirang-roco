@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import AnswerButton from '../components/AnswerButton';
 import PronounceArea from '../components/PronounceArea';
 import HeartButton from '../components/HeartButton';
+import styles from './QuizView.module.css';
 
 export default function QuizView({ onStageUnlock }) {
   const [selectedIdx, setSelectedIdx] = useState(null);
@@ -38,38 +39,38 @@ export default function QuizView({ onStageUnlock }) {
 
   return (
     <>
-      <div className="self-stretch flex-1 relative flex flex-col justify-end items-center gap-2.5">
+      <div className={styles.topArea}>
         {/* Text Area */}
-        <div className="self-stretch h-14 flex flex-col justify-between items-center">
-          <div className="self-stretch justify-start text-text text-2xl font-extrabold font-sans">
+        <div className={styles.textArea}>
+          <div className={styles.title}>
             같은 의미로 사용된 문장을 고르세요.
           </div>
         </div>
 
         {/* Question Sentence */}
         {isAnswered && selectedIdx !== 0 && selectedIdx !== null ? (
-          <div className="self-stretch flex-1 pt-2 inline-flex justify-center items-center gap-1 flex-wrap content-center">
-            <span className="text-text text-lg font-semibold font-sans">“</span>
+          <div className={styles.questionWrapper}>
+            <span className={styles.normalText}>“</span>
             {answers[selectedIdx].parts.map((part, index) => {
               if (part.type === 'highlight') {
                 return (
-                  <div key={index} className="px-0.5 border-b-[1.60px] border-text flex justify-center items-center gap-2.5">
-                    <span className="text-text text-lg font-extrabold font-sans">{part.text}</span>
+                  <div key={index} className={styles.highlightBlock}>
+                    <span className={styles.highlightText}>{part.text}</span>
                   </div>
                 );
               }
-              return <span key={index} className="text-text text-lg font-semibold font-sans">{part.text}</span>;
+              return <span key={index} className={styles.normalText}>{part.text}</span>;
             })}
-            <span className="text-text text-lg font-semibold font-sans">”</span>
+            <span className={styles.normalText}>”</span>
           </div>
         ) : (
-          <div className="self-stretch flex-1 pt-2 inline-flex justify-center items-center gap-1 flex-wrap content-center">
-            <span className="text-text text-lg font-semibold font-sans">“</span>
-            <span className="text-text text-lg font-semibold font-sans">저는 매일 저녁에 일기를</span>
-            <div className="px-0.5 border-b-[1.60px] border-text flex justify-center items-center gap-2.5">
-              <span className="text-text text-lg font-extrabold font-sans">써요</span>
+          <div className={styles.questionWrapper}>
+            <span className={styles.normalText}>“</span>
+            <span className={styles.normalText}>저는 매일 저녁에 일기를</span>
+            <div className={styles.highlightBlock}>
+              <span className={styles.highlightText}>써요</span>
             </div>
-            <span className="text-text text-lg font-semibold font-sans">”</span>
+            <span className={styles.normalText}>”</span>
           </div>
         )}
 
@@ -77,21 +78,21 @@ export default function QuizView({ onStageUnlock }) {
         {isAnswered && selectedIdx === 0 ? (
           <PronounceArea onFinish={onStageUnlock} />
         ) : (
-          <div className="relative self-stretch">
+          <div className={styles.imageWrapper}>
             <img
-              className="w-full flex-1 min-h-0 object-cover rounded-[20px] outline outline-[2.40px] outline-offset-[-2.40px] outline-text"
+              className={styles.feedImage}
               src={selectedIdx !== null && selectedIdx !== 0 ? `https://placehold.co/330x330?text=Option+${selectedIdx + 1}` : "https://placehold.co/330x330?text=Initial+Image"}
               alt="feed"
             />
             {/* Heart Button */}
-            <HeartButton initialCount={25} className="absolute right-4 bottom-4" />
+            <HeartButton initialCount={25} className={styles.heartButtonPos} />
 
           </div>
         )}
       </div>
 
       {/* Footer (Answers) */}
-      <div data-testid="footer" className="self-stretch flex-1 min-h-[240px] max-h-[240px] flex flex-col justify-between items-center gap-2.5 mt-2 shrink-0">
+      <div data-testid="footer" className={styles.footer}>
         {answers.map((answer, index) => (
           <AnswerButton
             key={index}

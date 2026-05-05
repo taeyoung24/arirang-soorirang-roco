@@ -1,0 +1,119 @@
+.button {
+  align-self: stretch;
+  height: 52px;
+  flex-shrink: 0;
+  width: 100%;
+  border-radius: var(--radius-global-round);
+  outline: var(--spacing-border-main) solid var(--color-text);
+  outline-offset: -2.4px;
+  display: inline-flex;
+  justify-content: space-between;
+  align-items: center;
+  transition: transform 0.15s ease;
+  cursor: pointer;
+  border: none;
+}
+
+.button:active {
+  transform: scale(0.98);
+}
+
+.bgDefault {
+  background-color: var(--color-bg);
+}
+
+.bgSoftdark {
+  background-color: var(--color-bg-softdark);
+}
+
+.bgSooriPrimary {
+  background-color: var(--color-soori-primary);
+}
+
+.bgGreenPrimary {
+  background-color: var(--color-green-primary);
+}
+
+.bgAriPrimary {
+  background-color: var(--color-ari-primary);
+}
+
+.opacity60 {
+  opacity: 0.6;
+}
+
+.textDefault {
+  color: var(--color-text);
+}
+
+.textWhite {
+  color: var(--color-white-primary);
+}
+
+.borderDefault {
+  border-bottom-color: var(--color-text);
+}
+
+.borderWhite {
+  border-bottom-color: var(--color-white-primary);
+}
+
+.contentContainer {
+  flex: 1;
+  align-self: stretch;
+  padding-left: 1rem;
+  display: inline-flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: flex-start;
+  gap: 0.625rem;
+}
+
+.textWrapper {
+  align-self: stretch;
+  display: inline-flex;
+  justify-content: flex-start;
+  align-items: center;
+  gap: 0.125rem;
+  flex-wrap: wrap;
+  align-content: center;
+}
+
+.highlightBlock {
+  padding: 0 0.125rem;
+  border-bottom-width: 1.6px;
+  border-bottom-style: solid;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 0.625rem;
+}
+
+.highlightText {
+  font-size: var(--font-size-h5);
+  font-weight: var(--font-weight-bold);
+  font-family: var(--font-sans);
+}
+
+.normalText {
+  font-size: var(--font-size-h5);
+  font-weight: var(--font-weight-semibold);
+  font-family: var(--font-sans);
+}
+
+.iconWrapper {
+  width: 3rem;
+  align-self: stretch;
+  display: inline-flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  overflow: hidden;
+}
+
+.iconInner {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}

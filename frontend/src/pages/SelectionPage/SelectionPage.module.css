@@ -1,0 +1,171 @@
+.filterChip {
+  padding: 0.25rem 0.625rem;
+  border-radius: var(--radius-global-round-hard);
+  outline: var(--spacing-border-main) solid var(--color-text);
+  outline-offset: -1.2px;
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  gap: 1rem;
+  overflow: hidden;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.filterChip:active {
+  transform: scale(0.95);
+}
+
+.filterChipActive {
+  background-color: var(--color-yellow-primary);
+}
+
+.filterChipInactive {
+  background-color: var(--color-bg);
+}
+
+.filterChipLabel {
+  display: flex;
+  justify-content: flex-start;
+  color: var(--color-text);
+  font-size: var(--font-size-h5);
+  font-weight: var(--font-weight-semibold);
+  font-family: var(--font-sans);
+  line-height: 1;
+}
+
+.resultItem {
+  align-self: stretch;
+  height: 2.75rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 0.625rem;
+  cursor: pointer;
+  transition: background-color 0.15s ease;
+}
+
+.resultItem:hover {
+  background-color: rgba(0, 0, 0, 0.05);
+}
+
+.resultItem:active {
+  background-color: rgba(0, 0, 0, 0.1);
+}
+
+.resultItemBorderTop {
+  border-top: var(--spacing-border-main) solid var(--color-text);
+}
+
+.resultItemLabel {
+  text-align: center;
+  display: flex;
+  justify-content: flex-start;
+  color: var(--color-text);
+  font-size: var(--font-size-h5);
+  font-weight: var(--font-weight-semibold);
+  font-family: var(--font-sans);
+  user-select: text;
+}
+
+.resultSection {
+  align-self: stretch;
+  border-radius: var(--radius-global-round);
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: flex-start;
+  gap: 0.625rem;
+}
+
+.resultSectionHeader {
+  align-self: stretch;
+  padding: 0 0.125rem;
+  display: inline-flex;
+  justify-content: space-between;
+  align-items: center;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.resultSectionHeader:active {
+  opacity: 0.7;
+}
+
+.resultSectionTitle {
+  text-align: center;
+  display: flex;
+  justify-content: flex-start;
+  color: var(--color-text);
+  font-size: var(--font-size-h5);
+  font-weight: var(--font-weight-semibold);
+  font-family: var(--font-sans);
+}
+
+.iconWrapper {
+  position: relative;
+  transition: transform 0.2s ease;
+}
+
+.iconRotated {
+  transform: rotate(-90deg);
+}
+
+.resultSectionContent {
+  align-self: stretch;
+  border-radius: var(--radius-global-round);
+  outline: var(--spacing-border-main) solid var(--color-text);
+  outline-offset: -1.2px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  overflow: hidden;
+}
+
+.layout {
+  height: 770px;
+  overflow: visible !important;
+}
+
+.mainContainer {
+  width: 20rem;
+  height: 718px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: center;
+  gap: 1rem;
+}
+
+.filterChipContainer {
+  align-self: stretch;
+  display: inline-flex;
+  justify-content: flex-start;
+  align-items: flex-start;
+  gap: 0.625rem;
+  flex-wrap: wrap;
+  align-content: flex-start;
+}
+
+.resultsArea {
+  align-self: stretch;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: center;
+  gap: 1rem;
+}
+
+.noInfoText {
+  align-self: stretch;
+  text-align: center;
+  display: flex;
+  justify-content: flex-start;
+  color: var(--color-text-dimmed);
+  font-size: var(--font-size-h4);
+  font-weight: var(--font-weight-semibold);
+  font-family: var(--font-sans);
+}

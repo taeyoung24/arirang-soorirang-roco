@@ -1,0 +1,80 @@
+.pageButton {
+  width: 20rem;
+  height: 3rem;
+  padding: 0 1.25rem;
+  background-color: var(--color-bg);
+  border-radius: var(--radius-global-round-hard);
+  outline: var(--spacing-border-main) solid var(--color-text);
+  outline-offset: -1.2px;
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  gap: 0.625rem;
+  overflow: hidden;
+  transition: all 0.2s ease;
+  cursor: pointer;
+  border: none;
+}
+
+.pageButton:hover {
+  opacity: 0.9;
+}
+
+.pageButton:active {
+  transform: scale(0.98);
+}
+
+.pageButtonLabel {
+  display: flex;
+  justify-content: flex-start;
+  color: var(--color-text);
+  font-size: var(--font-size-h4);
+  font-weight: var(--font-weight-bold);
+  font-family: var(--font-sans);
+}
+
+.pronounceButton {
+  height: 2.5rem;
+  background: transparent;
+  border: none;
+  border-bottom: var(--spacing-border-main) solid var(--color-text);
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  gap: 0.5rem;
+  transition: all 0.15s ease;
+  cursor: pointer;
+}
+
+.pronounceButton:active {
+  transform: scale(0.95);
+}
+
+.pronounceButtonText {
+  text-align: center;
+  color: var(--color-text);
+  font-size: var(--font-size-h2); /* 30px에 가장 가까운 24px 또는 h1인 32px 중 디자인 가이드 확인 필요. 현재는 h2로 임시 적용하거나 h1으로 제안 */
+  font-weight: var(--font-weight-bold);
+  font-family: var(--font-sans);
+}
+
+.simpleIconButton {
+  width: 52px;
+  height: 52px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: var(--color-bg);
+  border-radius: 32px;
+  outline: var(--spacing-border-main) solid var(--color-text);
+  outline-offset: -1.2px;
+  overflow: hidden;
+  transition: all 0.15s ease;
+  cursor: pointer;
+  flex-shrink: 0;
+  border: none;
+}
+
+.simpleIconButton:active {
+  transform: scale(0.95);
+}

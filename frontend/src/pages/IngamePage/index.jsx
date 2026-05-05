@@ -3,6 +3,8 @@ import { useNavigate } from 'react-router-dom'
 import Layout from 'src/components/Layout'
 import { IngameTopContainer } from 'src/components/TopContainer'
 import QuizView from './views/QuizView'
+import { GLOBAL_CONFIG } from 'src/settings'
+import { setThemeColor } from 'src/utils/theme'
 import styles from './IngamePage.module.css'
 
 export default function IngamePage() {
@@ -19,8 +21,11 @@ export default function IngamePage() {
   useEffect(() => {
     // 배경색을 피그마 디자인에 맞춰 yellow-primary로 변경
     document.body.style.backgroundColor = 'var(--color-yellow-primary)'
+    setThemeColor(GLOBAL_CONFIG.colorYellowPrimary)
+
     return () => {
       document.body.style.backgroundColor = ''
+      setThemeColor(GLOBAL_CONFIG.colorBg)
     }
   }, [])
 

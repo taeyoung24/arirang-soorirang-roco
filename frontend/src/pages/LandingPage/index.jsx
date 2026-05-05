@@ -1,9 +1,13 @@
 import { useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
+import ariImg from 'src/assets/landing-frame-ari.png'
+import shadowImg from 'src/assets/landing-frame-shadow.png'
+import sooriImg from 'src/assets/landing-frame-soori.png'
 import header from 'src/assets/landing-header.svg'
-import mascot from 'src/assets/landing-mascot.svg'
 import { PageButton } from 'src/components/Button'
 import Layout from 'src/components/Layout'
+import { GLOBAL_CONFIG } from 'src/settings'
+import { setThemeColor } from 'src/utils/theme'
 import styles from './LandingPage.module.css'
 
 function LandingPage() {
@@ -11,8 +15,11 @@ function LandingPage() {
 
   useEffect(() => {
     document.body.style.backgroundColor = 'var(--color-soori-primary)'
+    setThemeColor(GLOBAL_CONFIG.colorSooriPrimary)
+
     return () => {
       document.body.style.backgroundColor = ''
+      setThemeColor(GLOBAL_CONFIG.colorBg)
     }
   }, [])
 
@@ -26,9 +33,11 @@ function LandingPage() {
           <img src={header} alt="아리랑 수리랑" className={styles.headerImg} />
         </div>
 
-        {/* Mascot section with Shadows */}
+        {/* Mascot section */}
         <div className={styles.mascotSection}>
-          <img src={mascot} alt="mascot" className={styles.mascotImg} />
+          <img src={shadowImg} alt="shadow" className={styles.mascotShadow} />
+          <img src={ariImg} alt="ari" className={styles.mascotAri} />
+          <img src={sooriImg} alt="soori" className={styles.mascotSoori} />
         </div>
 
         {/* Bottom container (Terms Only) */}

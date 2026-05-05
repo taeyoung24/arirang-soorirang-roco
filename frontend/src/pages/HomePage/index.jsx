@@ -1,3 +1,4 @@
+import { useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import mascot from 'src/assets/landing-mascot.svg'
 import normalMascot from 'src/assets/mascot/word-image-snow.png'
@@ -5,6 +6,8 @@ import winterMascot from 'src/assets/mascot/word-image-write.png'
 import BottomNav from 'src/components/BottomNav'
 import Layout from 'src/components/Layout'
 import { HomeTopContainer } from 'src/components/TopContainer'
+import { GLOBAL_CONFIG } from 'src/settings'
+import { setThemeColor } from 'src/utils/theme'
 import styles from './HomePage.module.css'
 
 
@@ -44,6 +47,10 @@ function ContentSection({ label, bg, cards }) {
 
 function HomePage() {
   const navigate = useNavigate()
+
+  useEffect(() => {
+    setThemeColor(GLOBAL_CONFIG.colorBg)
+  }, [])
 
   return (
     <Layout className={styles.layout}>

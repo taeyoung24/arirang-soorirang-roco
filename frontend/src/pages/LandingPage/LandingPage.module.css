@@ -1,22 +1,23 @@
 .layout {
   background-color: var(--color-soori-primary);
-  height: 770px;
+  height: 100vh;
+  position: relative;
+  overflow: hidden;
 }
 
 .mainContent {
   width: 20rem;
-  height: 718px;
+  height: 100%;
   margin: 0 auto;
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
+  justify-content: space-evenly;
   align-items: center;
 }
 
 .header {
   align-self: stretch;
-  height: 12rem;
-  padding: 3rem 0;
+  padding-top: 2rem;
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -30,22 +31,68 @@
 
 .mascotSection {
   position: relative;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
+  width: 20rem;
+  height: 16rem;
+  margin: 0 auto;
 }
 
-.mascotImg {
-  width: 20rem;
+.mascotShadow {
+  position: absolute;
+  bottom: 1rem;
+  left: 0;
+  width: 100%;
   height: auto;
-  position: relative;
-  z-index: 10;
+  z-index: 1;
+  opacity: 1.0;
+}
+
+.mascotAri {
+  position: absolute;
+  left: -0.8rem;
+  top: 1.8rem;
+  width: 11.8rem;
+  height: auto;
+  z-index: 3;
+  animation: floatAri 3.5s ease-in-out infinite;
+}
+
+.mascotSoori {
+  position: absolute;
+  right: -1.8rem;
+  top: 4.2rem;
+  width: 11.2rem;
+  height: auto;
+  z-index: 2;
+  animation: floatSoori 3s ease-in-out infinite 1.7s;
+}
+
+@keyframes floatAri {
+
+  0%,
+  100% {
+    transform: translateY(0) rotate(-2deg);
+  }
+
+  50% {
+    transform: translateY(-20px) rotate(2deg);
+  }
+}
+
+@keyframes floatSoori {
+
+  0%,
+  100% {
+    transform: translateY(0) rotate(2deg);
+  }
+
+  50% {
+    transform: translateY(-12px) rotate(-1deg);
+  }
 }
 
 .termsContainer {
   align-self: stretch;
-  height: 9rem;
+  padding-bottom: 7rem;
   display: flex;
   justify-content: center;
   align-items: center;

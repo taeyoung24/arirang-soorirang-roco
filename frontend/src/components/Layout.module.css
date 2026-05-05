@@ -1,7 +1,7 @@
 .layout {
   background-color: var(--color-bg);
   min-height: 100vh;
-  padding: 3.25rem 2.25rem; /* py-13 px-9 */
+  padding: 2.85rem 2.25rem; /* py-13 px-9 */
   overflow: hidden;
   position: relative;
 }

@@ -14,12 +14,13 @@ FastAPI 백엔드 서버입니다.
 - 발음 평가 요청
 - 저장 단어 목록 조회
 
-현재 카테고리/세트/카드/답안 제출 API는 JSON 데이터 기반으로 동작하며,
+현재 카테고리/세트/카드/보기에 대한 정답 판정 API는 PostgreSQL DB 기반으로 동작하며,
 추천/최근/발음/저장 단어 API는 아직 UI 확인용 더미 데이터 기반으로 동작합니다.
 """
 
-from fastapi import FastAPI, UploadFile, File, Form
+from fastapi import FastAPI, UploadFile, File, Form, Depends
 from fastapi.staticfiles import StaticFiles
+from sqlalchemy.orm import Session
 
 from schemas import (
     RecommendedSet,
@@ -43,19 +44,8 @@ from schemas import (
     SavedWordsResponse,
 )
 
-import sys
-from pathlib import Path
-
-# content_data 모듈을 임포트할 수 있도록 경로 추가
-repo_root = Path(__file__).resolve().parents[2]
-content_data_path = repo_root / "content_data"
-sys.path.insert(0, str(content_data_path))
-
-# src 모듈도 경로에 추가
-src_path = content_data_path / "src"
-sys.path.insert(0, str(src_path))
-
-from src.models import DataRepository, Word, Meaning, Sentence, Quiz, QuizChoice
+from database import get_db
+from db_models import CategoryDB, LearningSetDB, QuizDB, QuizChoiceDB
 
 # =============================================================================
 # FastAPI 앱 초기화
@@ -69,9 +59,6 @@ app = FastAPI(
 
 # 실행 위치: backend/fastapi
 app.mount("/assets", StaticFiles(directory="assets"), name="assets")
-
-# 데이터 리포지토리 초기화
-repo = DataRepository()
 
 
 # =============================================================================
@@ -104,95 +91,52 @@ SET_THUMBNAIL_MAPPING = {
 # =============================================================================
 
 
-def get_categories_from_data():
-    """실제 데이터에서 카테고리 목록을 생성"""
-    quizzes = repo.get_all("quizzes")
-    set_ids = set(quiz["set_id"] for quiz in quizzes)
-
-    # set_id를 기반으로 카테고리 매핑
-    category_mapping = {
-        "set_school_01": {"id": "school", "ko": "고등학교", "en": "High school"},
-        "set_hospital_01": {"id": "hospital", "ko": "병원", "en": "Hospital"},
-        "set_bank_01": {"id": "bank", "ko": "은행", "en": "Bank"},
-        "set_hanging_with_01": {
-            "id": "hanging_with",
-            "ko": "친구와 놀기",
-            "en": "Hanging with",
-        },
-        "set_cafe_01": {"id": "cafe", "ko": "카페", "en": "Cafe"},
-        "set_pc_game_01": {"id": "pc_game", "ko": "PC 게임", "en": "Video games"},
-        "set_university_01": {"id": "university", "ko": "대학교", "en": "University"},
-    }
-
-    categories = []
-    for set_id in set_ids:
-        if set_id in category_mapping:
-            cat = category_mapping[set_id]
-            categories.append(
-                Category(category_id=cat["id"], name_ko=cat["ko"], name_en=cat["en"])
-            )
-
-    return categories
+def get_categories_from_db(db: Session):
+    categories = db.query(CategoryDB).order_by(CategoryDB.category_id).all()
+    return [
+        Category(
+            category_id=category.category_id,
+            name_ko=category.name_ko,
+            name_en=category.name_en,
+        )
+        for category in categories
+    ]
 
 
-def get_learning_sets_for_category(category_id):
-    """카테고리에 속한 학습 세트 목록을 반환"""
-    quizzes = repo.get_all("quizzes")
-
-    # category_id를 set_id로 매핑
-    category_to_sets = {
-        "school": ["set_school_01"],
-        "hospital": ["set_hospital_01"],
-        "bank": ["set_bank_01"],
-        "hanging_with": ["set_hanging_with_01"],
-        "cafe": ["set_cafe_01"],
-        "pc_game": ["set_pc_game_01"],
-        "university": ["set_university_01"],
-    }
-
-    if category_id not in category_to_sets:
-        return []
+def get_learning_sets_for_category(db: Session, category_id: str):
+    learning_sets = (
+        db.query(LearningSetDB)
+        .filter(LearningSetDB.category_id == category_id)
+        .order_by(LearningSetDB.set_id)
+        .all()
+    )
 
     sets = []
-    for set_id in category_to_sets[category_id]:
-        # 해당 set_id의 퀴즈들 가져오기
-        set_quizzes = [q for q in quizzes if q["set_id"] == set_id]
-        if set_quizzes:
-            # 단어 목록 추출 (중복 제거)
-            words = list(set(q["polysemy_word"] for q in set_quizzes))
-
-            # set_id를 기반으로 제목 매핑
-            title_mapping = {
-                "set_school_01": "고등학교",
-                "set_hospital_01": "병원",
-                "set_bank_01": "은행",
-                "set_hanging_with_01": "친구와 놀기",
-                "set_cafe_01": "카페",
-                "set_pc_game_01": "PC 게임",
-                "set_university_01": "대학교",
-            }
-
-            sets.append(
-                LearningSet(
-                    set_id=set_id,
-                    title=title_mapping.get(set_id, "정보 없음"),
-                    word_count=len(words),
-                    words=words,
-                )
+    for learning_set in learning_sets:
+        words = sorted({quiz.polysemy_word for quiz in learning_set.quizzes})
+        sets.append(
+            LearningSet(
+                set_id=learning_set.set_id,
+                title=learning_set.title,
+                word_count=len(words),
+                words=words,
             )
+        )
 
     return sets
 
 
-def get_cards_for_set(set_id):
-    """세트에 속한 카드 목록을 반환"""
-    quizzes = repo.get_all("quizzes")
-    set_quizzes = [q for q in quizzes if q["set_id"] == set_id]
+def get_cards_for_set(db: Session, set_id: str):
+    set_quizzes = (
+        db.query(QuizDB)
+        .filter(QuizDB.set_id == set_id)
+        .order_by(QuizDB.card_order)
+        .all()
+    )
 
     if not set_quizzes:
         return None
 
-    # set_id를 기반으로 제목 매핑
     title_mapping = {
         "set_school_01": "고등학교",
         "set_hospital_01": "병원",
@@ -205,59 +149,45 @@ def get_cards_for_set(set_id):
     }
 
     cards = []
-    for quiz in sorted(set_quizzes, key=lambda x: x["card_order"]):
+    for quiz in set_quizzes:
         choices = [
-            Choice(choice_id=c["choice_id"], text=c["text"]) for c in quiz["choices"]
+            Choice(choice_id=choice.choice_id, text=choice.text)
+            for choice in quiz.choices
         ]
         cards.append(
             LearningCard(
-                card_id=quiz["card_id"],
-                polysemy_word=quiz["polysemy_word"],
-                prompt_sentence=quiz["prompt_sentence"],
+                card_id=quiz.card_id,
+                polysemy_word=quiz.polysemy_word,
+                prompt_sentence=quiz.prompt_sentence,
                 choices=choices,
-                pronunciation_target=quiz["pronunciation_target"],
-                image_url=quiz["image_url"],
-                card_order=quiz["card_order"],
+                pronunciation_target=quiz.pronunciation_target,
+                image_url=quiz.image_url,
+                card_order=quiz.card_order,
             )
         )
 
     return SetCardsData(
-        set_id=set_id, title=title_mapping.get(set_id, "정보 없음"), cards=cards
+        set_id=set_id,
+        title=title_mapping.get(set_id, "정보 없음"),
+        cards=cards,
     )
 
 
-def get_recommended_sets_from_data():
-    """실제 데이터에서 추천 학습 세트를 생성"""
-    quizzes = repo.get_all("quizzes")
-    set_ids = set(quiz["set_id"] for quiz in quizzes)
-
-    # set_id를 기반으로 제목 매핑
-    title_mapping = {
-        "set_school_01": "고등학교",
-        "set_hospital_01": "병원",
-        "set_bank_01": "은행",
-        "set_hanging_with_01": "친구와 놀기",
-        "set_cafe_01": "카페",
-        "set_pc_game_01": "PC 게임",
-        "set_university_01": "대학교",
-        "set_test_01": "테스트",
-    }
-
-    sets = []
-    for set_id in sorted(set_ids):
-        set_quizzes = [q for q in quizzes if q["set_id"] == set_id]
-        if set_quizzes:
-            sets.append(
-                RecommendedSet(
-                    set_id=set_id,
-                    title=title_mapping.get(set_id, "정보 없음"),
-                    thumbnail_url=SET_THUMBNAIL_MAPPING.get(
-                        set_id, CARD_IMAGE_PLACEHOLDER
-                    ),
+def get_recommended_sets_from_db(db: Session):
+    learning_sets = db.query(LearningSetDB).order_by(LearningSetDB.set_id).all()
+    return [
+        RecommendedSet(
+            set_id=learning_set.set_id,
+            title=learning_set.title,
+            thumbnail_url=(
+                learning_set.thumbnail_url
+                or SET_THUMBNAIL_MAPPING.get(
+                    learning_set.set_id, CARD_IMAGE_PLACEHOLDER
                 )
-            )
-
-    return sets
+            ),
+        )
+        for learning_set in learning_sets
+    ]
 
 
 # =============================================================================
@@ -287,7 +217,7 @@ async def munang():
 
 
 @app.get("/api/v1/contents/recommended", response_model=RecommendedResponse)
-async def get_recommended_contents():
+async def get_recommended_contents(db: Session = Depends(get_db)):
     """
     추천 학습 세트 목록 조회 API
 
@@ -295,7 +225,7 @@ async def get_recommended_contents():
     실제 데이터에서 동적으로 생성된 세트 목록을 반환합니다.
     """
 
-    recommended_sets = get_recommended_sets_from_data()
+    recommended_sets = get_recommended_sets_from_db(db)
 
     return RecommendedResponse(
         success=True,
@@ -352,7 +282,7 @@ async def get_recent_contents():
 
 
 @app.get("/api/v1/categories", response_model=CategoriesResponse)
-async def get_categories():
+async def get_categories(db: Session = Depends(get_db)):
     """
     카테고리 목록 조회 API
 
@@ -360,7 +290,7 @@ async def get_categories():
     실제 데이터에서 동적으로 생성합니다.
     """
 
-    categories = get_categories_from_data()
+    categories = get_categories_from_db(db)
 
     return CategoriesResponse(
         success=True,
@@ -375,7 +305,7 @@ async def get_categories():
 
 
 @app.get("/api/v1/categories/{category_id}/sets", response_model=CategorySetsResponse)
-async def get_category_sets(category_id: str):
+async def get_category_sets(category_id: str, db: Session = Depends(get_db)):
     """
     카테고리별 학습 세트 조회 API
 
@@ -383,7 +313,7 @@ async def get_category_sets(category_id: str):
     실제 데이터에서 동적으로 생성합니다.
     """
 
-    sets = get_learning_sets_for_category(category_id)
+    sets = get_learning_sets_for_category(db, category_id)
 
     return CategorySetsResponse(
         success=True,
@@ -398,7 +328,7 @@ async def get_category_sets(category_id: str):
 
 
 @app.get("/api/v1/sets/{set_id}/cards", response_model=SetCardsResponse)
-async def get_set_cards(set_id: str):
+async def get_set_cards(set_id: str, db: Session = Depends(get_db)):
     """
     학습 카드 목록 조회 API
 
@@ -408,7 +338,7 @@ async def get_set_cards(set_id: str):
     실제 데이터에서 동적으로 생성합니다.
     """
 
-    data = get_cards_for_set(set_id)
+    data = get_cards_for_set(db, set_id)
 
     if data is None:
         return SetCardsResponse(
@@ -430,7 +360,11 @@ async def get_set_cards(set_id: str):
 
 
 @app.post("/api/v1/cards/{card_id}/answer", response_model=AnswerSubmitResponse)
-async def submit_card_answer(card_id: str, request: AnswerSubmitRequest):
+async def submit_card_answer(
+    card_id: str,
+    request: AnswerSubmitRequest,
+    db: Session = Depends(get_db),
+):
     """
     의미 테스트 답안 제출 API
 
@@ -439,9 +373,7 @@ async def submit_card_answer(card_id: str, request: AnswerSubmitRequest):
     오답이면 현재 문제 단계에 머무릅니다.
     """
 
-    quizzes = repo.get_all("quizzes")
-    quiz = next((q for q in quizzes if q["card_id"] == card_id), None)
-
+    quiz = db.query(QuizDB).filter(QuizDB.card_id == card_id).one_or_none()
     if quiz is None:
         return AnswerSubmitResponse(
             success=False,
@@ -449,9 +381,23 @@ async def submit_card_answer(card_id: str, request: AnswerSubmitRequest):
             message="존재하지 않는 카드입니다.",
         )
 
-    correct_choice_id = quiz["correct_choice_id"]
-    is_correct = request.choice_id == correct_choice_id
+    selected_choice = (
+        db.query(QuizChoiceDB)
+        .filter(
+            QuizChoiceDB.card_id == card_id,
+            QuizChoiceDB.choice_id == request.choice_id,
+        )
+        .one_or_none()
+    )
 
+    if selected_choice is None:
+        return AnswerSubmitResponse(
+            success=False,
+            data=None,
+            message="존재하지 않는 선택지입니다.",
+        )
+
+    is_correct = selected_choice.is_correct
     if is_correct:
         data = AnswerResult(
             card_id=card_id,

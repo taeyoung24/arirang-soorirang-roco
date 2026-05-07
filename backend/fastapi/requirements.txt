@@ -1,0 +1,7 @@
+fastapi
+uvicorn
+python-multipart
+sqlalchemy==2.0.49
+psycopg[binary]
+alembic==1.13.0
+python-dotenv==1.0.0

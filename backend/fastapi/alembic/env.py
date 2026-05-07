@@ -18,7 +18,7 @@ if config.config_file_name is not None:
 ROOT_DIR = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT_DIR))
 
-from database import Base, DATABASE_URL  # noqa: E402
+from database import Base  # noqa: E402
 from db_models import (
     CategoryDB,
     LearningSetDB,
@@ -29,7 +29,12 @@ from db_models import (
     QuizChoiceDB,
 )  # noqa: E402
 
-config.set_main_option("sqlalchemy.url", os.getenv("DATABASE_URL", DATABASE_URL))
+database_url = os.getenv("DATABASE_URL")
+
+if database_url is None:
+    raise RuntimeError("DATABASE_URL 환경변수가 설정되어 있지 않습니다.")
+
+config.set_main_option("sqlalchemy.url", database_url)
 
 target_metadata = Base.metadata
 

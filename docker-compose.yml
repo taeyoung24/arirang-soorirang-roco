@@ -4,9 +4,9 @@ services:
     container_name: arirang-postgres
     restart: always
     environment:
-      POSTGRES_DB: arirang
-      POSTGRES_USER: arirang_user
-      POSTGRES_PASSWORD: arirang_password
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
     ports:
       - "5433:5432"
     volumes:

@@ -10,8 +10,15 @@ services:
       MDD_SERVICE_MODE: api
       MDD_INFERENCE_BASE_URL: http://inference:8080
       MDD_INFERENCE_TIMEOUT_SECONDS: 120
+      MDD_ALIGNER_BASE_URL: http://aligner:8090
+      MDD_ALIGNER_TIMEOUT_SECONDS: 120
+      MDD_ALIGNER_LANGUAGE: Korean
+      MDD_GEMINI_API_KEY: ${MDD_GEMINI_API_KEY:-}
+      MDD_GEMINI_MODEL: ${MDD_GEMINI_MODEL:-gemini-2.5-flash}
+      MDD_GEMINI_TIMEOUT_SECONDS: ${MDD_GEMINI_TIMEOUT_SECONDS:-30}
     depends_on:
       - inference
+      - aligner
     restart: unless-stopped
 
   inference:
@@ -31,6 +38,22 @@ services:
       NVIDIA_DRIVER_CAPABILITIES: compute,utility
     volumes:
       - "./models:/opt/mdd/checkpoints:ro"
+    runtime: nvidia
+    ipc: host
+    restart: unless-stopped
+
+  aligner:
+    build:
+      context: .
+      dockerfile: Dockerfile.aligner
+    container_name: mdd-aligner
+    environment:
+      MDD_SERVICE_MODE: aligner
+      MDD_HOST: 0.0.0.0
+      MDD_PORT: 8090
+      MDD_ALIGNER_MODEL_ID: Qwen/Qwen3-ForcedAligner-0.6B
+      NVIDIA_VISIBLE_DEVICES: all
+      NVIDIA_DRIVER_CAPABILITIES: compute,utility
     runtime: nvidia
     ipc: host
     restart: unless-stopped

@@ -15,7 +15,7 @@ pipeline = MDDPipeline(settings, inference_backend=InProcessFairseqBackend(runne
 app = FastAPI(title="MDD Inference Service", version="0.1.0")
 
 
-@app.get("/health", response_model=HealthResponse)
+@app.get("/health", response_model=HealthResponse, response_model_exclude_none=True)
 def healthcheck() -> HealthResponse:
     return HealthResponse(
         status="ok",
@@ -25,7 +25,7 @@ def healthcheck() -> HealthResponse:
     )
 
 
-@app.post("/predict", response_model=PredictResponse)
+@app.post("/predict", response_model=PredictResponse, response_model_exclude_none=True)
 async def predict(
     script: str = Form(...),
     audio: UploadFile = File(...),
@@ -36,4 +36,10 @@ async def predict(
     except ValueError as exc:
         raise HTTPException(status_code=400, detail=str(exc)) from exc
     except MDDInferenceError as exc:
-        raise HTTPException(status_code=500, detail=str(exc)) from exc
+        message = str(exc)
+        if message == "Predicted phoneme sequence is empty.":
+            raise HTTPException(
+                status_code=422,
+                detail="No recognizable speech was detected in the audio.",
+            ) from exc
+        raise HTTPException(status_code=500, detail=message) from exc

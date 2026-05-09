@@ -24,6 +24,9 @@ class Settings:
     gemini_api_key: str
     gemini_model: str
     gemini_timeout_seconds: float
+    tts_model: str
+    tts_voice: str
+    tts_timeout_seconds: float
 
     @classmethod
     def from_env(cls) -> "Settings":
@@ -48,4 +51,7 @@ class Settings:
             gemini_api_key=os.getenv("MDD_GEMINI_API_KEY", ""),
             gemini_model=os.getenv("MDD_GEMINI_MODEL", "gemini-2.5-flash"),
             gemini_timeout_seconds=float(os.getenv("MDD_GEMINI_TIMEOUT_SECONDS", "30")),
+            tts_model=os.getenv("MDD_TTS_MODEL", "gemini-2.5-flash-preview-tts"),
+            tts_voice=os.getenv("MDD_TTS_VOICE", "Kore"),
+            tts_timeout_seconds=float(os.getenv("MDD_TTS_TIMEOUT_SECONDS", "30")),
         )

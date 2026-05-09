@@ -1,9 +1,9 @@
 from __future__ import annotations
-
 import base64
 import hashlib
-
 import httpx
+import wave
+import io
 
 class TTSService:
     BASE_URL = "https://generativelanguage.googleapis.com/v1beta/models"
@@ -20,6 +20,16 @@ class TTSService:
     @property
     def has_api_key(self) -> bool:
         return bool(self.api_key)
+    
+    @staticmethod
+    def _pcm_to_wav(pcm_bytes: bytes, sample_rate: int = 24000) -> bytes:
+        buffer = io.BytesIO()
+        with wave.open(buffer, "wb") as wf:
+            wf.setnchannels(1)
+            wf.setsampwidth(2)
+            wf.setframerate(sample_rate)
+            wf.writeframes(pcm_bytes)
+        return buffer.getvalue()
     
     def synthesize_speech(self, script: str) -> bytes:
         """
@@ -46,7 +56,7 @@ class TTSService:
         Returns:
             The raw binary audio data decoded from Base64
         """
-        
+
         if not self.has_api_key:
             raise RuntimeError("TTS API key is not configured!")
         
@@ -81,8 +91,8 @@ class TTSService:
         except (KeyError, IndexError, TypeError) as exc:
             raise RuntimeError(f"Unexpected TTS response shape: {parsed_response}") from exc
 
-        return base64.b64decode(base64_audio)
-
+        pcm_bytes = base64.b64decode(base64_audio)
+        return self._pcm_to_wav(pcm_bytes, sample_rate=24000)
 
 
 

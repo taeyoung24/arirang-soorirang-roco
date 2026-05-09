@@ -24,7 +24,7 @@ API_KEY = "ENTER_API_HERE"
 
 response = httpx.post(
     "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-tts:generateContent",
-    headers={"x-goog-api-key": "AIzaSyCQ0uo2n37Feu9jG-jIFFk3KBH8FbokpOI", "Content-Type": "application/json"},
+    headers={"x-goog-api-key": "TEST_API_HERE", "Content-Type": "application/json"},
     json={
         "contents": [{"parts": [{"text": "Hello, how are you today?"}]}],
         "generationConfig": {

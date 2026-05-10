@@ -13,6 +13,39 @@ class TimeInterval(BaseModel):
     confidence: Optional[float] = Field(default=None, ge=0.0, le=1.0)
 
 
+class PauseInterval(TimeInterval):
+    duration_ms: int = Field(ge=0)
+    source: Literal["forced", "acoustic"] = "forced"
+
+
+class StretchedInterval(TimeInterval):
+    label: str
+    unit_type: Literal["syllable", "word"]
+    ms_per_syllable: float = Field(ge=0.0)
+    source: Literal["forced"] = "forced"
+
+
+class ReferenceDurationComparison(TimeInterval):
+    label: str
+    unit_type: Literal["syllable", "word"]
+    user_duration_ms: int = Field(ge=0)
+    reference_duration_ms: int = Field(ge=0)
+    duration_delta_ms: int
+    duration_ratio: float = Field(ge=0.0)
+    source: Literal["tts_reference"] = "tts_reference"
+
+
+class ReferencePauseComparison(TimeInterval):
+    user_duration_ms: int = Field(ge=0)
+    reference_duration_ms: int = Field(ge=0)
+    duration_delta_ms: int
+    duration_ratio: Optional[float] = Field(default=None, ge=0.0)
+    pause_level: Optional[Literal["medium", "high"]] = None
+    previous_label: Optional[str] = None
+    next_label: Optional[str] = None
+    source: Literal["tts_reference"] = "tts_reference"
+
+
 class AlignmentUnit(TimeInterval):
     label: str
     unit_type: Literal["phoneme", "syllable", "word"]
@@ -51,8 +84,28 @@ class AudioQualitySummary(BaseModel):
 class ProsodySummary(BaseModel):
     speech_rate_syllables_per_second: Optional[float] = None
     articulation_rate_syllables_per_second: Optional[float] = None
+    expected_syllable_count: Optional[int] = Field(default=None, ge=0)
+    aligned_speech_start_ms: Optional[int] = Field(default=None, ge=0)
+    aligned_speech_end_ms: Optional[int] = Field(default=None, ge=0)
+    speech_duration_ms: Optional[int] = Field(default=None, ge=0)
+    leading_silence_ms: Optional[int] = Field(default=None, ge=0)
+    trailing_silence_ms: Optional[int] = Field(default=None, ge=0)
     pause_count: int = Field(default=0, ge=0)
     pause_total_ms: int = Field(default=0, ge=0)
+    interior_pause_count: int = Field(default=0, ge=0)
+    interior_pause_total_ms: int = Field(default=0, ge=0)
+    longest_interior_pause_ms: int = Field(default=0, ge=0)
+    pause_intervals: list[PauseInterval] = Field(default_factory=list)
+    slowest_aligned_unit: Optional[str] = None
+    slowest_aligned_unit_ms_per_syllable: Optional[float] = Field(default=None, ge=0.0)
+    stretched_intervals: list[StretchedInterval] = Field(default_factory=list)
+    reference_speech_duration_ms: Optional[int] = Field(default=None, ge=0)
+    speech_duration_ratio: Optional[float] = Field(default=None, ge=0.0)
+    reference_duration_comparisons: list[ReferenceDurationComparison] = Field(default_factory=list)
+    reference_pause_comparisons: list[ReferencePauseComparison] = Field(default_factory=list)
+    timing_source: Literal["forced_alignment", "acoustic", "none"] = "acoustic"
+    reference_timing_source: Optional[Literal["tts_reference"]] = None
+    rate_reliability: Literal["high", "medium", "low"] = "low"
     utterance_f0_mean_hz: Optional[float] = None
     utterance_f0_range_semitones: Optional[float] = None
     phrase_final_f0_slope: Optional[float] = None

@@ -63,6 +63,7 @@ class AcousticAnalyzer:
         audio_bytes: bytes,
         prediction: PredictResponse,
         forced_alignment: Optional[ForcedAlignmentResponse] = None,
+        reference_alignment: Optional[ForcedAlignmentResponse] = None,
         include_llm_note: bool = False,
         feedback_language: str = "ko",
     ) -> tuple[PronunciationAnalysisResponse, AcousticEvidencePacket]:
@@ -73,14 +74,20 @@ class AcousticAnalyzer:
             prediction.predicted_phonemes,
         )
         alignments, used_forced_alignment = self._resolve_alignments(
+            prediction.script,
             prediction.canonical_phonemes,
             prediction.predicted_phonemes,
             audio.duration_ms,
             forced_alignment,
             observed_by_expected,
         )
+        reference_alignments = self._resolve_reference_alignments(
+            prediction.script,
+            prediction.canonical_phonemes,
+            reference_alignment,
+        )
         segment_features = self.feature_extractor.extract_segment_features(audio, alignments)
-        prosody = self.feature_extractor.extract_prosody(audio)
+        prosody = self.feature_extractor.extract_prosody(audio, alignments, reference_alignments)
         diagnostics = self.diagnostic_engine.build(
             prediction.canonical_phonemes,
             prediction.predicted_phonemes,
@@ -93,7 +100,6 @@ class AcousticAnalyzer:
         if used_forced_alignment:
             notes = [
                 "Word and syllable timings come from Qwen3 forced alignment.",
-                "Phoneme timings are subdivided within the aligned syllable span and remain approximate.",
             ]
         else:
             notes = [
@@ -102,6 +108,10 @@ class AcousticAnalyzer:
             ]
         if include_llm_note:
             notes.append("LLM feedback is generated from structured evidence, not from raw audio.")
+        if reference_alignment and reference_alignments:
+            notes.append("Prosodic timing diagnostics compare learner speech against cached TTS reference alignment.")
+        elif used_forced_alignment:
+            notes.append("No TTS reference alignment was supplied, so reference-based prosody diagnostics are unavailable.")
 
         evidence = AcousticEvidencePacket(
             script=prediction.script,
@@ -182,6 +192,7 @@ class AcousticAnalyzer:
 
     def _resolve_alignments(
         self,
+        script: str,
         canonical: str,
         predicted: str,
         duration_ms: int,
@@ -190,6 +201,7 @@ class AcousticAnalyzer:
     ) -> tuple[list[AlignmentUnit], bool]:
         if forced_alignment and forced_alignment.items:
             return self._build_alignments_from_forced(
+                script,
                 canonical,
                 predicted,
                 forced_alignment,
@@ -197,6 +209,25 @@ class AcousticAnalyzer:
                 observed_by_expected,
             ), True
         return self._build_alignments_heuristic(canonical, predicted, duration_ms, observed_by_expected), False
+
+    def _resolve_reference_alignments(
+        self,
+        script: str,
+        canonical: str,
+        reference_alignment: Optional[ForcedAlignmentResponse],
+    ) -> list[AlignmentUnit]:
+        if not reference_alignment or not reference_alignment.items:
+            return []
+        observed_by_expected, _ = align_phonemes(canonical, canonical)
+        duration_ms = max((item.end_ms for item in reference_alignment.items), default=0)
+        return self._build_alignments_from_forced(
+            script,
+            canonical,
+            canonical,
+            reference_alignment,
+            duration_ms,
+            observed_by_expected,
+        )
 
     def _load_audio(self, audio_bytes: bytes) -> AudioBuffer:
         with sf.SoundFile(io.BytesIO(audio_bytes)) as audio_file:
@@ -289,6 +320,7 @@ class AcousticAnalyzer:
 
     def _build_alignments_from_forced(
         self,
+        script: str,
         canonical: str,
         predicted: str,
         forced_alignment: ForcedAlignmentResponse,
@@ -296,99 +328,50 @@ class AcousticAnalyzer:
         observed_by_expected: list[str | None],
     ) -> list[AlignmentUnit]:
         alignments: list[AlignmentUnit] = []
-        syllable_chars = [char for char in self._compose_jamo(canonical) if not char.isspace()]
         forced_items = [item for item in forced_alignment.items if item.text.strip()]
 
-        canonical_groups = self._canonical_syllable_groups(canonical)
-        phoneme_index = 0
-        syllable_index = 0
-
-        for item in forced_items:
-            token_syllables = [char for char in item.text if not char.isspace()]
-            if not token_syllables:
-                continue
-            remaining = len(canonical_groups) - syllable_index
-            if remaining <= 0:
-                break
-            take = min(len(token_syllables), remaining)
-            token_duration = max(1, item.end_ms - item.start_ms)
-            local_cursor = item.start_ms
-            for local_idx in range(take):
-                group = canonical_groups[syllable_index]
-                syllable_label = syllable_chars[syllable_index] if syllable_index < len(syllable_chars) else token_syllables[local_idx]
-                syllable_end = item.end_ms if local_idx == take - 1 else min(
-                    item.end_ms,
-                    item.start_ms + int(round(token_duration * (local_idx + 1) / take)),
-                )
-                alignments.append(
-                    AlignmentUnit(
-                        label=syllable_label,
-                        unit_type="syllable",
-                        expected_label=syllable_label,
-                        observed_label=token_syllables[local_idx],
-                        start_ms=local_cursor,
-                        end_ms=max(local_cursor + 1, syllable_end),
-                        confidence=0.85,
-                        source="forced",
-                    )
-                )
-                group_weights = [2.0 if ch in self.VOWELS else 1.0 for ch in group]
-                total_weight = sum(group_weights) or 1.0
-                phoneme_cursor = local_cursor
-                for offset, (char, weight) in enumerate(zip(group, group_weights)):
-                    span_ms = max(10, int(round((syllable_end - local_cursor) * weight / total_weight)))
-                    phoneme_end = syllable_end if offset == len(group) - 1 else min(syllable_end, phoneme_cursor + span_ms)
-                    observed = observed_by_expected[phoneme_index] if phoneme_index < len(observed_by_expected) else None
-                    alignments.append(
-                        AlignmentUnit(
-                            label=char,
-                            unit_type="phoneme",
-                            expected_label=char,
-                            observed_label=observed,
-                            start_ms=phoneme_cursor,
-                            end_ms=max(phoneme_cursor + 1, phoneme_end),
-                            confidence=0.6,
-                            source="forced",
-                        )
-                    )
-                    phoneme_cursor = phoneme_end
-                    phoneme_index += 1
-                local_cursor = syllable_end
-                syllable_index += 1
+        syllable_alignments = self._forced_syllable_units(script, forced_items)
+        if syllable_alignments:
+            alignments.extend(syllable_alignments)
+            alignments.extend(self._forced_word_units_from_syllables(script, syllable_alignments))
+        else:
+            alignments.extend(self._forced_word_units(forced_items))
 
         if not alignments:
             return self._build_alignments_heuristic(canonical, predicted, duration_ms)
 
-        alignments.extend(self._append_forced_word_units(forced_items))
-        phoneme_units = [unit for unit in alignments if unit.unit_type == "phoneme"]
         syllable_units = [unit for unit in alignments if unit.unit_type == "syllable"]
         word_units = [unit for unit in alignments if unit.unit_type == "word"]
-        return phoneme_units + syllable_units + word_units
+        return syllable_units + word_units
 
     @classmethod
-    def _canonical_syllable_groups(cls, canonical: str) -> list[list[str]]:
-        groups: list[list[str]] = []
-        index = 0
-        while index < len(canonical):
-            start = index
-            if canonical[index] not in cls.CHOSEONG or index + 1 >= len(canonical):
-                groups.append([canonical[index]])
-                index += 1
-                continue
-            if canonical[index + 1] not in cls.JUNGSEONG:
-                groups.append([canonical[index]])
-                index += 1
-                continue
-            index += 2
-            if index < len(canonical) and canonical[index] in cls.JONGSEONG[1:]:
-                next_is_vowel = index + 1 < len(canonical) and canonical[index + 1] in cls.JUNGSEONG
-                if not next_is_vowel:
-                    index += 1
-            groups.append(list(canonical[start:index]))
-        return groups
+    def _forced_syllable_units(cls, script: str, forced_items) -> list[AlignmentUnit]:
+        script_syllables = [char for char in script if cls._is_hangul_syllable(char)]
+        if not script_syllables:
+            return []
+        syllable_items = [item for item in forced_items if cls._is_single_hangul_syllable(item.text.strip())]
+        if not syllable_items:
+            return []
+
+        units: list[AlignmentUnit] = []
+        for expected, item in zip(script_syllables, syllable_items):
+            observed = item.text.strip()
+            units.append(
+                AlignmentUnit(
+                    label=expected,
+                    unit_type="syllable",
+                    expected_label=expected,
+                    observed_label=observed,
+                    start_ms=item.start_ms,
+                    end_ms=max(item.start_ms + 1, item.end_ms),
+                    confidence=0.85,
+                    source="forced",
+                )
+            )
+        return units
 
     @staticmethod
-    def _append_forced_word_units(forced_items) -> list[AlignmentUnit]:
+    def _forced_word_units(forced_items) -> list[AlignmentUnit]:
         words: list[AlignmentUnit] = []
         for item in forced_items:
             words.append(
@@ -404,3 +387,41 @@ class AcousticAnalyzer:
                 )
             )
         return words
+
+    @classmethod
+    def _forced_word_units_from_syllables(cls, canonical: str, syllable_units: list[AlignmentUnit]) -> list[AlignmentUnit]:
+        words: list[AlignmentUnit] = []
+        cursor = 0
+        for word in cls._script_words(canonical):
+            syllable_count = sum(1 for char in word if cls._is_hangul_syllable(char))
+            if syllable_count <= 0:
+                continue
+            group = syllable_units[cursor : cursor + syllable_count]
+            cursor += len(group)
+            if len(group) != syllable_count:
+                break
+            words.append(
+                AlignmentUnit(
+                    label=word,
+                    unit_type="word",
+                    expected_label=word,
+                    observed_label="".join(unit.observed_label or "" for unit in group),
+                    start_ms=group[0].start_ms,
+                    end_ms=group[-1].end_ms,
+                    confidence=0.8,
+                    source="forced",
+                )
+            )
+        return words
+
+    @staticmethod
+    def _is_hangul_syllable(char: str) -> bool:
+        return len(char) == 1 and 0xAC00 <= ord(char) <= 0xD7A3
+
+    @classmethod
+    def _is_single_hangul_syllable(cls, text: str) -> bool:
+        return len(text) == 1 and cls._is_hangul_syllable(text)
+
+    @staticmethod
+    def _script_words(canonical: str) -> list[str]:
+        return [word for word in canonical.split() if word]

@@ -1,0 +1,16 @@
+{
+  "audio_file": "../sound/중간공백_2.m4a",
+  "label": "interior_pause",
+  "script": "집에 가고싶다",
+  "segments": [
+    {
+      "text": "집에 가고싶다",
+      "issue": "interior_pause",
+      "pause_after": "집에",
+      "pause_before": "가고싶다",
+      "start_ms": null,
+      "end_ms": null
+    }
+  ],
+  "notes": "띄어쓰기 구간의 중간 공백이 늘어짐."
+}

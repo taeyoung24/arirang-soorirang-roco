@@ -78,6 +78,7 @@ curl -X POST http://localhost:8000/predict `
 curl -X POST http://localhost:8000/analyze-pronunciation-basic `
   -F "script=옷을 입어요" `
   -F "feedback_language=ko" `
+  -F "use_tts_reference=true" `
   -F "debug=false" `
   -F "audio=@.\sample.wav"
 ```
@@ -88,6 +89,7 @@ LLM 피드백 포함 분석 요청:
 curl -X POST http://localhost:8000/analyze-pronunciation-llm `
   -F "script=옷을 입어요" `
   -F "feedback_language=ko" `
+  -F "use_tts_reference=true" `
   -F "debug=false" `
   -F "audio=@.\sample.wav"
 ```
@@ -98,6 +100,7 @@ curl -X POST http://localhost:8000/analyze-pronunciation-llm `
 - `Qwen/Qwen3-ForcedAligner-0.6B`로 word/character timestamp 정렬
 - 정렬 결과를 바탕으로 음절/음소 구간 생성
 - lightweight acoustic feature extractor로 구간별 debug feature 추출
+- `use_tts_reference=true`이면 TTS reference를 자동 생성/캐싱하고, cached TTS reference alignment와 사용자 timing을 비교해 늘어짐/중간 공백 후보 생성
 - in-process fairseq backend에서는 hypothesis decoder score를 `model_score`로 노출
 - MDD 음소 mismatch를 중심으로 오류 후보 생성
 - `/analyze-pronunciation-llm`에서는 `MDD_GEMINI_API_KEY`가 있으면 상위 진단과 관련 feature만 압축해 Gemini API로 한국어 피드백 생성

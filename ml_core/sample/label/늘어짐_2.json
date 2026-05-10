@@ -1,0 +1,14 @@
+{
+  "audio_file": "../sound/늘어짐_2.m4a",
+  "label": "stretched_pronunciation",
+  "script": "핸드폰 가지고 가세요",
+  "segments": [
+    {
+      "text": "고",
+      "issue": "stretched_pronunciation",
+      "start_ms": null,
+      "end_ms": null
+    }
+  ],
+  "notes": ""
+}

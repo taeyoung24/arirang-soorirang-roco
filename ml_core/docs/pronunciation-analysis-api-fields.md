@@ -4,6 +4,9 @@ This document explains the response fields for:
 
 - `POST /analyze-pronunciation-basic`
 - `POST /analyze-pronunciation-llm`
+- `POST /reference-cache`
+- `POST /reference-cache/generate`
+- `GET /reference-cache/{cache_key}`
 
 By default, both endpoints return a compact response. Pass `debug=true` to include full alignments, acoustic features, and phoneme scores.
 
@@ -15,7 +18,43 @@ By default, both endpoints return a compact response. Pass `debug=true` to inclu
 | `audio` | yes | - | Learner speech audio file. |
 | `language` | no | `Korean` | Language name passed to the forced aligner. Usually omit this for Korean. |
 | `feedback_language` | no | `ko` | Language used for LLM feedback text. Examples: `ko`, `en`, `ja`, `zh-CN`. |
+| `reference_cache_key` | no | - | Cache key for a TTS reference audio/alignment entry. When provided, prosody diagnostics compare learner timing against this reference. |
+| `use_tts_reference` | no | `true` | If no `reference_cache_key` is supplied, generate or reuse a TTS reference automatically. |
 | `debug` | no | `false` | If `true`, returns full diagnostic internals. If `false`, returns compact fields only. |
+
+## Reference Cache
+
+The reference cache stores TTS-generated answer audio and its Qwen forced alignment result in object storage. In Docker Compose this uses MinIO.
+
+`POST /reference-cache` accepts:
+
+| Field | Required | Default | Description |
+| --- | --- | --- | --- |
+| `script` | yes | - | Target script used to generate the TTS reference. |
+| `audio` | yes | - | TTS reference audio, normally normalized WAV. |
+| `alignment_json` | yes | - | Qwen forced alignment response JSON for the TTS reference audio. |
+| `language` | no | `Korean` | Alignment language. |
+| `tts_provider` | no | `unknown` | TTS provider name. |
+| `tts_model` | no | `unknown` | TTS model or engine version. |
+| `voice_id` | no | `default` | TTS voice identifier. |
+| `speaking_rate` | no | `1.0` | TTS speaking rate used when generating the reference. |
+| `audio_format` | no | `wav_16khz_mono` | Normalized audio format. |
+| `aligner_model_id` | no | `Qwen/Qwen3-ForcedAligner-0.6B` | Aligner model used to create `alignment_json`. |
+| `alignment_resolution_ms` | no | `80` | Aligner timestamp resolution. |
+
+The cache key is a SHA-256 hash over normalized script, language, TTS provider/model/voice/rate, audio format, aligner model, aligner resolution, and cache schema version.
+
+Objects are stored as:
+
+```text
+tts-reference/{cache_key}/reference.wav
+tts-reference/{cache_key}/alignment.json
+tts-reference/{cache_key}/manifest.json
+```
+
+`GET /reference-cache/{cache_key}` returns the manifest if the cache entry exists.
+
+`POST /reference-cache/generate` accepts `script` and optional `language`. It generates a TTS reference audio file, runs Qwen forced alignment for that TTS audio, stores both objects in MinIO, and returns the manifest. The analysis endpoints call this path automatically when `use_tts_reference=true` and no `reference_cache_key` was supplied.
 
 ## Top-Level Response Fields
 
@@ -39,7 +78,7 @@ The following fields are compacted unless `debug=true`:
 | `predicted_phoneme_scores` | Only issue-related predicted phoneme scores are returned. |
 | `target_phoneme_scores` | Only issue-related target phoneme scores are returned. |
 | `syllable_candidate_scores` | Only issue-related syllable candidate scores are returned. |
-| `prosody` | Removed in compact mode. |
+| `prosody` | Removed in compact mode unless a top diagnostic candidate is prosodic. |
 | `model_score` | Removed in compact mode. |
 
 ## Important Confidence Types
@@ -109,6 +148,30 @@ Alignment units connect text units to time spans.
 | `source` | `forced` or `heuristic`. |
 
 Qwen forced alignment provides word/character or syllable-like spans. Phoneme spans are currently subdivided inside syllable spans, so phoneme timing is approximate.
+
+## `prosody`
+
+Prosody is computed from Qwen forced alignment when aligned word and syllable units are available. If `reference_cache_key` is supplied, timing diagnostics are based on comparison against the cached TTS reference alignment. The thresholds are intentionally lenient for non-native Korean learners; the TTS reference is a baseline, not a required native-speed target. Without a TTS reference, prosody values may be returned but prosodic diagnostic candidates are not emitted.
+
+| Field | Description |
+| --- | --- |
+| `timing_source` | `forced_alignment`, `acoustic`, or `none`. |
+| `speech_rate_syllables_per_second` | Expected syllables divided by the aligned speech span. |
+| `articulation_rate_syllables_per_second` | Expected syllables divided by aligned speech span after removing detected interior pauses. |
+| `expected_syllable_count` | Number of aligned syllable units used for rate calculation. |
+| `speech_duration_ms` | Time from the first aligned word to the last aligned word. |
+| `leading_silence_ms`, `trailing_silence_ms` | Silence before/after the aligned speech span. These are not treated as slow pronunciation. |
+| `interior_pause_count`, `interior_pause_total_ms` | Count and total duration of word-gap pauses inside the utterance. |
+| `longest_interior_pause_ms` | Longest Qwen-aligned gap between adjacent words/tokens. |
+| `pause_intervals` | Start/end/duration for detected interior pauses. |
+| `slowest_aligned_unit` | Word/token with the largest duration per syllable. |
+| `slowest_aligned_unit_ms_per_syllable` | Duration per syllable for `slowest_aligned_unit`. |
+| `rate_reliability` | Reliability of rate and pause calculations. |
+| `reference_timing_source` | `tts_reference` when a cached TTS reference was used. |
+| `reference_speech_duration_ms` | Speech span of the cached TTS reference. |
+| `speech_duration_ratio` | Learner speech duration divided by reference speech duration. |
+| `reference_duration_comparisons` | Per-syllable/word learner duration vs reference duration. |
+| `reference_pause_comparisons` | Learner word-gap pauses vs reference word-gap pauses. |
 
 ## `predicted_phoneme_scores`
 
@@ -190,6 +253,10 @@ Common codes:
 | `segmental_substitution` | Expected phoneme was decoded as another phoneme. |
 | `aspiration_insufficient` | Aspirated consonant was decoded closer to a lenis consonant. |
 | `vowel_quality_shift` | Vowel was decoded as another vowel. |
+| `speech_rate_too_slow` | Qwen alignment indicates the utterance syllable rate is too slow. |
+| `long_interior_pause` | Qwen alignment found a long pause between aligned words/tokens. |
+| `excessive_interior_pause` | Qwen alignment found repeated interior pauses. |
+| `stretched_aligned_unit` | One aligned word/token is long relative to its syllable count. |
 | `audio_quality_limited` | Audio quality limits interpretation. |
 
 ## `segment_features`

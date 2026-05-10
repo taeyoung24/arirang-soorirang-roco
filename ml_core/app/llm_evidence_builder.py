@@ -5,6 +5,7 @@ from app.acoustic_schemas import (
     AlignmentUnit,
     DiagnosticCandidate,
     PhonemeEdit,
+    ProsodySummary,
     SegmentFeatureBundle,
 )
 
@@ -48,7 +49,7 @@ class LLMEvidenceBuilder:
             phoneme_edits=phoneme_edits,
             alignments=self._relevant_alignments(evidence.alignments, target_units),
             segment_features=self._relevant_features(evidence.segment_features, target_units),
-            prosody=None,
+            prosody=self._relevant_prosody(evidence.prosody, diagnostics, target_units),
             diagnostic_candidates=diagnostics,
             policy=evidence.policy,
         )
@@ -62,6 +63,12 @@ class LLMEvidenceBuilder:
         evidence_rank = {
             "phoneme_edit_alignment": 2,
             "predicted_phoneme_mismatch": 2,
+            "qwen_forced_alignment_syllable_rate": 2,
+            "qwen_forced_alignment_word_gaps": 2,
+            "qwen_forced_alignment_word_duration": 2,
+            "tts_reference_speech_duration_ratio": 2,
+            "tts_reference_pause_delta": 2,
+            "tts_reference_duration_ratio": 2,
             "syllable_ctc_likelihood_comparison": 1,
         }
         ranked = sorted(
@@ -100,7 +107,7 @@ class LLMEvidenceBuilder:
         result = [
             unit
             for unit in alignments
-            if unit.unit_type in {"phoneme", "syllable"} and (unit.label in target_units or unit.expected_label in target_units)
+            if unit.unit_type in {"syllable", "word"} and (unit.label in target_units or unit.expected_label in target_units)
         ]
         if result:
             return result[:12]
@@ -132,3 +139,36 @@ class LLMEvidenceBuilder:
                     )
                 )
         return bundles[:8]
+
+    @staticmethod
+    def _has_prosodic_diagnostic(diagnostics: list[DiagnosticCandidate]) -> bool:
+        return any(item.category == "prosodic" for item in diagnostics)
+
+    def _relevant_prosody(
+        self,
+        prosody: ProsodySummary | None,
+        diagnostics: list[DiagnosticCandidate],
+        target_units: set[str],
+    ) -> ProsodySummary | None:
+        if not self._should_include_prosody(prosody, diagnostics):
+            return None
+        assert prosody is not None
+        duration_comparisons = [
+            item for item in prosody.reference_duration_comparisons if not target_units or item.label in target_units
+        ][:6]
+        pause_comparisons = [
+            item for item in prosody.reference_pause_comparisons if item.pause_level is not None
+        ][:5]
+        return prosody.model_copy(
+            update={
+                "reference_duration_comparisons": duration_comparisons,
+                "reference_pause_comparisons": pause_comparisons,
+            }
+        )
+
+    def _should_include_prosody(self, prosody: ProsodySummary | None, diagnostics: list[DiagnosticCandidate]) -> bool:
+        if prosody is None:
+            return False
+        if self._has_prosodic_diagnostic(diagnostics):
+            return True
+        return any(item.pause_level is not None for item in prosody.reference_pause_comparisons)

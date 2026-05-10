@@ -10,6 +10,14 @@ class DiagnosticEngine:
         "ㅙ", "ㅚ", "ㅛ", "ㅜ", "ㅝ", "ㅞ", "ㅟ", "ㅠ", "ㅡ", "ㅢ", "ㅣ",
     }
     ASPIRATED_TO_LENIS = {"ㅋ": "ㄱ", "ㅌ": "ㄷ", "ㅍ": "ㅂ", "ㅊ": "ㅈ"}
+    SLOW_SPEECH_DURATION_RATIO = 2.3
+    VERY_SLOW_SPEECH_DURATION_RATIO = 2.9
+    STRETCHED_SYLLABLE_DURATION_RATIO = 2.0
+    STRETCHED_SYLLABLE_DELTA_MS = 150
+    STRETCHED_WORD_DURATION_RATIO = 2.0
+    STRETCHED_WORD_DELTA_MS = 450
+    VERY_STRETCHED_DURATION_RATIO = 3.0
+    VERY_STRETCHED_DELTA_MS = 300
 
     def build(
         self,
@@ -23,6 +31,7 @@ class DiagnosticEngine:
     ) -> list[DiagnosticCandidate]:
         diagnostics = []
         diagnostics.extend(self._phoneme_mismatch_diagnostics(phoneme_edits, syllable_candidate_scores))
+        diagnostics.extend(self._prosody_diagnostics(prosody, quality))
         diagnostics.extend(self._quality_diagnostics(quality))
         return sorted(diagnostics, key=lambda item: (self._severity_rank(item.severity), item.confidence), reverse=True)
 
@@ -120,6 +129,158 @@ class DiagnosticEngine:
                 rationale="Audio quality limits the confidence of phonetic interpretation.",
             )
         ]
+
+    def _prosody_diagnostics(
+        self,
+        prosody: ProsodySummary,
+        quality: AudioQualitySummary,
+    ) -> list[DiagnosticCandidate]:
+        if prosody.timing_source != "forced_alignment" or prosody.reference_timing_source != "tts_reference":
+            return []
+        if quality.overall_reliability == "low" and prosody.rate_reliability != "high":
+            return []
+
+        diagnostics: list[DiagnosticCandidate] = []
+        long_pauses = [
+            item
+            for item in prosody.reference_pause_comparisons
+            if item.pause_level in {"medium", "high"}
+        ][:3]
+        for item in long_pauses:
+            severity = "high" if item.pause_level == "high" else "medium"
+            confidence = 0.82 if severity == "high" else 0.76
+            diagnostics.append(
+                DiagnosticCandidate(
+                    diagnosis_code="long_interior_pause",
+                    category="prosodic",
+                    target_unit=None,
+                    severity=severity,
+                    confidence=confidence,
+                    evidence_keys=[
+                        "tts_reference_pause_delta",
+                        "reference_pause_comparisons",
+                    ],
+                    rationale=(
+                        "Learner pause is longer than the cached TTS reference pause: "
+                        f"after={item.previous_label}, before={item.next_label}, "
+                        f"user_pause_ms={item.user_duration_ms}, "
+                        f"reference_pause_ms={item.reference_duration_ms}, "
+                        f"delta_ms={item.duration_delta_ms}, "
+                        f"pause_level={item.pause_level}."
+                    ),
+                )
+            )
+
+        stretched_units = self._deduplicate_stretched_units([
+            item
+            for item in prosody.reference_duration_comparisons
+            if self._is_stretched_unit(item)
+        ])[:3]
+        for item in stretched_units:
+            severity = self._stretched_severity(item)
+            diagnostics.append(
+                DiagnosticCandidate(
+                    diagnosis_code="stretched_aligned_unit",
+                    category="prosodic",
+                    target_unit=item.label,
+                    severity=severity,
+                    confidence=0.78 if severity == "high" else 0.7,
+                    evidence_keys=[
+                        "tts_reference_duration_ratio",
+                        "reference_duration_comparisons",
+                    ],
+                    rationale=(
+                        "Learner aligned syllable/word is longer than the cached TTS reference: "
+                        f"unit={item.label}, "
+                        f"unit_type={item.unit_type}, "
+                        f"user_duration_ms={item.user_duration_ms}, "
+                        f"reference_duration_ms={item.reference_duration_ms}, "
+                        f"duration_ratio={item.duration_ratio}, "
+                        f"ratio_threshold={self._stretched_ratio_threshold(item.unit_type)}, "
+                        f"delta_threshold_ms={self._stretched_delta_threshold(item.unit_type)}."
+                    ),
+                )
+            )
+
+        speech_ratio = prosody.speech_duration_ratio
+        if speech_ratio is not None and speech_ratio >= self.SLOW_SPEECH_DURATION_RATIO and not long_pauses and not stretched_units:
+            severity = "high" if speech_ratio >= self.VERY_SLOW_SPEECH_DURATION_RATIO else "medium"
+            confidence = 0.78 if severity == "high" else 0.7
+            diagnostics.append(
+                DiagnosticCandidate(
+                    diagnosis_code="speech_rate_too_slow",
+                    category="prosodic",
+                    target_unit=None,
+                    severity=severity,
+                    confidence=confidence,
+                    evidence_keys=[
+                        "tts_reference_speech_duration_ratio",
+                        "speech_duration_ms",
+                        "reference_speech_duration_ms",
+                    ],
+                    rationale=(
+                        "Learner speech is slower than the cached TTS reference: "
+                        f"speech_duration_ratio={speech_ratio}, "
+                        f"threshold={self.SLOW_SPEECH_DURATION_RATIO}, "
+                        f"speech_duration_ms={prosody.speech_duration_ms}, "
+                        f"reference_speech_duration_ms={prosody.reference_speech_duration_ms}."
+                    ),
+                )
+            )
+
+        if len(long_pauses) >= 2:
+            severity = "high" if any(item.pause_level == "high" for item in long_pauses) else "medium"
+            diagnostics.append(
+                DiagnosticCandidate(
+                    diagnosis_code="excessive_interior_pause",
+                    category="prosodic",
+                    target_unit=None,
+                    severity=severity,
+                    confidence=0.74 if severity == "high" else 0.72,
+                    evidence_keys=[
+                        "tts_reference_pause_delta",
+                        "reference_pause_comparisons",
+                    ],
+                    rationale=(
+                        "Learner has repeated pauses longer than the cached TTS reference: "
+                        f"long_reference_based_pause_count={len(long_pauses)}."
+                    ),
+                )
+            )
+
+        return diagnostics
+
+    def _is_stretched_unit(self, item) -> bool:
+        return (
+            item.duration_ratio >= self._stretched_ratio_threshold(item.unit_type)
+            and item.duration_delta_ms >= self._stretched_delta_threshold(item.unit_type)
+        )
+
+    def _stretched_ratio_threshold(self, unit_type: str) -> float:
+        if unit_type == "syllable":
+            return self.STRETCHED_SYLLABLE_DURATION_RATIO
+        return self.STRETCHED_WORD_DURATION_RATIO
+
+    def _stretched_delta_threshold(self, unit_type: str) -> int:
+        if unit_type == "syllable":
+            return self.STRETCHED_SYLLABLE_DELTA_MS
+        return self.STRETCHED_WORD_DELTA_MS
+
+    def _stretched_severity(self, item) -> str:
+        if item.duration_ratio >= self.VERY_STRETCHED_DURATION_RATIO and item.duration_delta_ms >= self.VERY_STRETCHED_DELTA_MS:
+            return "high"
+        return "medium"
+
+    def _deduplicate_stretched_units(self, items: list) -> list:
+        syllables = [item for item in items if item.unit_type == "syllable"]
+        result = []
+        for item in items:
+            if item.unit_type == "word" and any(
+                syllable.start_ms >= item.start_ms and syllable.end_ms <= item.end_ms for syllable in syllables
+            ):
+                continue
+            result.append(item)
+        return result
 
     @staticmethod
     def _severity_rank(severity: str) -> int:

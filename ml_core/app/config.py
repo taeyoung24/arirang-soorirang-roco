@@ -24,6 +24,16 @@ class Settings:
     gemini_api_key: str
     gemini_model: str
     gemini_timeout_seconds: float
+    object_storage_enabled: bool
+    object_storage_endpoint: str
+    object_storage_access_key: str
+    object_storage_secret_key: str
+    object_storage_bucket: str
+    object_storage_secure: bool
+    tts_provider: str
+    tts_voice_id: str
+    tts_speaking_rate: float
+    tts_model: str
 
     @classmethod
     def from_env(cls) -> "Settings":
@@ -48,4 +58,14 @@ class Settings:
             gemini_api_key=os.getenv("MDD_GEMINI_API_KEY", ""),
             gemini_model=os.getenv("MDD_GEMINI_MODEL", "gemini-2.5-flash"),
             gemini_timeout_seconds=float(os.getenv("MDD_GEMINI_TIMEOUT_SECONDS", "30")),
+            object_storage_enabled=os.getenv("MDD_OBJECT_STORAGE_ENABLED", "false").lower() in {"1", "true", "yes"},
+            object_storage_endpoint=os.getenv("MDD_OBJECT_STORAGE_ENDPOINT", "localhost:9000"),
+            object_storage_access_key=os.getenv("MDD_OBJECT_STORAGE_ACCESS_KEY", "mddadmin"),
+            object_storage_secret_key=os.getenv("MDD_OBJECT_STORAGE_SECRET_KEY", "mddadmin123"),
+            object_storage_bucket=os.getenv("MDD_OBJECT_STORAGE_BUCKET", "mdd-reference-cache"),
+            object_storage_secure=os.getenv("MDD_OBJECT_STORAGE_SECURE", "false").lower() in {"1", "true", "yes"},
+            tts_provider=os.getenv("MDD_TTS_PROVIDER", "edge"),
+            tts_voice_id=os.getenv("MDD_TTS_VOICE_ID", "ko-KR-SunHiNeural"),
+            tts_speaking_rate=float(os.getenv("MDD_TTS_SPEAKING_RATE", "1.0")),
+            tts_model=os.getenv("MDD_TTS_MODEL", "edge-tts"),
         )

@@ -16,9 +16,20 @@ services:
       MDD_GEMINI_API_KEY: ${MDD_GEMINI_API_KEY:-}
       MDD_GEMINI_MODEL: ${MDD_GEMINI_MODEL:-gemini-2.5-flash}
       MDD_GEMINI_TIMEOUT_SECONDS: ${MDD_GEMINI_TIMEOUT_SECONDS:-30}
+      MDD_OBJECT_STORAGE_ENABLED: ${MDD_OBJECT_STORAGE_ENABLED:-true}
+      MDD_OBJECT_STORAGE_ENDPOINT: minio:9000
+      MDD_OBJECT_STORAGE_ACCESS_KEY: ${MDD_OBJECT_STORAGE_ACCESS_KEY:-mddadmin}
+      MDD_OBJECT_STORAGE_SECRET_KEY: ${MDD_OBJECT_STORAGE_SECRET_KEY:-mddadmin123}
+      MDD_OBJECT_STORAGE_BUCKET: ${MDD_OBJECT_STORAGE_BUCKET:-mdd-reference-cache}
+      MDD_OBJECT_STORAGE_SECURE: ${MDD_OBJECT_STORAGE_SECURE:-false}
+      MDD_TTS_PROVIDER: ${MDD_TTS_PROVIDER:-edge}
+      MDD_TTS_MODEL: ${MDD_TTS_MODEL:-edge-tts}
+      MDD_TTS_VOICE_ID: ${MDD_TTS_VOICE_ID:-ko-KR-SunHiNeural}
+      MDD_TTS_SPEAKING_RATE: ${MDD_TTS_SPEAKING_RATE:-1.0}
     depends_on:
       - inference
       - aligner
+      - minio
     restart: unless-stopped
 
   inference:
@@ -57,3 +68,20 @@ services:
     runtime: nvidia
     ipc: host
     restart: unless-stopped
+
+  minio:
+    image: minio/minio:latest
+    container_name: mdd-minio
+    command: server /data --console-address ":9001"
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    environment:
+      MINIO_ROOT_USER: ${MDD_OBJECT_STORAGE_ACCESS_KEY:-mddadmin}
+      MINIO_ROOT_PASSWORD: ${MDD_OBJECT_STORAGE_SECRET_KEY:-mddadmin123}
+    volumes:
+      - minio-data:/data
+    restart: unless-stopped
+
+volumes:
+  minio-data:

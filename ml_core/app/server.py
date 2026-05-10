@@ -11,6 +11,8 @@ from app.gemini_client import GeminiFeedbackClient
 from app.inference_client import InferenceClient
 from app.pronunciation_analysis_service import PronunciationAnalysisService
 from app.schemas import HealthResponse, PredictResponse
+from app.stress_analyzer import StressAnalyzer
+from app.tts_service import TTSService
 
 
 settings = Settings.from_env()
@@ -23,6 +25,13 @@ analysis_service = PronunciationAnalysisService(
         model=settings.gemini_model,
         timeout_seconds=settings.gemini_timeout_seconds,
     ),
+    tts_service=TTSService(
+        api_key=settings.gemini_api_key,
+        model=settings.tts_model,
+        voice=settings.tts_voice,
+        timeout_seconds=settings.tts_timeout_seconds,
+    ),
+    stress_analyzer=StressAnalyzer(),
 )
 app = FastAPI(title="MDD Service", version="0.1.0")
 

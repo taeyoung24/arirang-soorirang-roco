@@ -122,6 +122,18 @@ class AcousticLLMFeedback(BaseModel):
     next_practice_focus: list[str] = Field(default_factory=list)
 
 
+class SyllableStressResult(BaseModel):
+    syllable: str
+    index: int
+    user_f0: Optional[float] = None
+    ref_f0: Optional[float] = None
+    user_energy: float
+    ref_energy: float
+    is_stressed_ref: bool
+    is_stressed_user: bool
+    is_mismatch: bool
+
+
 class PronunciationAnalysisResponse(BaseModel):
     script: str
     canonical_phonemes: str
@@ -136,6 +148,7 @@ class PronunciationAnalysisResponse(BaseModel):
     segment_features: list[SegmentFeatureBundle] = Field(default_factory=list)
     prosody: Optional[ProsodySummary] = None
     diagnostic_candidates: list[DiagnosticCandidate] = Field(default_factory=list)
+    syllable_stress: list[SyllableStressResult] = Field(default_factory=list)
     llm_feedback: Optional[AcousticLLMFeedback] = None
     notes: list[str] = Field(default_factory=list)
 

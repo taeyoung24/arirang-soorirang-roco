@@ -1,17 +1,35 @@
 from __future__ import annotations
 
+from dataclasses import asdict
+from typing import Optional
+
 from app.acoustic_analysis import AcousticAnalyzer
-from app.acoustic_schemas import AcousticLLMFeedback, ForcedAlignmentResponse, PronunciationAnalysisResponse
+from app.acoustic_schemas import (
+    AcousticLLMFeedback,
+    ForcedAlignmentResponse,
+    PronunciationAnalysisResponse,
+    SyllableStressResult,
+)
 from app.gemini_client import GeminiFeedbackClient
 from app.llm_evidence_builder import LLMEvidenceBuilder
 from app.schemas import PredictResponse
+from app.stress_analyzer import StressAnalyzer
+from app.tts_service import TTSService
 
 
 class PronunciationAnalysisService:
-    def __init__(self, analyzer: AcousticAnalyzer, gemini_client: GeminiFeedbackClient):
+    def __init__(
+        self,
+        analyzer: AcousticAnalyzer,
+        gemini_client: GeminiFeedbackClient,
+        tts_service: Optional[TTSService] = None,
+        stress_analyzer: Optional[StressAnalyzer] = None,
+    ):
         self.analyzer = analyzer
         self.gemini_client = gemini_client
         self.llm_evidence_builder = LLMEvidenceBuilder()
+        self.tts_service = tts_service
+        self.stress_analyzer = stress_analyzer or StressAnalyzer()
 
     def analyze(
         self,
@@ -28,6 +46,7 @@ class PronunciationAnalysisService:
             include_llm_note=include_llm_feedback and self.gemini_client.enabled,
             feedback_language=feedback_language,
         )
+        self._attach_stress_analysis(response, audio_bytes, prediction.script)
         if not include_llm_feedback:
             response.notes.append("LLM feedback was not requested for this endpoint.")
             return response
@@ -41,6 +60,19 @@ class PronunciationAnalysisService:
             | {edit.actual for edit in llm_evidence.phoneme_edits if edit.actual},
         )
         return response
+
+    def _attach_stress_analysis(
+        self, response: PronunciationAnalysisResponse, user_audio: bytes, script: str
+    ) -> None:
+        if self.tts_service is None or not self.tts_service.has_api_key:
+            response.notes.append("Stress analysis skipped: TTS API key is not configured.")
+            return
+        try:
+            ref_audio = self.tts_service.synthesize_speech(script)
+            results = self.stress_analyzer.analyze(user_audio, ref_audio, script)
+            response.syllable_stress = [SyllableStressResult(**asdict(r)) for r in results]
+        except Exception as exc:
+            response.notes.append(f"Stress analysis skipped: {exc}")
 
     @staticmethod
     def _filter_llm_feedback(feedback: AcousticLLMFeedback, allowed_units: set[str]) -> AcousticLLMFeedback:

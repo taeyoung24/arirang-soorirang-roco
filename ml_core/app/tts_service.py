@@ -1,6 +1,8 @@
 from __future__ import annotations
+
 import base64
 import hashlib
+
 import httpx
 import wave
 import io
@@ -15,21 +17,6 @@ class TTSService:
         self.timeout_seconds = timeout_seconds
         # self._cache is a dic with keys are str and values are bytes
         self._cache: dict[str, bytes] = {}
-    
-
-    @property
-    def has_api_key(self) -> bool:
-        return bool(self.api_key)
-    
-    @staticmethod
-    def _pcm_to_wav(pcm_bytes: bytes, sample_rate: int = 24000) -> bytes:
-        buffer = io.BytesIO()
-        with wave.open(buffer, "wb") as wf:
-            wf.setnchannels(1)
-            wf.setsampwidth(2)
-            wf.setframerate(sample_rate)
-            wf.writeframes(pcm_bytes)
-        return buffer.getvalue()
     
     def synthesize_speech(self, script: str) -> bytes:
         """
@@ -48,6 +35,31 @@ class TTSService:
         audio_bytes = self._fetch_tts_audio(script)
         self._cache[cache_key] = audio_bytes
         return audio_bytes
+
+    @property
+    def has_api_key(self) -> bool:
+        return bool(self.api_key)
+    
+    @staticmethod
+    def _pcm_to_wav(pcm_bytes: bytes, sample_rate: int = 24000) -> bytes:
+        """
+        Wraps raw PCM audio data into a playable WAV container.
+
+        Args:
+            pcm_bytes: Raw binary PCM data (16-bit, Mono).
+            sample_rate: The sampling frequency in Hz. Defaults to 24kHz.
+
+        Returns:
+            The complete WAV file as a bytes object, including the RIFF header.
+        """
+        buffer = io.BytesIO()
+        with wave.open(buffer, "wb") as wf:
+            wf.setnchannels(1)
+            wf.setsampwidth(2)
+            wf.setframerate(sample_rate)
+            wf.writeframes(pcm_bytes)
+        return buffer.getvalue()
+    
     
     def _fetch_tts_audio(self, script: str) -> bytes:
         """

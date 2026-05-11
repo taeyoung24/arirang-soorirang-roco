@@ -2,6 +2,13 @@
   background-color: var(--color-bg);
   min-height: 100vh;
   padding: 2.85rem 2.25rem; /* py-13 px-9 */
-  overflow: hidden;
+  overflow-x: hidden;
   position: relative;
+}
+
+@media (max-width: 400px) {
+  .layout {
+    padding-left: 1.25rem;
+    padding-right: 1.25rem;
+  }
 }

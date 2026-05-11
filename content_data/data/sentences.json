@@ -28,5 +28,653 @@
     "meaning_id": "2a00e9ac",
     "content": "이 소스는 조금 쓰네요.",
     "highlight": "쓰네요"
+  },
+  {
+    "id": "0f9d9cf0",
+    "meaning_id": "03c7ae56",
+    "content": "수술용 모자를 쓰세요.",
+    "highlight": "쓰세요"
+  },
+  {
+    "id": "11798b5d",
+    "meaning_id": "03c7ae56",
+    "content": "교복 모자를 써라.",
+    "highlight": "써라"
+  },
+  {
+    "id": "18bb6132",
+    "meaning_id": "03c7ae56",
+    "content": "안전모를 꼭 씁시다.",
+    "highlight": "씁시다"
+  },
+  {
+    "id": "cb6d46b0",
+    "meaning_id": "03c7ae56",
+    "content": "학사모를 높이 써보자.",
+    "highlight": "써보자"
+  },
+  {
+    "id": "1cca1566",
+    "meaning_id": "03c7ae56",
+    "content": "군밤 모자를 써봐.",
+    "highlight": "써봐"
+  },
+  {
+    "id": "3c573d31",
+    "meaning_id": "03c7ae56",
+    "content": "공사장에선 안전모를 꼭 써라.",
+    "highlight": "써라."
+  },
+  {
+    "id": "c7390267",
+    "meaning_id": "03c7ae56",
+    "content": "수술용 모자를 바르게 쓰세요.",
+    "highlight": "쓰세요."
+  },
+  {
+    "id": "0f85cffe",
+    "meaning_id": "03c7ae56",
+    "content": "편의점 갈 때 이 모자 써봐.",
+    "highlight": "써봐."
+  },
+  {
+    "id": "89d054da",
+    "meaning_id": "03c7ae56",
+    "content": "초등학교 등굣길엔 모자를 씁시다.",
+    "highlight": "씁시다."
+  },
+  {
+    "id": "d4bf11d9",
+    "meaning_id": "03c7ae56",
+    "content": "교복 입고 학년 모자 높이 써.",
+    "highlight": "써."
+  },
+  {
+    "id": "1ef24963",
+    "meaning_id": "03c7ae56",
+    "content": "등굣길엔 노란 모자를 써요.",
+    "highlight": "써요"
+  },
+  {
+    "id": "a3b98ce9",
+    "meaning_id": "03c7ae56",
+    "content": "학사모를 쓰고 추억을 남겨.",
+    "highlight": "쓰고"
+  },
+  {
+    "id": "fa623d79",
+    "meaning_id": "03c7ae56",
+    "content": "공사장에선 안전모를 씁시다.",
+    "highlight": "씁시다"
+  },
+  {
+    "id": "dcfb3c33",
+    "meaning_id": "03c7ae56",
+    "content": "학년이 바뀌면 새 모자를 써.",
+    "highlight": "써"
+  },
+  {
+    "id": "c96022f7",
+    "meaning_id": "03c7ae56",
+    "content": "편의점 갈 때도 모자를 쓴다.",
+    "highlight": "쓴다"
+  },
+  {
+    "id": "20e16be2",
+    "meaning_id": "03c7ae56",
+    "content": "학사모를 바르게 씁시다?",
+    "highlight": "씁시다"
+  },
+  {
+    "id": "39e68c6e",
+    "meaning_id": "03c7ae56",
+    "content": "교복에 모자를 쓸까요?",
+    "highlight": "쓸까요"
+  },
+  {
+    "id": "d429ba0b",
+    "meaning_id": "03c7ae56",
+    "content": "등굣길엔 모자를 써요?",
+    "highlight": "써요"
+  },
+  {
+    "id": "fc730b73",
+    "meaning_id": "03c7ae56",
+    "content": "군밤 모자 쓴 아이예요?",
+    "highlight": "쓴"
+  },
+  {
+    "id": "53b17d48",
+    "meaning_id": "03c7ae56",
+    "content": "환자가 모자를 썼나요?",
+    "highlight": "썼나요"
+  },
+  {
+    "id": "3bc39e12",
+    "meaning_id": "8dfa7526",
+    "content": "알림장에 숙제를 써.",
+    "highlight": "써"
+  },
+  {
+    "id": "eb2a3cd0",
+    "meaning_id": "8dfa7526",
+    "content": "처방전을 써 줄게.",
+    "highlight": "써"
+  },
+  {
+    "id": "69533845",
+    "meaning_id": "8dfa7526",
+    "content": "편의점에서 명부 써.",
+    "highlight": "써"
+  },
+  {
+    "id": "ead1ef20",
+    "meaning_id": "8dfa7526",
+    "content": "칠판에 답을 써 봐.",
+    "highlight": "써"
+  },
+  {
+    "id": "4143025d",
+    "meaning_id": "8dfa7526",
+    "content": "연습장에 이름을 써.",
+    "highlight": "써"
+  },
+  {
+    "id": "e039f251",
+    "meaning_id": "8dfa7526",
+    "content": "연습장에 답을 써 봐.",
+    "highlight": "써"
+  },
+  {
+    "id": "e9c4d0e9",
+    "meaning_id": "8dfa7526",
+    "content": "칠판에 이름을 쓰세요.",
+    "highlight": "쓰세요"
+  },
+  {
+    "id": "e5676ab4",
+    "meaning_id": "8dfa7526",
+    "content": "알림장에 숙제를 써라.",
+    "highlight": "써라"
+  },
+  {
+    "id": "ffaa9a11",
+    "meaning_id": "8dfa7526",
+    "content": "처방전을 써 주십시오.",
+    "highlight": "써"
+  },
+  {
+    "id": "ebf58e7f",
+    "meaning_id": "8dfa7526",
+    "content": "편의점 명부를 쓰자.",
+    "highlight": "쓰자"
+  },
+  {
+    "id": "dd1bd4bb",
+    "meaning_id": "8dfa7526",
+    "content": "방문자 명부에 이름을 쓰세요.",
+    "highlight": "쓰세요."
+  },
+  {
+    "id": "dc8d8afd",
+    "meaning_id": "8dfa7526",
+    "content": "연습장에 수학 문제를 써요.",
+    "highlight": "써요."
+  },
+  {
+    "id": "87eabf4d",
+    "meaning_id": "8dfa7526",
+    "content": "의사 선생님이 처방전을 씁니다.",
+    "highlight": "씁니다."
+  },
+  {
+    "id": "53e1ae60",
+    "meaning_id": "8dfa7526",
+    "content": "선생님이 칠판에 글을 써요.",
+    "highlight": "써요."
+  },
+  {
+    "id": "f0f89b84",
+    "meaning_id": "8dfa7526",
+    "content": "준비물을 알림장에 쓰세요.",
+    "highlight": "쓰세요."
+  },
+  {
+    "id": "64a5c577",
+    "meaning_id": "8dfa7526",
+    "content": "선생님이 지루한 글을 또 써라 하신다.",
+    "highlight": "써라"
+  },
+  {
+    "id": "efec8691",
+    "meaning_id": "8dfa7526",
+    "content": "알림장에 남길 숙제나 쓰며 시간을 죽인다.",
+    "highlight": "쓰며"
+  },
+  {
+    "id": "5cc50a1d",
+    "meaning_id": "8dfa7526",
+    "content": "의사는 기계처럼 처방전을 씁니다.",
+    "highlight": "씁니다"
+  },
+  {
+    "id": "316b41ec",
+    "meaning_id": "8dfa7526",
+    "content": "편의점 알바가 유통기한을 대충 써요.",
+    "highlight": "써요"
+  },
+  {
+    "id": "cd2d9319",
+    "meaning_id": "8dfa7526",
+    "content": "수학 문제를 억지로 써 내려가는 중이다.",
+    "highlight": "써"
+  },
+  {
+    "id": "e079f41b",
+    "meaning_id": "2a00e9ac",
+    "content": "처방약이 매우 쓰니 주의 바랍니다.",
+    "highlight": "쓰니"
+  },
+  {
+    "id": "2ca17e88",
+    "meaning_id": "2a00e9ac",
+    "content": "초등생용 시럽도 맛이 쓸 수 있습니다.",
+    "highlight": "쓸"
+  },
+  {
+    "id": "7b0974f9",
+    "meaning_id": "2a00e9ac",
+    "content": "중학교 급식의 채소가 써서 남겼습니다.",
+    "highlight": "써서"
+  },
+  {
+    "id": "62137784",
+    "meaning_id": "2a00e9ac",
+    "content": "편의점 커피가 너무 써서 못 마셨습니다.",
+    "highlight": "써서"
+  },
+  {
+    "id": "1f793a2a",
+    "meaning_id": "2a00e9ac",
+    "content": "편의점 커피가 쓰니 시럽을 넣으세요.",
+    "highlight": "쓰니"
+  },
+  {
+    "id": "78118b2c",
+    "meaning_id": "2a00e9ac",
+    "content": "약 맛이 써도 참고 다 마시기 바랍니다.",
+    "highlight": "써도"
+  },
+  {
+    "id": "dd1f871e",
+    "meaning_id": "2a00e9ac",
+    "content": "초등학교 급식 반찬이 쓸 테니 주의해.",
+    "highlight": "쓸"
+  },
+  {
+    "id": "7bf5e4b8",
+    "meaning_id": "2a00e9ac",
+    "content": "중학교 매점 커피가 쓰면 물을 타라.",
+    "highlight": "쓰면"
+  },
+  {
+    "id": "41f59c7c",
+    "meaning_id": "2a00e9ac",
+    "content": "처방약이 너무 써서 시럽도 섞었어.",
+    "highlight": "써서"
+  },
+  {
+    "id": "d618b060",
+    "meaning_id": "2a00e9ac",
+    "content": "입안이 써서 밥을 남겼습니다.",
+    "highlight": "써서"
+  },
+  {
+    "id": "732ec918",
+    "meaning_id": "2a00e9ac",
+    "content": "편의점 커피가 쓰면 물을 더 부어.",
+    "highlight": "쓰면"
+  },
+  {
+    "id": "c8dc1638",
+    "meaning_id": "2a00e9ac",
+    "content": "초등학교 때 먹은 한약은 참 썼어.",
+    "highlight": "썼어"
+  },
+  {
+    "id": "47307f4d",
+    "meaning_id": "2a00e9ac",
+    "content": "병원 약이 유독 쓰다.",
+    "highlight": "쓰다."
+  },
+  {
+    "id": "a9203895",
+    "meaning_id": "2a00e9ac",
+    "content": "물을 더 부어 맛이 쓰다.",
+    "highlight": "쓰다."
+  },
+  {
+    "id": "e14f8e1b",
+    "meaning_id": "2a00e9ac",
+    "content": "편의점 커피가 매우 씀.",
+    "highlight": "씀."
+  },
+  {
+    "id": "76225a59",
+    "meaning_id": "2a00e9ac",
+    "content": "약을 섞었어 맛이 쓰다.",
+    "highlight": "쓰다."
+  },
+  {
+    "id": "13c19d7a",
+    "meaning_id": "2a00e9ac",
+    "content": "가루약이 너무 쓰니 조심해.",
+    "highlight": "쓰니"
+  },
+  {
+    "id": "a9f69593",
+    "meaning_id": "2a00e9ac",
+    "content": "약이 써도 참고 먹자.",
+    "highlight": "써도"
+  },
+  {
+    "id": "3ebb06b7",
+    "meaning_id": "2a00e9ac",
+    "content": "급식의 채소가 쓰면 남겨라.",
+    "highlight": "쓰면"
+  },
+  {
+    "id": "872cae25",
+    "meaning_id": "2a00e9ac",
+    "content": "편의점 커피가 쓰니 물 타.",
+    "highlight": "쓰니"
+  },
+  {
+    "id": "3241afc1",
+    "meaning_id": "f7a4b128",
+    "content": "겨우 이깟 일에 내 운을 쓰고 싶지 않아.",
+    "highlight": "쓰고"
+  },
+  {
+    "id": "1a854d1b",
+    "meaning_id": "f7a4b128",
+    "content": "편의점 알바에 학력을 써서 뭐 하니?",
+    "highlight": "써서"
+  },
+  {
+    "id": "ebb93534",
+    "meaning_id": "f7a4b128",
+    "content": "치료에 비싼 약을 써봐야 다 헛수고지.",
+    "highlight": "써봐야"
+  },
+  {
+    "id": "7d0c489c",
+    "meaning_id": "f7a4b128",
+    "content": "놀이공원에 돈을 쓰는 꼴이 참 한심하다.",
+    "highlight": "쓰는"
+  },
+  {
+    "id": "b13f079c",
+    "meaning_id": "f7a4b128",
+    "content": "돈을 써서 놀이기구 타자.",
+    "highlight": "써서"
+  },
+  {
+    "id": "7565f6c2",
+    "meaning_id": "f7a4b128",
+    "content": "겨우 학력을 써서 취직했어.",
+    "highlight": "써서"
+  },
+  {
+    "id": "467f60db",
+    "meaning_id": "f7a4b128",
+    "content": "편의점 카드를 써서 결제해.",
+    "highlight": "써서"
+  },
+  {
+    "id": "3e55dced",
+    "meaning_id": "f7a4b128",
+    "content": "초등학교 때 연필을 썼어.",
+    "highlight": "썼어"
+  },
+  {
+    "id": "11c4cda4",
+    "meaning_id": "f7a4b128",
+    "content": "편의점에서 카드를 써서 결제해라.",
+    "highlight": "써서"
+  },
+  {
+    "id": "9d4c1c1e",
+    "meaning_id": "f7a4b128",
+    "content": "놀이공원 갈 때 머리띠를 써 보자.",
+    "highlight": "써"
+  },
+  {
+    "id": "0ca89487",
+    "meaning_id": "f7a4b128",
+    "content": "초등학교 때 배운 연필을 다 써라.",
+    "highlight": "써라"
+  },
+  {
+    "id": "52b29370",
+    "meaning_id": "f7a4b128",
+    "content": "병원에서 마스크를 쓰고 대기해.",
+    "highlight": "쓰고"
+  },
+  {
+    "id": "5061eb31",
+    "meaning_id": "f7a4b128",
+    "content": "편의점에서 카드를 써요.",
+    "highlight": "써요"
+  },
+  {
+    "id": "040b0228",
+    "meaning_id": "f7a4b128",
+    "content": "놀이기구에 예산을 씁니다.",
+    "highlight": "씁니다"
+  },
+  {
+    "id": "43a45ce3",
+    "meaning_id": "f7a4b128",
+    "content": "이 꼴이 안 나게 돈을 써.",
+    "highlight": "써"
+  },
+  {
+    "id": "6c9674c2",
+    "meaning_id": "f7a4b128",
+    "content": "헛수고지, 힘만 썼습니다.",
+    "highlight": "썼습니다"
+  },
+  {
+    "id": "5cddabfb",
+    "meaning_id": "a08b020d",
+    "content": "눈에 안약을 넣어야 해.",
+    "highlight": "눈에"
+  },
+  {
+    "id": "baf7461c",
+    "meaning_id": "a08b020d",
+    "content": "초등학교 때 시력 검사했어.",
+    "highlight": "시력"
+  },
+  {
+    "id": "59c8fc03",
+    "meaning_id": "a08b020d",
+    "content": "편의점에서 안대 하나 사자.",
+    "highlight": "안대"
+  },
+  {
+    "id": "f5c4d0db",
+    "meaning_id": "a08b020d",
+    "content": "놀이공원 가니 눈이 즐겁네.",
+    "highlight": "눈이"
+  },
+  {
+    "id": "6d178be5",
+    "meaning_id": "a08b020d",
+    "content": "편의점에서 안대를 사서 눈에 썼습니다.",
+    "highlight": "눈에"
+  },
+  {
+    "id": "eec51a45",
+    "meaning_id": "a08b020d",
+    "content": "병원에서 눈 상태를 검사했어.",
+    "highlight": "눈"
+  },
+  {
+    "id": "2d0d3569",
+    "meaning_id": "a08b020d",
+    "content": "초등학교 가니 눈 관리 잘해라.",
+    "highlight": "눈"
+  },
+  {
+    "id": "84f41fe9",
+    "meaning_id": "a08b020d",
+    "content": "눈에 안약을 넣어야 할 듯합니다.",
+    "highlight": "눈에"
+  },
+  {
+    "id": "a3387e90",
+    "meaning_id": "a08b020d",
+    "content": "눈 상태를 확인해 볼까요?",
+    "highlight": "눈"
+  },
+  {
+    "id": "6348cfcc",
+    "meaning_id": "a08b020d",
+    "content": "눈에 이물질이 들어갔나요?",
+    "highlight": "눈에"
+  },
+  {
+    "id": "bcc643fb",
+    "meaning_id": "a08b020d",
+    "content": "초등학생 눈이 왜 빨갛죠?",
+    "highlight": "눈이"
+  },
+  {
+    "id": "7dcd8412",
+    "meaning_id": "a08b020d",
+    "content": "안약 하나 넣어줄까요?",
+    "highlight": "하나"
+  },
+  {
+    "id": "c744f5b2",
+    "meaning_id": "a08b020d",
+    "content": "아픈 눈에 안약을 넣어줄까요?",
+    "highlight": "눈에"
+  },
+  {
+    "id": "7219af74",
+    "meaning_id": "a08b020d",
+    "content": "충혈된 눈이 꽤 빨갛죠?",
+    "highlight": "눈이"
+  },
+  {
+    "id": "ab32d47f",
+    "meaning_id": "a08b020d",
+    "content": "초등학생의 맑은 눈은 보석 같다.",
+    "highlight": "눈은"
+  },
+  {
+    "id": "91323e3e",
+    "meaning_id": "a08b020d",
+    "content": "피곤한 눈이 감길 듯합니다.",
+    "highlight": "눈이"
+  },
+  {
+    "id": "777724c4",
+    "meaning_id": "607998e2",
+    "content": "놀이공원에 눈이 올까요?",
+    "highlight": "눈이"
+  },
+  {
+    "id": "0a597dd2",
+    "meaning_id": "607998e2",
+    "content": "초등학교 운동장에 눈 왔니?",
+    "highlight": "눈"
+  },
+  {
+    "id": "19029815",
+    "meaning_id": "607998e2",
+    "content": "편의점 앞에 눈 치웠어?",
+    "highlight": "눈"
+  },
+  {
+    "id": "30686360",
+    "meaning_id": "607998e2",
+    "content": "병원 가는 길에 눈 쌓였니?",
+    "highlight": "눈"
+  },
+  {
+    "id": "e902d478",
+    "meaning_id": "607998e2",
+    "content": "놀이공원에 눈이 내려.",
+    "highlight": "눈이"
+  },
+  {
+    "id": "f052794f",
+    "meaning_id": "607998e2",
+    "content": "편의점 앞에 눈이 쌓였니?",
+    "highlight": "눈이"
+  },
+  {
+    "id": "0f16336f",
+    "meaning_id": "607998e2",
+    "content": "학교 앞 눈은 다 치웠어?",
+    "highlight": "눈은"
+  },
+  {
+    "id": "1a39d9b8",
+    "meaning_id": "607998e2",
+    "content": "병원 창가에 눈꽃이 폈어.",
+    "highlight": "눈꽃이"
+  },
+  {
+    "id": "33df1189",
+    "meaning_id": "607998e2",
+    "content": "운동장에 눈이 쌓였어.",
+    "highlight": "눈이"
+  },
+  {
+    "id": "8a4843ef",
+    "meaning_id": "607998e2",
+    "content": "편의점 앞 눈 치워라.",
+    "highlight": "눈"
+  },
+  {
+    "id": "1b1545b3",
+    "meaning_id": "607998e2",
+    "content": "하늘에서 눈이 내려.",
+    "highlight": "눈이"
+  },
+  {
+    "id": "2dac5a46",
+    "meaning_id": "607998e2",
+    "content": "눈 보러 밖으로 왔니?",
+    "highlight": "눈"
+  },
+  {
+    "id": "df8daad8",
+    "meaning_id": "607998e2",
+    "content": "초등학교 길에 눈꽃이 핀들 무슨 소용인가.",
+    "highlight": "눈꽃이"
+  },
+  {
+    "id": "0c26e738",
+    "meaning_id": "607998e2",
+    "content": "병원 창밖으로 눈 내리는 꼴이 참 처량하네.",
+    "highlight": "눈"
+  },
+  {
+    "id": "6ecfe423",
+    "meaning_id": "607998e2",
+    "content": "편의점 앞엔 눈 녹은 구정물만 가득하군.",
+    "highlight": "눈"
+  },
+  {
+    "id": "24b08ea4",
+    "meaning_id": "607998e2",
+    "content": "놀이공원에 눈 맞으러 왔니? 참 한가하구나.",
+    "highlight": "눈"
   }
 ]

@@ -34,6 +34,9 @@ content_data/            <-- uv 파이썬 환경이 초기화된 루트
 │   └── create_quiz.py
 └── src/                 <-- 스크립트들이 공통으로 참조할 소스 (모델, 파일 I/O, 헬퍼 등)
     └── utils.py
+├── .env
+├── settings.py          <-- 여기에서 .env 필요 항목 확인
+└── main.py
 ```
 
 ### 스크립트 실행

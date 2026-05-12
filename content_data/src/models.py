@@ -1,7 +1,7 @@
 import json
 import os
 from pathlib import Path
-from typing import List
+from typing import List, Optional
 from pydantic import BaseModel, Field
 
 from src.utils.logger import logger
@@ -70,6 +70,7 @@ class Sentence(BaseModel):
     meaning_id: str
     content: str
     highlight: str
+    tts_url: Optional[str] = None
 
 
 class QuizChoice(BaseModel):
@@ -86,6 +87,7 @@ class Quiz(BaseModel):
     choices: List[QuizChoice]
     correct_choice_id: str
     pronunciation_target: str
+    tts_url: Optional[str] = None
     image_url: str
     card_order: int
     set_id: str

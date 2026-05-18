@@ -7,7 +7,7 @@
 
 .mainContent {
   width: 20rem;
-  height: 100%;
+  height: 80%;
   margin: 0 auto;
   display: flex;
   flex-direction: column;
@@ -63,7 +63,7 @@
   width: 11.2rem;
   height: auto;
   z-index: 2;
-  animation: floatSoori 3s ease-in-out infinite 1.7s;
+  animation: floatSoori 3s ease-in-out infinite -1.5s;
 }
 
 @keyframes floatAri {
@@ -92,7 +92,6 @@
 
 .termsContainer {
   align-self: stretch;
-  padding-bottom: 7rem;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -119,9 +118,20 @@
   cursor: pointer;
 }
 
-.buttonWrapper {
+.bottomArea {
   position: absolute;
   bottom: 2.5rem;
   left: 50%;
   transform: translateX(-50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.2rem;
+  width: 20rem;
+}
+
+.buttonWrapper {
+  align-self: stretch;
+  display: flex;
+  justify-content: center;
 }

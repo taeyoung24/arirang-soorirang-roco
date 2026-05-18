@@ -25,7 +25,7 @@ function LandingPage() {
 
   return (
     <Layout className={styles.layout}>
-      {/* Main Content Area (Header, Mascot, Terms) */}
+      {/* Main Content Area (Header, Mascot) */}
       <div className={styles.mainContent}>
 
         {/* Header section */}
@@ -39,8 +39,10 @@ function LandingPage() {
           <img src={ariImg} alt="ari" className={styles.mascotAri} />
           <img src={sooriImg} alt="soori" className={styles.mascotSoori} />
         </div>
+      </div>
 
-        {/* Bottom container (Terms Only) */}
+      {/* Bottom Container (Terms + Button) */}
+      <div className={styles.bottomArea}>
         <div className={styles.termsContainer}>
           <div className={styles.termsTextWrapper}>
             <span className={styles.termsText}>시작하기 버튼을 누르면 </span>
@@ -50,14 +52,13 @@ function LandingPage() {
             <span className={styles.termsText}>에 동의하는 것으로 간주합니다.</span>
           </div>
         </div>
-      </div>
 
-      {/* Absolute Positioned Button */}
-      <div className={styles.buttonWrapper}>
-        <PageButton
-          label="로그인 없이 시작"
-          onClick={() => navigate('/home')}
-        />
+        <div className={styles.buttonWrapper}>
+          <PageButton
+            label="로그인 없이 시작"
+            onClick={() => navigate('/home')}
+          />
+        </div>
       </div>
     </Layout>
   )

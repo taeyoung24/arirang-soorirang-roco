@@ -67,7 +67,7 @@ function HomePage() {
         </h1>
 
         {/* Login Banner */}
-        <div className={styles.loginBanner}>
+        {/* <div className={styles.loginBanner}>
           <p className={styles.loginTitle}>로그인</p>
           <p className={styles.loginDesc}>더 나은 학습을 위해 로그인하세요.</p>
           <div className={styles.loginIconWrapper}>
@@ -79,7 +79,7 @@ function HomePage() {
               <path d="M0 26M52 26M52 26M0 26M26 0M52 26M26 52M0 26M26 52V49.6C12.9661 49.6 2.4 39.0339 2.4 26H0H-2.4C-2.4 41.6849 10.3151 54.4 26 54.4V52ZM52 26H49.6C49.6 39.0339 39.0339 49.6 26 49.6V52V54.4C41.6849 54.4 54.4 41.6849 54.4 26H52ZM26 0V2.4C39.0339 2.4 49.6 12.9661 49.6 26H52H54.4C54.4 10.3151 41.6849 -2.4 26 -2.4V0ZM26 0V-2.4C10.3151 -2.4 -2.4 10.3151 -2.4 26H0H2.4C2.4 12.9661 12.9661 2.4 26 2.4V0Z" fill="var(--text, #2C2C2C)" mask="url(#path-1-inside-1_254_560)" />
             </svg>
           </div>
-        </div>
+        </div> */}
 
         {/* Search */}
         <div

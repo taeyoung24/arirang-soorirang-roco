@@ -13,6 +13,17 @@
   gap: 1rem;
 }
 
+.mainContainer > * {
+  opacity: 0;
+  animation: fadeInUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.mainContainer > :nth-child(1) { animation-delay: 0.05s; }
+.mainContainer > :nth-child(2) { animation-delay: 0.13s; }
+.mainContainer > :nth-child(3) { animation-delay: 0.21s; }
+.mainContainer > :nth-child(4) { animation-delay: 0.29s; }
+.mainContainer > :nth-child(5) { animation-delay: 0.37s; }
+
 .title {
   align-self: stretch;
   display: flex;
@@ -208,4 +219,15 @@
   align-self: stretch;
   height: 6rem;
   object-fit: cover;
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(15px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }

@@ -60,6 +60,7 @@ body {
   -webkit-user-select: none;
   -moz-user-select: none;
   -ms-user-select: none;
+  transition: background-color 0.5s ease-in-out;
 }
 
 img {
@@ -77,7 +78,7 @@ img {
   width: 100%;
   max-width: 490px;
   min-height: 100vh;
-  background-color: rgb(255, 255, 255);
+  background-color: transparent;
   position: relative;
   font-family: "Pretendard", sans-serif;
 }

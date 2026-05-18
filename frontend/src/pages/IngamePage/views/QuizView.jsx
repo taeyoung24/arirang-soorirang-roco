@@ -85,7 +85,7 @@ export default function QuizView({ onStageUnlock }) {
               alt="feed"
             />
             {/* Heart Button */}
-            <HeartButton initialCount={25} className={styles.heartButtonPos} />
+            {/* <HeartButton initialCount={25} className={styles.heartButtonPos} /> */}
 
           </div>
         )}

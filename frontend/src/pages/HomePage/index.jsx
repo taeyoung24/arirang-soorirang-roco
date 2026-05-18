@@ -49,7 +49,12 @@ function HomePage() {
   const navigate = useNavigate()
 
   useEffect(() => {
+    document.body.style.backgroundColor = 'var(--color-bg)'
     setThemeColor(GLOBAL_CONFIG.colorBg)
+
+    return () => {
+      document.body.style.backgroundColor = ''
+    }
   }, [])
 
   return (

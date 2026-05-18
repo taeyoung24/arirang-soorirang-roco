@@ -1,4 +1,4 @@
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import ariImg from 'src/assets/landing-frame-ari.png'
 import shadowImg from 'src/assets/landing-frame-shadow.png'
@@ -12,6 +12,7 @@ import styles from './LandingPage.module.css'
 
 function LandingPage() {
   const navigate = useNavigate()
+  const [isExiting, setIsExiting] = useState(false)
 
   useEffect(() => {
     document.body.style.backgroundColor = 'var(--color-soori-primary)'
@@ -24,7 +25,7 @@ function LandingPage() {
   }, [])
 
   return (
-    <Layout className={styles.layout}>
+    <Layout className={`${styles.layout} ${isExiting ? styles.fadeOut : ''}`}>
       {/* Main Content Area (Header, Mascot) */}
       <div className={styles.mainContent}>
 
@@ -56,7 +57,11 @@ function LandingPage() {
         <div className={styles.buttonWrapper}>
           <PageButton
             label="로그인 없이 시작"
-            onClick={() => navigate('/home')}
+            onClick={() => {
+              setIsExiting(true)
+              document.body.style.backgroundColor = 'var(--color-bg)'
+              setTimeout(() => navigate('/home'), 500)
+            }}
           />
         </div>
       </div>

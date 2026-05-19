@@ -2,10 +2,10 @@ import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import Layout from 'src/components/Layout'
 import { IngameTopContainer } from 'src/components/TopContainer'
-import QuizView from './views/QuizView'
 import { GLOBAL_CONFIG } from 'src/settings'
 import { setThemeColor } from 'src/utils/theme'
 import styles from './IngamePage.module.css'
+import QuizView from './views/QuizView'
 
 export default function IngamePage() {
   const navigate = useNavigate()
@@ -13,7 +13,8 @@ export default function IngamePage() {
   // 게임 흐름을 제어하는 상태 ('quiz' | 'stats' | 'pronounce' | 'result')
   const [currentStep, setCurrentStep] = useState('quiz')
   const [isStageUnlocked, setIsStageUnlocked] = useState(false)
-  
+  const [isExiting, setIsExiting] = useState(false)
+
   // 무한 스와이프를 위한 스테이지 상태
   const [stageCount, setStageCount] = useState(1)
   const [currentIndex, setCurrentIndex] = useState(0)
@@ -29,6 +30,12 @@ export default function IngamePage() {
     }
   }, [])
 
+  const handleBack = () => {
+    setIsExiting(true)
+    document.body.style.backgroundColor = 'var(--color-bg)'
+    setTimeout(() => navigate('/home'), 500)
+  }
+
   // 스테이지 클리어 시 다음 스테이지 미리 렌더링 허용
   const handleStageUnlock = () => {
     setIsStageUnlocked(true)
@@ -42,7 +49,7 @@ export default function IngamePage() {
     const { scrollTop, clientHeight } = e.target
     // 현재 가장 많이 보여지는 화면의 인덱스 계산
     const newIndex = Math.round(scrollTop / clientHeight)
-    
+
     // 다음 화면으로 완전히 넘어갔을 때
     if (newIndex > currentIndex) {
       setCurrentIndex(newIndex)
@@ -55,22 +62,21 @@ export default function IngamePage() {
   }
 
   return (
-    <Layout className={styles.layout}>
+    <Layout className={`${styles.layout} ${styles.fadeIn} ${isExiting ? styles.fadeOut : ''}`}>
       <div className={styles.mainContainer}>
 
         {/* Header */}
-        <IngameTopContainer 
-          onBack={() => navigate('/home')} 
-          onHelp={() => { }} 
-          status={isStageUnlocked ? 'unlocked' : 'locked'} 
+        <IngameTopContainer
+          onBack={handleBack}
+          onHelp={() => { }}
+          status={isStageUnlocked ? 'unlocked' : 'locked'}
         />
 
         {/* View Routing / Scrollable Swipe Area */}
-        <div 
+        <div
           onScroll={handleScroll}
-          className={`${styles.scrollArea} ${
-            isStageUnlocked ? styles.scrollUnlocked : styles.scrollLocked
-          }`}
+          className={`${styles.scrollArea} ${isStageUnlocked ? styles.scrollUnlocked : styles.scrollLocked
+            }`}
         >
           {Array.from({ length: stageCount }).map((_, index) => (
             <div key={index} className={styles.stageItem}>

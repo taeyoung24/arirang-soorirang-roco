@@ -10,14 +10,14 @@ const FilterChip = ({ label, active }) => (
   </div>
 )
 
-const ResultItem = ({ label, hasBorderTop }) => (
-  <div className={`${styles.resultItem} ${hasBorderTop ? styles.resultItemBorderTop : ''}`}>
+const ResultItem = ({ label, hasBorderTop, onClick }) => (
+  <div className={`${styles.resultItem} ${hasBorderTop ? styles.resultItemBorderTop : ''}`} onClick={onClick}>
     <div className={styles.resultItemLabel}>{label}</div>
   </div>
 )
 
 
-const ResultSection = ({ title, items }) => {
+const ResultSection = ({ title, items, onItemClick }) => {
   const [isOpen, setIsOpen] = React.useState(true);
   const count = items.length;
 
@@ -37,7 +37,7 @@ const ResultSection = ({ title, items }) => {
       {isOpen && (
         <div className={styles.resultSectionContent}>
           {items.map((item, index) => (
-            <ResultItem key={index} label={item} hasBorderTop={index > 0} />
+            <ResultItem key={index} label={item} hasBorderTop={index > 0} onClick={() => onItemClick && onItemClick(item)} />
           ))}
         </div>
       )}
@@ -47,6 +47,15 @@ const ResultSection = ({ title, items }) => {
 
 export default function SelectionPage() {
   const navigate = useNavigate()
+  const [isExiting, setIsExiting] = React.useState(false)
+
+  const handleTransition = (path, bgColor) => {
+    setIsExiting(true)
+    if (bgColor) {
+      document.body.style.backgroundColor = bgColor
+    }
+    setTimeout(() => navigate(path), 500)
+  }
 
   // 임시 데이터 (실제 연동 시 상태로 관리)
   const results = [
@@ -56,11 +65,11 @@ export default function SelectionPage() {
 
 
   return (
-    <Layout className={styles.layout}>
+    <Layout className={`${styles.layout} ${isExiting ? styles.fadeOut : ''}`}>
       <div className={styles.mainContainer}>
 
         {/* Search Header */}
-        <SearchTopContainer onBack={() => navigate('/home')} onSearch={() => { }} />
+        <SearchTopContainer onBack={() => handleTransition('/home')} onSearch={() => { }} />
 
         {/* Filter Chips */}
         <div className={styles.filterChipContainer}>
@@ -78,7 +87,7 @@ export default function SelectionPage() {
 
           {results.length > 0 ? (
             results.map((section, idx) => (
-              <ResultSection key={idx} title={section.title} count={section.count} items={section.items} />
+              <ResultSection key={idx} title={section.title} count={section.count} items={section.items} onItemClick={() => handleTransition('/ingame', 'var(--color-yellow-primary)')} />
             ))
           ) : (
             <div className={styles.noInfoText}>

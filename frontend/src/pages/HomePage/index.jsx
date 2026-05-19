@@ -1,4 +1,4 @@
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import mascot from 'src/assets/landing-mascot.svg'
 import normalMascot from 'src/assets/mascot/word-image-snow.png'
@@ -11,9 +11,9 @@ import { setThemeColor } from 'src/utils/theme'
 import styles from './HomePage.module.css'
 
 
-function ContentCard({ title, image }) {
+function ContentCard({ title, image, onClick }) {
   return (
-    <div className={styles.contentCard}>
+    <div className={styles.contentCard} onClick={onClick} style={{ cursor: 'pointer' }}>
       <div className={styles.contentCardTitle}>
         {title}
       </div>
@@ -25,13 +25,13 @@ function ContentCard({ title, image }) {
 
 
 
-function ContentSection({ label, bg, cards }) {
+function ContentSection({ label, bg, cards, onCardClick }) {
   return (
     <div className={styles.contentSectionWrap}>
       <div className={`${styles.contentSectionBlob} ${bg === 'bg-soori-primary' ? styles.bgSooriPrimary : styles.bgSoftDark}`}>
         <div className={styles.contentList}>
           {cards.map((card, i) => (
-            <ContentCard key={i} title={card.title} image={card.image} />
+            <ContentCard key={i} title={card.title} image={card.image} onClick={onCardClick} />
           ))}
         </div>
       </div>
@@ -47,6 +47,15 @@ function ContentSection({ label, bg, cards }) {
 
 function HomePage() {
   const navigate = useNavigate()
+  const [isExiting, setIsExiting] = useState(false)
+
+  const handleTransition = (path, bgColor) => {
+    setIsExiting(true)
+    if (bgColor) {
+      document.body.style.backgroundColor = bgColor
+    }
+    setTimeout(() => navigate(path), 500)
+  }
 
   useEffect(() => {
     document.body.style.backgroundColor = 'var(--color-bg)'
@@ -58,7 +67,7 @@ function HomePage() {
   }, [])
 
   return (
-    <Layout className={styles.layout}>
+    <Layout className={`${styles.layout} ${isExiting ? styles.fadeOut : ''}`}>
       <div className={styles.mainContainer}>
 
         {/* HomeTopContainer */}
@@ -88,7 +97,7 @@ function HomePage() {
 
         {/* Search */}
         <div
-          onClick={() => navigate('/selection')}
+          onClick={() => handleTransition('/selection')}
           className={styles.searchBox}
         >
 
@@ -108,6 +117,7 @@ function HomePage() {
             { title: '은행', image: normalMascot },
             { title: '학교', image: winterMascot },
           ]}
+          onCardClick={() => handleTransition('/ingame', 'var(--color-yellow-primary)')}
         />
 
         {/* Recent Records */}
@@ -120,6 +130,7 @@ function HomePage() {
             { title: '쓰다', image: normalMascot },
             { title: '바람', image: winterMascot },
           ]}
+          onCardClick={() => handleTransition('/ingame', 'var(--color-yellow-primary)')}
         />
 
       </div>

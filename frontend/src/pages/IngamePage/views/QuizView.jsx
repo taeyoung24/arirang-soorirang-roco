@@ -1,7 +1,6 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import AnswerButton from '../components/AnswerButton';
 import PronounceArea from '../components/PronounceArea';
-import HeartButton from '../components/HeartButton';
 import styles from './QuizView.module.css';
 
 export default function QuizView({ onStageUnlock }) {
@@ -81,7 +80,7 @@ export default function QuizView({ onStageUnlock }) {
           <div className={styles.imageWrapper}>
             <img
               className={styles.feedImage}
-              src={selectedIdx !== null && selectedIdx !== 0 ? `https://placehold.co/330x330?text=Option+${selectedIdx + 1}` : "https://placehold.co/330x330?text=Initial+Image"}
+              src={selectedIdx !== null && selectedIdx !== 0 ? `https://placehold.co/330x330?text=Option+${selectedIdx + 1}` : "https://placehold.co/330x330?text=No+Image"}
               alt="feed"
             />
             {/* Heart Button */}

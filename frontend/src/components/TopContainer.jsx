@@ -1,10 +1,19 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { SimpleIconButton } from './Button';
 import styles from './TopContainer.module.css';
 
 
 export const IngameTopContainer = ({ onBack, onHelp, status = 'locked' }) => {
   const isLocked = status === 'locked';
+  const [animate, setAnimate] = useState(false);
+
+  useEffect(() => {
+    if (status === 'unlocked') {
+      setAnimate(true);
+      const timer = setTimeout(() => setAnimate(false), 600); // 600ms animation duration
+      return () => clearTimeout(timer);
+    }
+  }, [status]);
 
   return (
     <div className={styles.container}>
@@ -14,7 +23,7 @@ export const IngameTopContainer = ({ onBack, onHelp, status = 'locked' }) => {
 
 
       {/* Stage Status */}
-      <div className={styles.statusArea}>
+      <div className={`${styles.statusArea} ${animate ? styles.popBounce : ''}`}>
         <div className={styles.iconWrapper}>
           {isLocked ? (
             <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">

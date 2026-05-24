@@ -14,13 +14,15 @@ from app.inference_client import InferenceClient
 from app.pronunciation_analysis_service import PronunciationAnalysisService
 from app.reference_cache import ReferenceCacheManifest, ReferenceCacheRequest, create_reference_cache_store
 from app.schemas import HealthResponse, PredictResponse
-from app.tts_reference import create_tts_reference_generator
+from app.tts_asset_cache import TTSAssetManifest, TTSAssetRequest, create_tts_asset_store
+from app.tts_reference import EdgeTTSReferenceGenerator, create_tts_reference_generator
 
 
 settings = Settings.from_env()
 client = InferenceClient(settings.inference_base_url, settings.inference_timeout_seconds)
 aligner_client = AlignerClient(settings.aligner_base_url, settings.aligner_timeout_seconds)
 reference_cache = create_reference_cache_store(settings)
+tts_asset_store = create_tts_asset_store(settings)
 tts_reference_generator = create_tts_reference_generator(settings)
 analysis_service = PronunciationAnalysisService(
     analyzer=AcousticAnalyzer(),
@@ -145,6 +147,47 @@ def generate_reference_cache(
         raise HTTPException(status_code=exc.response.status_code, detail=_extract_upstream_detail(exc)) from exc
     except httpx.HTTPError as exc:
         raise HTTPException(status_code=502, detail=f"aligner service unavailable: {exc}") from exc
+    except RuntimeError as exc:
+        raise HTTPException(status_code=503, detail=str(exc)) from exc
+
+@app.get(
+    "/tts-assets/{cache_key}",
+    response_model=TTSAssetManifest,
+    response_model_exclude_none=True,
+)
+def get_tts_asset_manifest(cache_key: str) -> TTSAssetManifest:
+    manifest = tts_asset_store.get_manifest(cache_key)
+    if manifest is None:
+        raise HTTPException(status_code=404, detail="TTS asset not found")
+    return manifest
+
+
+@app.post(
+    "/tts-assets/generate",
+    response_model=TTSAssetManifest,
+    response_model_exclude_none=True,
+)
+def generate_tts_asset(
+    text: str = Form(...),
+    language: str | None = Form(None),
+    tts_provider: str | None = Form(None),
+    tts_model: str | None = Form(None),
+    voice_id: str | None = Form(None),
+    speaking_rate: float | None = Form(None),
+    audio_format: str = Form("wav_16khz_mono"),
+) -> TTSAssetManifest:
+    try:
+        return _get_or_create_tts_asset(
+            text=text,
+            language=language,
+            tts_provider=tts_provider,
+            tts_model=tts_model,
+            voice_id=voice_id,
+            speaking_rate=speaking_rate,
+            audio_format=audio_format,
+        )
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
     except RuntimeError as exc:
         raise HTTPException(status_code=503, detail=str(exc)) from exc
 
@@ -276,6 +319,41 @@ def _get_or_create_tts_reference(script: str, language: str | None) -> Reference
         language=language or settings.aligner_language,
     )
     return reference_cache.put_reference(request, tts_audio.audio_bytes, alignment)
+
+def _get_or_create_tts_asset(
+    text: str,
+    language: str | None,
+    tts_provider: str | None,
+    tts_model: str | None,
+    voice_id: str | None,
+    speaking_rate: float | None,
+    audio_format: str,
+) -> TTSAssetManifest:
+    request = TTSAssetRequest(
+        text=text,
+        language=language or settings.aligner_language,
+        tts_provider=tts_provider or settings.tts_provider,
+        tts_model=tts_model or settings.tts_model,
+        voice_id=voice_id or settings.tts_voice_id,
+        speaking_rate=speaking_rate if speaking_rate is not None else settings.tts_speaking_rate,
+        audio_format=audio_format,
+    )
+    manifest = tts_asset_store.get_manifest(request.cache_key())
+    if manifest is not None:
+        return manifest
+
+    if request.tts_provider != "edge":
+        raise RuntimeError(f"unsupported TTS provider: {request.tts_provider}")
+    if request.audio_format != "wav_16khz_mono":
+        raise RuntimeError(f"unsupported TTS audio format: {request.audio_format}")
+
+    generator = EdgeTTSReferenceGenerator(
+        voice_id=request.voice_id,
+        speaking_rate=request.speaking_rate,
+        model=request.tts_model,
+    )
+    tts_audio = generator.generate(request.text)
+    return tts_asset_store.put_asset(request, tts_audio.audio_bytes)
 
 
 def _compact_analysis_response(response: PronunciationAnalysisResponse) -> None:

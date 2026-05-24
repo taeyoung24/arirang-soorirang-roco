@@ -94,6 +94,16 @@ curl -X POST http://localhost:8000/analyze-pronunciation-llm `
   -F "audio=@.\sample.wav"
 ```
 
+사용자 청취용 TTS asset 생성 또는 기존 위치 반환:
+
+```powershell
+curl -X POST http://localhost:8000/tts-assets/generate `
+  -F "text=옷을 입어요" `
+  -F "language=Korean"
+```
+
+응답의 `cache_key`, `object_bucket`, `audio_object_key`를 backend DB에 저장하면 됩니다. 같은 `text`, `language`, `provider`, `model`, `voice_id`, `speaking_rate`, `audio_format` 조합이 이미 MinIO에 있으면 새로 생성하지 않고 기존 위치를 반환합니다.
+
 현재 분석 API는 다음 단계를 수행합니다.
 
 - 기존 MDD 추론으로 `predicted_phonemes` 생성

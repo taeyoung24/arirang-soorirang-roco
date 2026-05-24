@@ -1,0 +1,36 @@
+[
+  {
+    "card_id": "card_001",
+    "meaning_id": "8dfa7526",
+    "polysemy_word": "쓰다",
+    "prompt_sentence": "저는 매일 저녁에 일기를 써요.",
+    "choices": [
+      {"choice_id": "c1", "text": "글씨 쓰는 연습을 하세요.", "meaning_id": "8dfa7526"},
+      {"choice_id": "c2", "text": "어제 쓴 우산을 말리고 있어요.", "meaning_id": "f7a4b128"},
+      {"choice_id": "c3", "text": "모자 쓴 사람을 보았어요.", "meaning_id": "03c7ae56"},
+      {"choice_id": "c4", "text": "이 소스는 조금 쓰네요.", "meaning_id": "2a00e9ac"}
+    ],
+    "correct_choice_id": "c1",
+    "pronunciation_target": "써요",
+    "image_url": "/assets/cards/bird-write.png",
+    "card_order": 1,
+    "set_id": "set_school_01"
+  },
+  {
+    "card_id": "card_002",
+    "meaning_id": "a08b020d",
+    "polysemy_word": "눈",
+    "prompt_sentence": "빛의 자극을 받아 물체를 볼 수 있는 감각 기관.",
+    "choices": [
+      {"choice_id": "c1", "text": "빛의 자극을 받아 물체를 볼 수 있는 감각 기관.", "meaning_id": "a08b020d"},
+      {"choice_id": "c2", "text": "자·저울·온도계 따위에 표시하여 길이·양·도수를 나타내는 금.", "meaning_id": "f74ae230"},
+      {"choice_id": "c3", "text": "그물 따위에서 코와 코를 이어 이룬 구멍.", "meaning_id": "c070986f"},
+      {"choice_id": "c4", "text": "대기 중의 수증기가 찬 기운을 만나 얼어서 떨어지는 얼음 결정체.", "meaning_id": "607998e2"}
+    ],
+    "correct_choice_id": "c1",
+    "pronunciation_target": "눈",
+    "image_url": "/assets/cards/placeholder.png",
+    "card_order": 1,
+    "set_id": "set_test_01"
+  }
+]

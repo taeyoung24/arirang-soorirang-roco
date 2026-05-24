@@ -86,14 +86,12 @@ class AcousticAnalyzer:
             prediction.canonical_phonemes,
             reference_alignment,
         )
-        segment_features = self.feature_extractor.extract_segment_features(audio, alignments)
         prosody = self.feature_extractor.extract_prosody(audio, alignments, reference_alignments)
         diagnostics = self.diagnostic_engine.build(
             prediction.canonical_phonemes,
             prediction.predicted_phonemes,
             phoneme_edits,
             prediction.syllable_candidate_scores,
-            segment_features,
             prosody,
             quality,
         )
@@ -104,7 +102,6 @@ class AcousticAnalyzer:
         else:
             notes = [
                 "Alignment is heuristic and uniformly distributed because forced alignment is not available.",
-                "Segment-level confidence should be treated as low until the aligner service is reachable.",
             ]
         if include_llm_note:
             notes.append("LLM feedback is generated from structured evidence, not from raw audio.")
@@ -124,7 +121,6 @@ class AcousticAnalyzer:
             audio_quality=quality,
             phoneme_edits=phoneme_edits,
             alignments=alignments,
-            segment_features=segment_features,
             prosody=prosody,
             diagnostic_candidates=diagnostics,
             policy=EvidencePolicy(language=feedback_language),
@@ -140,7 +136,6 @@ class AcousticAnalyzer:
             audio_quality=quality,
             phoneme_edits=phoneme_edits,
             alignments=alignments,
-            segment_features=segment_features,
             prosody=prosody,
             diagnostic_candidates=diagnostics,
             notes=notes,
@@ -338,7 +333,7 @@ class AcousticAnalyzer:
             alignments.extend(self._forced_word_units(forced_items))
 
         if not alignments:
-            return self._build_alignments_heuristic(canonical, predicted, duration_ms)
+            return self._build_alignments_heuristic(canonical, predicted, duration_ms, observed_by_expected)
 
         syllable_units = [unit for unit in alignments if unit.unit_type == "syllable"]
         word_units = [unit for unit in alignments if unit.unit_type == "word"]

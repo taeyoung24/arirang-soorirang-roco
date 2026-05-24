@@ -6,21 +6,10 @@ from app.acoustic_schemas import (
     DiagnosticCandidate,
     PhonemeEdit,
     ProsodySummary,
-    SegmentFeatureBundle,
 )
 
 
 class LLMEvidenceBuilder:
-    RELEVANT_FEATURES = {
-        "duration_ms",
-        "pitch_hz",
-        "spectral_centroid_hz",
-        "zero_cross_rate",
-        "high_frequency_ratio",
-        "burst_peak",
-        "frication_ms",
-    }
-
     def build(self, evidence: AcousticEvidencePacket, max_diagnostics: int = 3) -> AcousticEvidencePacket:
         diagnostics = self._top_diagnostics(evidence.diagnostic_candidates, max_diagnostics)
         target_units = {item.target_unit for item in diagnostics if item.target_unit}
@@ -48,7 +37,6 @@ class LLMEvidenceBuilder:
             audio_quality=evidence.audio_quality,
             phoneme_edits=phoneme_edits,
             alignments=self._relevant_alignments(evidence.alignments, target_units),
-            segment_features=self._relevant_features(evidence.segment_features, target_units),
             prosody=self._relevant_prosody(evidence.prosody, diagnostics, target_units),
             diagnostic_candidates=diagnostics,
             policy=evidence.policy,
@@ -112,33 +100,6 @@ class LLMEvidenceBuilder:
         if result:
             return result[:12]
         return [unit for unit in alignments if unit.unit_type == "word"][:6]
-
-    def _relevant_features(
-        self,
-        segment_features: list[SegmentFeatureBundle],
-        target_units: set[str],
-    ) -> list[SegmentFeatureBundle]:
-        if not target_units:
-            return []
-        bundles = []
-        for bundle in segment_features:
-            if bundle.label not in target_units:
-                continue
-            filtered = [
-                feature
-                for feature in bundle.features
-                if feature.name in self.RELEVANT_FEATURES and feature.value is not None
-            ]
-            if filtered:
-                bundles.append(
-                    SegmentFeatureBundle(
-                        label=bundle.label,
-                        unit_type=bundle.unit_type,
-                        interval=bundle.interval,
-                        features=filtered,
-                    )
-                )
-        return bundles[:8]
 
     @staticmethod
     def _has_prosodic_diagnostic(diagnostics: list[DiagnosticCandidate]) -> bool:

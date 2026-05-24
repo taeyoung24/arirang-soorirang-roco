@@ -45,6 +45,23 @@ def _extract_upstream_detail(exc: httpx.HTTPStatusError):
     return payload
 
 
+def _align_or_raise(audio_bytes: bytes, original_filename: str, text: str, language: str) -> ForcedAlignmentResponse:
+    try:
+        alignment = aligner_client.align(
+            audio_bytes=audio_bytes,
+            original_filename=original_filename,
+            text=text,
+            language=language,
+        )
+    except httpx.HTTPStatusError as exc:
+        raise HTTPException(status_code=exc.response.status_code, detail=_extract_upstream_detail(exc)) from exc
+    except httpx.HTTPError as exc:
+        raise HTTPException(status_code=502, detail=f"aligner service unavailable: {exc}") from exc
+    if not alignment.items:
+        raise HTTPException(status_code=502, detail="forced alignment returned no timing items")
+    return alignment
+
+
 @app.get("/health", response_model=HealthResponse, response_model_exclude_none=True)
 def healthcheck() -> HealthResponse:
     inference_status, _ = client.health()
@@ -149,6 +166,7 @@ def generate_reference_cache(
         raise HTTPException(status_code=502, detail=f"aligner service unavailable: {exc}") from exc
     except RuntimeError as exc:
         raise HTTPException(status_code=503, detail=str(exc)) from exc
+
 
 @app.get(
     "/tts-assets/{cache_key}",
@@ -257,21 +275,20 @@ async def _analyze_pronunciation(
     try:
         payload = await audio.read()
         prediction = client.predict(payload, audio.filename or "input.wav", script)
-        forced_alignment = None
-        try:
-            forced_alignment = aligner_client.align(
-                audio_bytes=payload,
-                original_filename=audio.filename or "input.wav",
-                text=script,
-                language=(language or settings.aligner_language),
-            )
-        except httpx.HTTPError:
-            forced_alignment = None
+        forced_alignment = _align_or_raise(
+            audio_bytes=payload,
+            original_filename=audio.filename or "input.wav",
+            text=script,
+            language=(language or settings.aligner_language),
+        )
         reference_alignment = None
         if reference_cache_key:
             reference_alignment = reference_cache.get_alignment(reference_cache_key)
             if reference_alignment is None:
-                raise HTTPException(status_code=404, detail="reference cache alignment not found")
+                if not use_tts_reference:
+                    raise HTTPException(status_code=404, detail="reference cache alignment not found")
+                reference_manifest = await asyncio.to_thread(_get_or_create_tts_reference, script, language)
+                reference_alignment = reference_cache.get_alignment(reference_manifest.cache_key)
         elif use_tts_reference:
             reference_manifest = await asyncio.to_thread(_get_or_create_tts_reference, script, language)
             reference_alignment = reference_cache.get_alignment(reference_manifest.cache_key)
@@ -312,13 +329,14 @@ def _get_or_create_tts_reference(script: str, language: str | None) -> Reference
         return manifest
 
     tts_audio = tts_reference_generator.generate(script)
-    alignment = aligner_client.align(
+    alignment = _align_or_raise(
         audio_bytes=tts_audio.audio_bytes,
         original_filename="tts-reference.wav",
         text=script,
         language=language or settings.aligner_language,
     )
     return reference_cache.put_reference(request, tts_audio.audio_bytes, alignment)
+
 
 def _get_or_create_tts_asset(
     text: str,
@@ -360,7 +378,6 @@ def _compact_analysis_response(response: PronunciationAnalysisResponse) -> None:
     target_units = {item.target_unit for item in response.diagnostic_candidates[:3] if item.target_unit}
     response.diagnostic_candidates = response.diagnostic_candidates[:3]
     response.alignments = _compact_alignments(response.alignments, target_units)
-    response.segment_features = []
     response.predicted_phoneme_scores = [
         score for score in response.predicted_phoneme_scores if score.phoneme in target_units
     ][:3]

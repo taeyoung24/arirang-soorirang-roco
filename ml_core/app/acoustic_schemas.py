@@ -54,25 +54,6 @@ class AlignmentUnit(TimeInterval):
     source: Optional[Literal["forced", "heuristic"]] = None
 
 
-class FeatureMeasurement(BaseModel):
-    name: str
-    value: Optional[float] = None
-    unit: Optional[str] = None
-    baseline_mean: Optional[float] = None
-    baseline_std: Optional[float] = Field(default=None, ge=0.0)
-    zscore: Optional[float] = None
-    percentile: Optional[float] = Field(default=None, ge=0.0, le=100.0)
-    reliability: Literal["high", "medium", "low"] = "medium"
-    note: Optional[str] = None
-
-
-class SegmentFeatureBundle(BaseModel):
-    label: str
-    unit_type: Literal["phoneme", "syllable", "word"]
-    interval: TimeInterval
-    features: list[FeatureMeasurement] = Field(default_factory=list)
-
-
 class AudioQualitySummary(BaseModel):
     snr_db: Optional[float] = None
     clipping_detected: bool = False
@@ -106,9 +87,6 @@ class ProsodySummary(BaseModel):
     timing_source: Literal["forced_alignment", "acoustic", "none"] = "acoustic"
     reference_timing_source: Optional[Literal["tts_reference"]] = None
     rate_reliability: Literal["high", "medium", "low"] = "low"
-    utterance_f0_mean_hz: Optional[float] = None
-    utterance_f0_range_semitones: Optional[float] = None
-    phrase_final_f0_slope: Optional[float] = None
     notes: list[str] = Field(default_factory=list)
 
 
@@ -152,7 +130,6 @@ class AcousticEvidencePacket(BaseModel):
     audio_quality: AudioQualitySummary
     phoneme_edits: list[PhonemeEdit] = Field(default_factory=list)
     alignments: list[AlignmentUnit] = Field(default_factory=list)
-    segment_features: list[SegmentFeatureBundle] = Field(default_factory=list)
     prosody: Optional[ProsodySummary] = None
     diagnostic_candidates: list[DiagnosticCandidate] = Field(default_factory=list)
     policy: EvidencePolicy = Field(default_factory=EvidencePolicy)
@@ -186,7 +163,6 @@ class PronunciationAnalysisResponse(BaseModel):
     audio_quality: AudioQualitySummary
     phoneme_edits: list[PhonemeEdit] = Field(default_factory=list)
     alignments: list[AlignmentUnit] = Field(default_factory=list)
-    segment_features: list[SegmentFeatureBundle] = Field(default_factory=list)
     prosody: Optional[ProsodySummary] = None
     diagnostic_candidates: list[DiagnosticCandidate] = Field(default_factory=list)
     llm_feedback: Optional[AcousticLLMFeedback] = None

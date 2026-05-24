@@ -8,7 +8,7 @@ This document explains the response fields for:
 - `POST /reference-cache/generate`
 - `GET /reference-cache/{cache_key}`
 
-By default, both endpoints return a compact response. Pass `debug=true` to include full alignments, acoustic features, and phoneme scores.
+By default, both endpoints return a compact response. Pass `debug=true` to include full alignments and phoneme scores.
 
 ## Request Fields
 
@@ -18,8 +18,8 @@ By default, both endpoints return a compact response. Pass `debug=true` to inclu
 | `audio` | yes | - | Learner speech audio file. |
 | `language` | no | `Korean` | Language name passed to the forced aligner. Usually omit this for Korean. |
 | `feedback_language` | no | `ko` | Language used for LLM feedback text. Examples: `ko`, `en`, `ja`, `zh-CN`. |
-| `reference_cache_key` | no | - | Cache key for a TTS reference audio/alignment entry. When provided, prosody diagnostics compare learner timing against this reference. |
-| `use_tts_reference` | no | `true` | If no `reference_cache_key` is supplied, generate or reuse a TTS reference automatically. |
+| `reference_cache_key` | no | - | Cache key for a TTS reference audio/alignment entry. When provided, prosody diagnostics compare learner timing against this reference. If the key is missing and `use_tts_reference=true`, the API falls back to automatic TTS reference lookup/generation. |
+| `use_tts_reference` | no | `true` | Generate or reuse a TTS reference automatically when no cache key is supplied, or when a supplied cache key cannot be found. |
 | `debug` | no | `false` | If `true`, returns full diagnostic internals. If `false`, returns compact fields only. |
 
 ## Reference Cache
@@ -54,7 +54,7 @@ tts-reference/{cache_key}/manifest.json
 
 `GET /reference-cache/{cache_key}` returns the manifest if the cache entry exists.
 
-`POST /reference-cache/generate` accepts `script` and optional `language`. It generates a TTS reference audio file, runs Qwen forced alignment for that TTS audio, stores both objects in MinIO, and returns the manifest. The analysis endpoints call this path automatically when `use_tts_reference=true` and no `reference_cache_key` was supplied.
+`POST /reference-cache/generate` accepts `script` and optional `language`. It generates a TTS reference audio file, runs Qwen forced alignment for that TTS audio, stores both objects in MinIO, and returns the manifest. The analysis endpoints call this path automatically when `use_tts_reference=true` and no `reference_cache_key` was supplied, or when the supplied key is not found.
 
 ## Top-Level Response Fields
 
@@ -74,7 +74,6 @@ The following fields are compacted unless `debug=true`:
 | Field | Compact Behavior |
 | --- | --- |
 | `alignments` | Only issue-related phoneme/syllable units or a few word units are returned. |
-| `segment_features` | Removed in compact mode. |
 | `predicted_phoneme_scores` | Only issue-related predicted phoneme scores are returned. |
 | `target_phoneme_scores` | Only issue-related target phoneme scores are returned. |
 | `syllable_candidate_scores` | Only issue-related syllable candidate scores are returned. |
@@ -82,6 +81,19 @@ The following fields are compacted unless `debug=true`:
 | `model_score` | Removed in compact mode. |
 
 ## Important Confidence Types
+
+## Error Behavior
+
+The analysis endpoints require forced alignment. If the aligner service is unreachable, returns an upstream error, or returns no timing items, the request fails instead of returning a heuristic timing analysis.
+
+Common cases:
+
+| Case | HTTP status |
+| --- | --- |
+| Internal inference service unavailable | `502` |
+| Forced aligner unavailable | `502` |
+| Forced aligner returns no timing items | `502` |
+| Upstream inference/aligner returns validation or runtime error | Same upstream status |
 
 The API has several different confidence values. They do not mean the same thing.
 
@@ -259,23 +271,6 @@ Common codes:
 | `stretched_aligned_unit` | One aligned word/token is long relative to its syllable count. |
 | `audio_quality_limited` | Audio quality limits interpretation. |
 
-## `segment_features`
-
-Returned only with `debug=true`.
-
-Each bundle contains acoustic measurements for a phoneme segment:
-
-- `duration_ms`
-- `rms_energy`
-- `pitch_hz`
-- `spectral_centroid_hz`
-- `zero_cross_rate`
-- `high_frequency_ratio`
-- `burst_peak`
-- `frication_ms`
-
-These features are lightweight debug measurements. They should not be treated as standalone pronunciation errors.
-
 ## `llm_feedback`
 
 Only returned by `/analyze-pronunciation-llm` when Gemini is configured.
@@ -300,5 +295,5 @@ For learner-facing UI:
 For debugging or research:
 
 - Use `debug=true`.
-- Inspect `phoneme_edits`, `target_phoneme_scores`, `syllable_candidate_scores`, and `segment_features`.
+- Inspect `phoneme_edits`, `target_phoneme_scores`, and `syllable_candidate_scores`.
 - Do not interpret `alignments[].confidence` as pronunciation confidence.

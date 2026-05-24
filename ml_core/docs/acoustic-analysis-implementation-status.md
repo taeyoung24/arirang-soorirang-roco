@@ -25,7 +25,7 @@ It is separate from the design document and focuses on current behavior, validat
 2. API calls internal `/predict` on the inference service.
 3. API calls Qwen3 forced aligner with the same audio and script.
 4. Analyzer builds word, syllable, and approximate phoneme spans.
-5. Analyzer extracts heuristic acoustic and prosodic features.
+5. Analyzer extracts timing/prosody evidence.
 6. Analyzer creates rule-based diagnostic candidates.
 7. If Gemini is configured, structured evidence is sent for learner-facing feedback generation.
 
@@ -33,7 +33,7 @@ It is separate from the design document and focuses on current behavior, validat
 
 - `api`
   - FastAPI gateway
-  - acoustic feature extraction
+  - timing/prosody analysis
   - diagnostic candidate generation
   - optional Gemini call
 - `inference`
@@ -108,9 +108,7 @@ This confirms:
 
 ## Known Limitations
 
-- Forced alignment currently provides reliable word and character timing, but phoneme spans are still subdivided inside aligned syllable spans and remain approximate.
-- Acoustic features are heuristic and lightweight. They are not a full phonetics-grade DSP stack.
-- Vowel formant-related values are proxy features, not a robust formant-tracking pipeline.
+- Forced alignment currently provides word and character timing; phoneme-level acoustic feature extraction is not part of the active API.
 - Gemini feedback is skipped unless `MDD_GEMINI_API_KEY` is configured.
 - Real user speech has not yet been validated in this document; current recorded end-to-end check used silent audio to validate failure behavior.
 
@@ -123,7 +121,5 @@ This confirms:
 ## Remaining Work
 
 - Validate `/analyze-pronunciation` with real Korean speech input.
-- Improve phoneme-level timing from approximate subdivision to a more defensible alignment strategy.
-- Replace proxy vowel features with a stronger measurement pipeline.
 - Add native baseline calibration and threshold tuning.
 - Enable and test Gemini output with a real API key.

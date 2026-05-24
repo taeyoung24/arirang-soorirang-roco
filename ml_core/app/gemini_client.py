@@ -86,6 +86,8 @@ class GeminiFeedbackClient:
                 "If reliability is low, mention that uncertainty briefly.",
                 "Prioritize the top 1-3 issues.",
                 "If diagnostic_candidates is not empty, issues must contain at least one issue grounded in those diagnostics.",
+                "issue.diagnosis must be a short learner-facing phrase, not a diagnostic code.",
+                "Never copy snake_case values such as diagnosis_code into learner-facing fields.",
                 "Coaching should be short, concrete, and pronounceable by a learner.",
                 "For segmental issues, issue.unit must come from phoneme_edits.expected or phoneme_edits.actual.",
                 "For prosodic issues such as slow speech rate or long pauses, issue.unit may be null.",

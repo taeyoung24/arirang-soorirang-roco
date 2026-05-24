@@ -108,23 +108,22 @@ curl -X POST http://localhost:8000/tts-assets/generate `
 
 - 기존 MDD 추론으로 `predicted_phonemes` 생성
 - `Qwen/Qwen3-ForcedAligner-0.6B`로 word/character timestamp 정렬
-- 정렬 결과를 바탕으로 음절/음소 구간 생성
-- lightweight acoustic feature extractor로 구간별 debug feature 추출
+- 정렬 결과를 바탕으로 음절/단어 구간 생성
 - `use_tts_reference=true`이면 TTS reference를 자동 생성/캐싱하고, cached TTS reference alignment와 사용자 timing을 비교해 늘어짐/중간 공백 후보 생성
 - in-process fairseq backend에서는 hypothesis decoder score를 `model_score`로 노출
 - MDD 음소 mismatch를 중심으로 오류 후보 생성
-- `/analyze-pronunciation-llm`에서는 `MDD_GEMINI_API_KEY`가 있으면 상위 진단과 관련 feature만 압축해 Gemini API로 한국어 피드백 생성
+- `/analyze-pronunciation-llm`에서는 `MDD_GEMINI_API_KEY`가 있으면 상위 진단과 관련 evidence만 압축해 Gemini API로 한국어 피드백 생성
 - `/analyze-pronunciation-basic`은 Gemini 키가 있어도 LLM을 호출하지 않음
 
 `language`는 forced aligner에 넘기는 발화 언어이며 기본값은 `Korean`입니다.
 `feedback_language`는 LLM 피드백 언어이며 기본값은 `ko`입니다. 예: `ko`, `en`, `ja`, `zh-CN`, `Spanish`.
-`debug`는 상세 응답 여부이며 기본값은 `false`입니다. `debug=true`이면 전체 alignment, segment feature, phoneme score를 포함합니다.
+`debug`는 상세 응답 여부이며 기본값은 `false`입니다. `debug=true`이면 전체 alignment와 phoneme score를 포함합니다.
 
 주의:
 
 - 강제정렬은 별도 `aligner` 컨테이너에서 수행됩니다.
-- 음소 경계는 강제정렬된 음절 구간 내부에서 분할한 값이라, word/syllable보다 신뢰도가 낮습니다.
-- acoustic feature는 debug/evidence 용도이며, 발음 오류 판정은 MDD phoneme edit alignment를 우선합니다.
+- 분석 API는 강제정렬에 실패하면 fallback 분석을 반환하지 않고 오류를 반환합니다.
+- 발음 오류 판정은 MDD phoneme edit alignment를 우선합니다.
 - `model_score`는 calibrated GOP가 아니라 decoder hypothesis score이므로, 음소별 confidence로 쓰려면 추가 calibration/후처리가 필요합니다.
 
 ## CLI
@@ -157,7 +156,7 @@ curl -X POST http://localhost:8000/tts-assets/generate `
 
 ## 주의
 
-- `api` 컨테이너는 음향 feature 추출과 Gemini 해석을 담당합니다.
+- `api` 컨테이너는 timing/prosody 분석과 Gemini 해석을 담당합니다.
 - `inference` 컨테이너가 모델을 시작 시 한 번 로드한 뒤 요청마다 재사용합니다.
 - `aligner` 컨테이너가 Qwen3 forced aligner를 시작 시 로드한 뒤 요청마다 재사용합니다.
 - 현재 compose는 `inference` 서비스에 `runtime: nvidia`를 사용합니다.

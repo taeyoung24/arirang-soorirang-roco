@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from app.acoustic_schemas import AudioQualitySummary, DiagnosticCandidate, PhonemeEdit, ProsodySummary, SegmentFeatureBundle
+from app.acoustic_schemas import AudioQualitySummary, DiagnosticCandidate, PhonemeEdit, ProsodySummary
 from app.schemas import SyllableCandidateScore
 
 
@@ -18,6 +18,8 @@ class DiagnosticEngine:
     STRETCHED_WORD_DELTA_MS = 450
     VERY_STRETCHED_DURATION_RATIO = 3.0
     VERY_STRETCHED_DELTA_MS = 300
+    MEDIUM_INTERIOR_PAUSE_MS = 500
+    HIGH_INTERIOR_PAUSE_MS = 1200
 
     def build(
         self,
@@ -25,7 +27,6 @@ class DiagnosticEngine:
         predicted: str,
         phoneme_edits: list[PhonemeEdit],
         syllable_candidate_scores: list[SyllableCandidateScore],
-        segment_features: list[SegmentFeatureBundle],
         prosody: ProsodySummary,
         quality: AudioQualitySummary,
     ) -> list[DiagnosticCandidate]:
@@ -135,7 +136,7 @@ class DiagnosticEngine:
         prosody: ProsodySummary,
         quality: AudioQualitySummary,
     ) -> list[DiagnosticCandidate]:
-        if prosody.timing_source != "forced_alignment" or prosody.reference_timing_source != "tts_reference":
+        if prosody.timing_source != "forced_alignment":
             return []
         if quality.overall_reliability == "low" and prosody.rate_reliability != "high":
             return []
@@ -170,6 +171,35 @@ class DiagnosticEngine:
                     ),
                 )
             )
+
+        if not long_pauses:
+            raw_pauses = [
+                item
+                for item in prosody.pause_intervals
+                if item.duration_ms >= self.MEDIUM_INTERIOR_PAUSE_MS
+            ][:3]
+            for item in raw_pauses:
+                severity = "high" if item.duration_ms >= self.HIGH_INTERIOR_PAUSE_MS else "medium"
+                diagnostics.append(
+                    DiagnosticCandidate(
+                        diagnosis_code="long_interior_pause",
+                        category="prosodic",
+                        target_unit=None,
+                        severity=severity,
+                        confidence=0.76 if severity == "high" else 0.7,
+                        evidence_keys=[
+                            "qwen_forced_alignment_word_gaps",
+                            "pause_intervals",
+                        ],
+                        rationale=(
+                            "Qwen forced alignment found an interior word gap: "
+                            f"start_ms={item.start_ms}, "
+                            f"end_ms={item.end_ms}, "
+                            f"duration_ms={item.duration_ms}, "
+                            f"threshold_ms={self.MEDIUM_INTERIOR_PAUSE_MS}."
+                        ),
+                    )
+                )
 
         stretched_units = self._deduplicate_stretched_units([
             item

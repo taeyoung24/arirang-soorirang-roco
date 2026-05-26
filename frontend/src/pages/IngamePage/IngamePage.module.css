@@ -51,6 +51,7 @@
   flex-shrink: 0;
   display: flex;
   flex-direction: column;
+  justify-content: flex-start;
   padding-bottom: 1rem;
   contain: layout style; /* 스테이지별 레이아웃 계산을 그 안으로 격리 시켜 리페인트 범위 축소 */
 }

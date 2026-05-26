@@ -14,11 +14,15 @@ FastAPI 백엔드 서버입니다.
 - 발음 평가 요청
 - 저장 단어 목록 조회
 
-현재 카테고리/세트/카드/보기에 대한 정답 판정 API는 PostgreSQL DB 기반으로 동작하며,
-추천/최근/발음/저장 단어 API는 아직 UI 확인용 더미 데이터 기반으로 동작합니다.
+현재 카테고리/세트/카드/추천/최근 기록/보기에 대한 정답 판정 API는
+PostgreSQL DB 기반으로 동작하며, 발음/저장 단어 API는 아직 UI 확인용 더미
+데이터 기반으로 동작합니다.
 """
 
+from datetime import datetime, timezone
+
 from fastapi import FastAPI, UploadFile, File, Form, Depends
+from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from sqlalchemy.orm import Session
 
@@ -36,6 +40,7 @@ from schemas import (
     SetCardsData,
     SetCardsResponse,
     AnswerSubmitRequest,
+    TtsUrlUpdateRequest,
     AnswerResult,
     AnswerSubmitResponse,
     PronunciationResult,
@@ -45,7 +50,14 @@ from schemas import (
 )
 
 from database import get_db
-from db_models import CategoryDB, LearningSetDB, QuizDB, QuizChoiceDB
+from db_models import (
+    CategoryDB,
+    LearningSetDB,
+    QuizDB,
+    QuizChoiceDB,
+    SentenceDB,
+    RecentLearningRecordDB,
+)
 
 # =============================================================================
 # FastAPI 앱 초기화
@@ -57,22 +69,41 @@ app = FastAPI(
     version="0.1.0",
 )
 
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=[
+        "http://localhost:5173",
+        "http://127.0.0.1:5173",
+    ],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
 # 실행 위치: backend/fastapi
+app.mount(
+    "/assets/categories",
+    StaticFiles(directory="categories"),
+    name="category_assets",
+)
 app.mount("/assets", StaticFiles(directory="assets"), name="assets")
 
 
 # =============================================================================
-# 이미지 경로 상수
+# 이미지 식별자
 # =============================================================================
 
-CARD_IMAGE_BIRD_WRITE = "/assets/cards/bird-write.png"
-CARD_IMAGE_PLACEHOLDER = "/assets/cards/placeholder.png"
-CARD_IMAGE_TIGER_CAP = "/assets/cards/tiger-cap.png"
-CARD_IMAGE_TIGER_SNOW = "/assets/cards/tiger-snow.png"
+FRONTEND_ASSET_WRITE = "word-image-write.png"
+FRONTEND_ASSET_SNOW = "word-image-snow.png"
 
-CATEGORY_IMAGE_BANK = "/assets/categories/bank.png"
-CATEGORY_IMAGE_HOSPITAL = "/assets/categories/hospital.png"
-CATEGORY_IMAGE_SCHOOL = "/assets/categories/school.png"
+CARD_IMAGE_BIRD_WRITE = FRONTEND_ASSET_WRITE
+CARD_IMAGE_PLACEHOLDER = FRONTEND_ASSET_SNOW
+CARD_IMAGE_TIGER_CAP = FRONTEND_ASSET_SNOW
+CARD_IMAGE_TIGER_SNOW = FRONTEND_ASSET_SNOW
+
+CATEGORY_IMAGE_BANK = FRONTEND_ASSET_SNOW
+CATEGORY_IMAGE_HOSPITAL = FRONTEND_ASSET_WRITE
+CATEGORY_IMAGE_SCHOOL = FRONTEND_ASSET_WRITE
 
 SET_THUMBNAIL_MAPPING = {
     "set_school_01": CATEGORY_IMAGE_SCHOOL,
@@ -127,15 +158,16 @@ def get_learning_sets_for_category(db: Session, category_id: str):
 
 
 def get_cards_for_set(db: Session, set_id: str):
+    learning_set = db.query(LearningSetDB).filter(LearningSetDB.set_id == set_id).one_or_none()
+    if learning_set is None:
+        return None
+
     set_quizzes = (
         db.query(QuizDB)
         .filter(QuizDB.set_id == set_id)
         .order_by(QuizDB.card_order)
         .all()
     )
-
-    if not set_quizzes:
-        return None
 
     title_mapping = {
         "set_school_01": "고등학교",
@@ -157,10 +189,12 @@ def get_cards_for_set(db: Session, set_id: str):
         cards.append(
             LearningCard(
                 card_id=quiz.card_id,
+                sentence_id=quiz.sentence_id,
                 polysemy_word=quiz.polysemy_word,
                 prompt_sentence=quiz.prompt_sentence,
                 choices=choices,
                 pronunciation_target=quiz.pronunciation_target,
+                tts_url=quiz.tts_url,
                 image_url=quiz.image_url,
                 card_order=quiz.card_order,
             )
@@ -168,13 +202,19 @@ def get_cards_for_set(db: Session, set_id: str):
 
     return SetCardsData(
         set_id=set_id,
-        title=title_mapping.get(set_id, "정보 없음"),
+        title=title_mapping.get(set_id, learning_set.title),
         cards=cards,
     )
 
 
 def get_recommended_sets_from_db(db: Session):
-    learning_sets = db.query(LearningSetDB).order_by(LearningSetDB.set_id).all()
+    learning_sets = (
+        db.query(LearningSetDB)
+        .join(QuizDB, LearningSetDB.set_id == QuizDB.set_id)
+        .group_by(LearningSetDB.set_id)
+        .order_by(LearningSetDB.set_id)
+        .all()
+    )
     return [
         RecommendedSet(
             set_id=learning_set.set_id,
@@ -188,6 +228,76 @@ def get_recommended_sets_from_db(db: Session):
         )
         for learning_set in learning_sets
     ]
+
+
+def touch_recent_learning_record(db: Session, card_id: str):
+    record = (
+        db.query(RecentLearningRecordDB)
+        .filter(RecentLearningRecordDB.card_id == card_id)
+        .one_or_none()
+    )
+    now = datetime.now(timezone.utc)
+
+    if record is None:
+        db.add(RecentLearningRecordDB(card_id=card_id, last_viewed_at=now))
+    else:
+        record.last_viewed_at = now
+
+
+def get_recent_cards_from_db(db: Session):
+    records = (
+        db.query(RecentLearningRecordDB)
+        .join(QuizDB, RecentLearningRecordDB.card_id == QuizDB.card_id)
+        .order_by(RecentLearningRecordDB.last_viewed_at.desc())
+        .limit(6)
+        .all()
+    )
+
+    if records:
+        recent_cards = []
+        seen_words = set()
+
+        for record in records:
+            word = record.quiz.polysemy_word
+            if word in seen_words:
+                continue
+
+            seen_words.add(word)
+            recent_cards.append(
+                RecentCard(
+                    card_id=record.quiz.card_id,
+                    set_id=record.quiz.set_id,
+                    word=word,
+                    image_url=record.quiz.image_url or CARD_IMAGE_PLACEHOLDER,
+                    last_viewed_at=record.last_viewed_at.isoformat(),
+                )
+            )
+
+            if len(recent_cards) >= 6:
+                break
+
+        return recent_cards
+
+    quizzes = db.query(QuizDB).order_by(QuizDB.card_id).limit(6).all()
+    recent_cards = []
+    seen_words = set()
+
+    for quiz in quizzes:
+        if quiz.polysemy_word in seen_words:
+            continue
+
+        seen_words.add(quiz.polysemy_word)
+        recent_cards.append(
+            RecentCard(
+                card_id=quiz.card_id,
+                set_id=quiz.set_id,
+                word=quiz.polysemy_word,
+                image_url=quiz.image_url or CARD_IMAGE_PLACEHOLDER,
+                last_viewed_at=datetime.now(timezone.utc).isoformat(),
+            )
+        )
+
+    return recent_cards
 
 
 # =============================================================================
@@ -240,34 +350,16 @@ async def get_recommended_contents(db: Session = Depends(get_db)):
 
 
 @app.get("/api/v1/contents/recent", response_model=RecentResponse)
-async def get_recent_contents():
+async def get_recent_contents(db: Session = Depends(get_db)):
     """
     최근 학습 목록 조회 API
 
     홈 화면의 최근 기록 영역에 표시할 최근 학습 카드 목록을 반환합니다.
-    현재는 UI 확인용 더미 데이터를 반환합니다.
+    학습 기록이 있으면 최근 기록 테이블에서, 아직 기록이 없으면 카드 DB에서
+    기본 목록을 반환합니다.
     """
 
-    recent_cards = [
-        RecentCard(
-            card_id="card_001",
-            word="쓰다",
-            image_url=CARD_IMAGE_BIRD_WRITE,
-            last_viewed_at="2026-04-25T11:00:00",
-        ),
-        RecentCard(
-            card_id="card_002",
-            word="보다",
-            image_url=CARD_IMAGE_PLACEHOLDER,
-            last_viewed_at="2026-04-25T11:05:00",
-        ),
-        RecentCard(
-            card_id="card_006",
-            word="맞다",
-            image_url=CARD_IMAGE_PLACEHOLDER,
-            last_viewed_at="2026-04-25T11:10:00",
-        ),
-    ]
+    recent_cards = get_recent_cards_from_db(db)
 
     return RecentResponse(
         success=True,
@@ -355,7 +447,53 @@ async def get_set_cards(set_id: str, db: Session = Depends(get_db)):
 
 
 # =============================================================================
-# 6. 의미 테스트 답안 제출
+# 6. TTS URL 갱신
+# =============================================================================
+
+
+@app.patch("/api/v1/sentences/{sentence_id}/tts-url")
+async def update_sentence_tts_url(
+    sentence_id: str,
+    request: TtsUrlUpdateRequest,
+    db: Session = Depends(get_db),
+):
+    """
+    문장 TTS URL 갱신 API
+
+    AI가 TTS 파일을 Object Storage에 업로드한 뒤 받은 URL을 전달하면,
+    문장과 해당 문장을 프롬프트로 사용하는 카드에 URL을 저장합니다.
+    """
+
+    sentence = (
+        db.query(SentenceDB).filter(SentenceDB.sentence_id == sentence_id).one_or_none()
+    )
+    if sentence is None:
+        return {
+            "success": False,
+            "data": None,
+            "message": "존재하지 않는 문장입니다.",
+        }
+
+    sentence.tts_url = request.tts_url
+    updated_cards = db.query(QuizDB).filter(QuizDB.sentence_id == sentence_id).all()
+    for quiz in updated_cards:
+        quiz.tts_url = request.tts_url
+
+    db.commit()
+
+    return {
+        "success": True,
+        "data": {
+            "sentence_id": sentence_id,
+            "tts_url": request.tts_url,
+            "updated_card_count": len(updated_cards),
+        },
+        "message": None,
+    }
+
+
+# =============================================================================
+# 7. 의미 테스트 답안 제출
 # =============================================================================
 
 
@@ -397,6 +535,9 @@ async def submit_card_answer(
             message="존재하지 않는 선택지입니다.",
         )
 
+    touch_recent_learning_record(db, card_id)
+    db.commit()
+
     is_correct = selected_choice.is_correct
     if is_correct:
         data = AnswerResult(
@@ -421,7 +562,7 @@ async def submit_card_answer(
 
 
 # =============================================================================
-# 7. 발음 평가 요청
+# 8. 발음 평가 요청
 # =============================================================================
 
 
@@ -430,6 +571,7 @@ async def evaluate_pronunciation(
     card_id: str,
     target_text: str = Form(...),
     audio_file: UploadFile = File(...),
+    db: Session = Depends(get_db),
 ):
     """
     발음 평가 요청 API
@@ -440,9 +582,8 @@ async def evaluate_pronunciation(
     현재는 실제 음성 분석 모델 없이 고정 더미 결과를 반환합니다. (추후 AI 모델 연동 예정)
     """
 
-    allowed_card_ids = {f"card_{i:03d}" for i in range(1, 36)}
-
-    if card_id not in allowed_card_ids:
+    quiz = db.query(QuizDB).filter(QuizDB.card_id == card_id).one_or_none()
+    if quiz is None:
         return PronunciationResponse(
             success=False,
             data=None,
@@ -455,6 +596,9 @@ async def evaluate_pronunciation(
             data=None,
             message="업로드된 음성 파일이 없습니다.",
         )
+
+    touch_recent_learning_record(db, card_id)
+    db.commit()
 
     data = PronunciationResult(
         card_id=card_id,
@@ -472,7 +616,7 @@ async def evaluate_pronunciation(
 
 
 # =============================================================================
-# 8. 저장 단어 목록 조회
+# 9. 저장 단어 목록 조회
 # =============================================================================
 
 

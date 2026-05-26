@@ -65,9 +65,10 @@ async def align(
             tmp.write(await audio.read())
             temp_path = Path(tmp.name)
         try:
+            align_text = _alignment_text(text, language)
             results = aligner.align(
                 audio=str(temp_path),
-                text=text,
+                text=align_text,
                 language=language,
             )
         finally:
@@ -94,3 +95,20 @@ async def align(
         raise HTTPException(status_code=500, detail=str(exc)) from exc
     except Exception as exc:  # pragma: no cover - runtime environment dependent
         raise HTTPException(status_code=500, detail=f"forced alignment failed: {exc}") from exc
+
+
+def _alignment_text(text: str, language: str) -> str:
+    if not _is_korean_language(language):
+        return text
+    syllables = [char for char in text if _is_hangul_syllable(char)]
+    if not syllables:
+        return text
+    return " ".join(syllables)
+
+
+def _is_korean_language(language: str) -> bool:
+    return language.strip().lower() in {"ko", "kor", "korean", "한국어"}
+
+
+def _is_hangul_syllable(char: str) -> bool:
+    return 0xAC00 <= ord(char) <= 0xD7A3

@@ -149,3 +149,6 @@ __pycache__/
 .tmp/
 ml_core/docs/original-image-dump/
 ml_core/models/*.pt
+
+*.wav
+*.m4a

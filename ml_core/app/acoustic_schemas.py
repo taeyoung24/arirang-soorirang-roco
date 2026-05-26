@@ -13,31 +13,45 @@ class TimeInterval(BaseModel):
     confidence: Optional[float] = Field(default=None, ge=0.0, le=1.0)
 
 
+class PauseInterval(TimeInterval):
+    duration_ms: int = Field(ge=0)
+    source: Literal["forced", "acoustic"] = "forced"
+
+
+class StretchedInterval(TimeInterval):
+    label: str
+    unit_type: Literal["syllable", "word"]
+    ms_per_syllable: float = Field(ge=0.0)
+    source: Literal["forced"] = "forced"
+
+
+class ReferenceDurationComparison(TimeInterval):
+    label: str
+    unit_type: Literal["syllable", "word"]
+    user_duration_ms: int = Field(ge=0)
+    reference_duration_ms: int = Field(ge=0)
+    duration_delta_ms: int
+    duration_ratio: float = Field(ge=0.0)
+    source: Literal["tts_reference"] = "tts_reference"
+
+
+class ReferencePauseComparison(TimeInterval):
+    user_duration_ms: int = Field(ge=0)
+    reference_duration_ms: int = Field(ge=0)
+    duration_delta_ms: int
+    duration_ratio: Optional[float] = Field(default=None, ge=0.0)
+    pause_level: Optional[Literal["medium", "high"]] = None
+    previous_label: Optional[str] = None
+    next_label: Optional[str] = None
+    source: Literal["tts_reference"] = "tts_reference"
+
+
 class AlignmentUnit(TimeInterval):
     label: str
     unit_type: Literal["phoneme", "syllable", "word"]
     expected_label: Optional[str] = None
     observed_label: Optional[str] = None
     source: Optional[Literal["forced", "heuristic"]] = None
-
-
-class FeatureMeasurement(BaseModel):
-    name: str
-    value: Optional[float] = None
-    unit: Optional[str] = None
-    baseline_mean: Optional[float] = None
-    baseline_std: Optional[float] = Field(default=None, ge=0.0)
-    zscore: Optional[float] = None
-    percentile: Optional[float] = Field(default=None, ge=0.0, le=100.0)
-    reliability: Literal["high", "medium", "low"] = "medium"
-    note: Optional[str] = None
-
-
-class SegmentFeatureBundle(BaseModel):
-    label: str
-    unit_type: Literal["phoneme", "syllable", "word"]
-    interval: TimeInterval
-    features: list[FeatureMeasurement] = Field(default_factory=list)
 
 
 class AudioQualitySummary(BaseModel):
@@ -51,11 +65,28 @@ class AudioQualitySummary(BaseModel):
 class ProsodySummary(BaseModel):
     speech_rate_syllables_per_second: Optional[float] = None
     articulation_rate_syllables_per_second: Optional[float] = None
+    expected_syllable_count: Optional[int] = Field(default=None, ge=0)
+    aligned_speech_start_ms: Optional[int] = Field(default=None, ge=0)
+    aligned_speech_end_ms: Optional[int] = Field(default=None, ge=0)
+    speech_duration_ms: Optional[int] = Field(default=None, ge=0)
+    leading_silence_ms: Optional[int] = Field(default=None, ge=0)
+    trailing_silence_ms: Optional[int] = Field(default=None, ge=0)
     pause_count: int = Field(default=0, ge=0)
     pause_total_ms: int = Field(default=0, ge=0)
-    utterance_f0_mean_hz: Optional[float] = None
-    utterance_f0_range_semitones: Optional[float] = None
-    phrase_final_f0_slope: Optional[float] = None
+    interior_pause_count: int = Field(default=0, ge=0)
+    interior_pause_total_ms: int = Field(default=0, ge=0)
+    longest_interior_pause_ms: int = Field(default=0, ge=0)
+    pause_intervals: list[PauseInterval] = Field(default_factory=list)
+    slowest_aligned_unit: Optional[str] = None
+    slowest_aligned_unit_ms_per_syllable: Optional[float] = Field(default=None, ge=0.0)
+    stretched_intervals: list[StretchedInterval] = Field(default_factory=list)
+    reference_speech_duration_ms: Optional[int] = Field(default=None, ge=0)
+    speech_duration_ratio: Optional[float] = Field(default=None, ge=0.0)
+    reference_duration_comparisons: list[ReferenceDurationComparison] = Field(default_factory=list)
+    reference_pause_comparisons: list[ReferencePauseComparison] = Field(default_factory=list)
+    timing_source: Literal["forced_alignment", "acoustic", "none"] = "acoustic"
+    reference_timing_source: Optional[Literal["tts_reference"]] = None
+    rate_reliability: Literal["high", "medium", "low"] = "low"
     notes: list[str] = Field(default_factory=list)
 
 
@@ -99,7 +130,6 @@ class AcousticEvidencePacket(BaseModel):
     audio_quality: AudioQualitySummary
     phoneme_edits: list[PhonemeEdit] = Field(default_factory=list)
     alignments: list[AlignmentUnit] = Field(default_factory=list)
-    segment_features: list[SegmentFeatureBundle] = Field(default_factory=list)
     prosody: Optional[ProsodySummary] = None
     diagnostic_candidates: list[DiagnosticCandidate] = Field(default_factory=list)
     policy: EvidencePolicy = Field(default_factory=EvidencePolicy)
@@ -133,7 +163,6 @@ class PronunciationAnalysisResponse(BaseModel):
     audio_quality: AudioQualitySummary
     phoneme_edits: list[PhonemeEdit] = Field(default_factory=list)
     alignments: list[AlignmentUnit] = Field(default_factory=list)
-    segment_features: list[SegmentFeatureBundle] = Field(default_factory=list)
     prosody: Optional[ProsodySummary] = None
     diagnostic_candidates: list[DiagnosticCandidate] = Field(default_factory=list)
     llm_feedback: Optional[AcousticLLMFeedback] = None

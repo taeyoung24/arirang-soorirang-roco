@@ -17,6 +17,11 @@ class HealthResponse(BaseModel):
     aligner_model_id: Optional[str] = None
     gemini_model: Optional[str] = None
     gemini_status: Optional[str] = None
+    reference_cache_status: Optional[str] = None
+    reference_cache_bucket: Optional[str] = None
+    reference_cache_error: Optional[str] = None
+    tts_provider: Optional[str] = None
+    tts_voice_id: Optional[str] = None
 
 
 class PronunciationIssue(BaseModel):

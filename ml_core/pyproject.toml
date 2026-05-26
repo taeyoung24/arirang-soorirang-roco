@@ -6,8 +6,10 @@ readme = "README.md"
 requires-python = ">=3.9"
 dependencies = [
     "fastapi",
+    "edge-tts",
     "g2pk2",
     "httpx",
+    "minio",
     "numpy",
     "python-Levenshtein",
     "python-multipart",

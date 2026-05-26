@@ -18,6 +18,7 @@ class PronunciationAnalysisService:
         audio_bytes: bytes,
         prediction: PredictResponse,
         forced_alignment: ForcedAlignmentResponse | None = None,
+        reference_alignment: ForcedAlignmentResponse | None = None,
         include_llm_feedback: bool = True,
         feedback_language: str = "ko",
     ) -> PronunciationAnalysisResponse:
@@ -25,6 +26,7 @@ class PronunciationAnalysisService:
             audio_bytes=audio_bytes,
             prediction=prediction,
             forced_alignment=forced_alignment,
+            reference_alignment=reference_alignment,
             include_llm_note=include_llm_feedback and self.gemini_client.enabled,
             feedback_language=feedback_language,
         )
@@ -35,20 +37,34 @@ class PronunciationAnalysisService:
             response.notes.append("Gemini API key is not configured, so LLM feedback was skipped.")
             return response
         llm_evidence = self.llm_evidence_builder.build(evidence)
+        allowed_segmental_units = (
+            {edit.expected for edit in llm_evidence.phoneme_edits if edit.expected}
+            | {edit.actual for edit in llm_evidence.phoneme_edits if edit.actual}
+        )
+        allowed_prosodic_units = {
+            candidate.target_unit
+            for candidate in llm_evidence.diagnostic_candidates
+            if candidate.category == "prosodic" and candidate.target_unit
+        }
         response.llm_feedback = self._filter_llm_feedback(
             self.gemini_client.generate_feedback(llm_evidence),
-            allowed_units={edit.expected for edit in llm_evidence.phoneme_edits if edit.expected}
-            | {edit.actual for edit in llm_evidence.phoneme_edits if edit.actual},
+            allowed_segmental_units=allowed_segmental_units,
+            allowed_prosodic_units=allowed_prosodic_units,
         )
         return response
 
     @staticmethod
-    def _filter_llm_feedback(feedback: AcousticLLMFeedback, allowed_units: set[str]) -> AcousticLLMFeedback:
-        if not allowed_units:
-            return feedback
+    def _filter_llm_feedback(
+        feedback: AcousticLLMFeedback,
+        allowed_segmental_units: set[str],
+        allowed_prosodic_units: set[str],
+    ) -> AcousticLLMFeedback:
         feedback.issues = [
             issue
             for issue in feedback.issues
-            if issue.unit is None or issue.unit in allowed_units
+            if issue.unit is None
+            or (issue.category == "segmental" and issue.unit in allowed_segmental_units)
+            or (issue.category == "prosodic" and issue.unit in allowed_prosodic_units)
+            or (issue.category == "quality")
         ]
         return feedback

@@ -1,11 +1,13 @@
 annotated-types==0.7.0
 anyio==4.12.1
+edge-tts==7.2.8
 fastapi==0.128.8
 g2pk2==0.0.3
 h11==0.16.0
 httptools==0.7.1
 httpx==0.28.1
 jamo==0.4.1
+minio==7.2.20
 numpy==2.3.4; python_version >= "3.10"
 numpy==1.22.3; python_version < "3.10"
 pydantic==2.13.3

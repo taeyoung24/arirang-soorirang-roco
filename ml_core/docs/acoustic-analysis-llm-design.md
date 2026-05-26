@@ -14,7 +14,6 @@ The current service already does:
 It does not yet do:
 
 - time alignment between signal and target units
-- segment-level acoustic measurement
 - prosody analysis
 - evidence-to-feedback interpretation
 
@@ -26,7 +25,7 @@ It should receive a structured evidence packet that has already been aligned, me
 Recommended architecture:
 
 1. `Alignment layer`
-2. `Feature extraction layer`
+2. `Prosody evidence layer`
 3. `Candidate diagnosis layer`
 4. `LLM interpretation layer`
 
@@ -36,9 +35,8 @@ Recommended architecture:
 audio + script
 -> canonical phonemes
 -> forced alignment
--> phoneme / syllable / word intervals
--> acoustic + prosodic feature extraction
--> baseline normalization
+-> syllable / word intervals
+-> timing + prosody evidence extraction
 -> rule-based diagnostic candidates
 -> LLM evidence packet
 -> learner-facing feedback
@@ -48,7 +46,6 @@ audio + script
 
 The alignment layer should output time spans for:
 
-- phoneme
 - syllable
 - word
 
@@ -60,48 +57,16 @@ Required fields:
 - `end_ms`
 - `confidence`
 
-This layer is mandatory because later measurements need a stable segment window.
+This layer is mandatory because timing diagnostics need stable syllable and word windows.
 
-## Layer 2: Acoustic Features
+## Layer 2: Prosody Evidence
 
-Only interpretable features should be passed downstream.
-
-### Vowel features
-
-- `duration_ms`
-- `f1_mean_hz`
-- `f2_mean_hz`
-- `f1_slope`
-- `f2_slope`
-- `intensity_mean_db`
-
-### Stop consonant features
-
-- `closure_ms`
-- `burst_peak`
-- `vot_ms`
-- `post_onset_f0_hz`
-
-### Fricative features
-
-- `frication_ms`
-- `spectral_centroid_hz`
-- `high_frequency_ratio`
-
-### Coda / release features
-
-- `release_present`
-- `coda_duration_ms`
-
-### Prosody features
+Only interpretable timing evidence should be passed downstream.
 
 - `speech_rate_syllables_per_second`
 - `articulation_rate_syllables_per_second`
 - `pause_count`
 - `pause_total_ms`
-- `utterance_f0_mean_hz`
-- `utterance_f0_range_semitones`
-- `phrase_final_f0_slope`
 
 ### Audio quality guards
 
@@ -112,17 +77,13 @@ Only interpretable features should be passed downstream.
 
 ## Layer 3: Diagnostic Candidates
 
-Before calling the LLM, a deterministic layer should convert feature deviations into candidate findings.
+Before calling the LLM, a deterministic layer should convert MDD phoneme edits and timing deviations into candidate findings.
 
 Examples:
 
 - `aspiration_insufficient`
 - `fortis_tension_insufficient`
-- `vowel_fronting`
-- `vowel_backing`
-- `vowel_height_shift`
 - `coda_release_missing`
-- `phrase_final_intonation_flat`
 - `speech_rate_unstable`
 
 Each candidate should include:
@@ -155,10 +116,9 @@ The LLM prompt should enforce:
 The first implementation should focus on the contrasts that matter most for Korean learner feedback:
 
 - lenis / fortis / aspirated stop contrast
-- vowel space separation such as `ㅓ-ㅗ`, `ㅡ-ㅜ`, `ㅔ-ㅐ`
 - coda neutralization and release behavior
 - liaison and resyllabification sensitive contexts
-- phrase-final intonation
+- speech rate and interior pause timing
 
 ## API Extension Strategy
 
@@ -168,7 +128,7 @@ Introduce a second response block or a second endpoint for acoustic analysis.
 Recommended additions:
 
 - `alignment`
-- `acoustic_features`
+- `prosody`
 - `diagnostic_candidates`
 - `llm_feedback`
 
@@ -207,7 +167,7 @@ Response:
 
 ### Phase 3
 
-- extract vowel, stop, and utterance-level prosody features
+- extract utterance-level timing/prosody evidence
 - add reliability gating
 
 ### Phase 4

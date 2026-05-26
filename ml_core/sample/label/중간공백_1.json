@@ -1,0 +1,16 @@
+{
+  "audio_file": "../sound/중간공백_1.m4a",
+  "label": "interior_pause",
+  "script": "밥을 먹어요",
+  "segments": [
+    {
+      "text": "밥을 먹어요",
+      "issue": "interior_pause",
+      "pause_after": "밥을",
+      "pause_before": "먹어요",
+      "start_ms": null,
+      "end_ms": null
+    }
+  ],
+  "notes": "띄어쓰기 구간의 중간 공백이 늘어짐."
+}

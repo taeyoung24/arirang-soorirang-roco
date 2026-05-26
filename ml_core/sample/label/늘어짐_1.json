@@ -1,0 +1,20 @@
+{
+  "audio_file": "../sound/늘어짐_1.m4a",
+  "label": "stretched_pronunciation",
+  "script": "저는 신동빈입니다",
+  "segments": [
+    {
+      "text": "는",
+      "issue": "stretched_pronunciation",
+      "start_ms": null,
+      "end_ms": null
+    },
+    {
+      "text": "니",
+      "issue": "stretched_pronunciation",
+      "start_ms": null,
+      "end_ms": null
+    }
+  ],
+  "notes": ""
+}

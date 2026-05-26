@@ -1,4 +1,10 @@
+import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+import {
+  getRecentContents,
+  getRecommendedContents,
+  resolveAssetUrl,
+} from 'src/api'
 import mascot from 'src/assets/landing-mascot.svg'
 import normalMascot from 'src/assets/mascot/word-image-snow.png'
 import winterMascot from 'src/assets/mascot/word-image-write.png'
@@ -7,14 +13,17 @@ import Layout from 'src/components/Layout'
 import { HomeTopContainer } from 'src/components/TopContainer'
 
 
-function ContentCard({ title, image }) {
+function ContentCard({ title, image, onClick }) {
   return (
-    <div className="w-24 bg-bg rounded-[20px] outline outline-[2.40px] outline-offset-[-1.20px] outline-text inline-flex flex-col justify-center items-center overflow-hidden shrink-0 snap-start">
-      <div className="self-stretch h-8 flex items-center justify-center text-text text-base font-semibold font-sans text-center">
+    <div
+      onClick={onClick}
+      className="w-[104px] h-[130px] bg-bg rounded-[20px] outline outline-[2.40px] outline-offset-[-1.20px] outline-text inline-flex flex-col justify-center items-center overflow-hidden shrink-0 snap-start cursor-pointer active:scale-95 transition-transform"
+    >
+      <div className="self-stretch h-9 px-1 flex items-center justify-center text-text text-base font-extrabold font-sans text-center leading-none break-keep overflow-hidden">
         {title}
       </div>
       <div className="self-stretch border-t-[2.40px] border-text" />
-      <img src={image} alt={title} className="self-stretch h-24 object-cover" />
+      <img src={image} alt={title} className="self-stretch flex-1 min-h-0 object-cover bg-yellow-primary" />
     </div>
   )
 }
@@ -23,11 +32,16 @@ function ContentCard({ title, image }) {
 
 function ContentSection({ label, bg, cards }) {
   return (
-    <div className="PopAreaWrap self-stretch pt-5 relative inline-flex flex-col justify-end items-center gap-2.5">
-      <div className={`Blob self-stretch h-44 pt-5 ${bg} rounded-[20px] outline outline-[2.40px] outline-offset-[-1.20px] outline-text inline-flex justify-start items-center overflow-hidden`}>
-        <div className="ContentList px-4 pt-1 scroll-px-4 h-full flex justify-start items-center gap-[5px] overflow-x-auto scrollbar-none snap-x snap-mandatory">
+    <div className="PopAreaWrap self-stretch pt-6 relative flex flex-col justify-end items-center gap-2.5">
+      <div className={`Blob self-stretch h-[190px] pt-10 pb-5 ${bg} rounded-[20px] outline outline-[2.40px] outline-offset-[-1.20px] outline-text inline-flex justify-start items-center overflow-hidden`}>
+        <div className="ContentList w-full px-4 scroll-px-4 h-full flex justify-start items-center gap-2.5 overflow-x-auto scrollbar-none snap-x snap-mandatory">
           {cards.map((card, i) => (
-            <ContentCard key={i} title={card.title} image={card.image} />
+            <ContentCard
+              key={card.id || i}
+              title={card.title}
+              image={card.image}
+              onClick={card.onClick}
+            />
           ))}
         </div>
       </div>
@@ -43,10 +57,83 @@ function ContentSection({ label, bg, cards }) {
 
 function HomePage() {
   const navigate = useNavigate()
+  const [recommendedCards, setRecommendedCards] = useState([])
+  const [recentCards, setRecentCards] = useState([])
+  const [isLoading, setIsLoading] = useState(true)
+
+  useEffect(() => {
+    let isMounted = true
+
+    async function loadHomeContents() {
+      try {
+        const [recommended, recent] = await Promise.all([
+          getRecommendedContents(),
+          getRecentContents(),
+        ])
+
+        if (!isMounted) return
+
+        const recommendedOrder = [
+          'set_hospital_01',
+          'set_school_01',
+          'set_bank_01',
+          'set_cafe_01',
+          'set_hanging_with_01',
+          'set_pc_game_01',
+        ]
+        const orderedRecommended = [...recommended].sort((a, b) => {
+          const aIndex = recommendedOrder.indexOf(a.set_id)
+          const bIndex = recommendedOrder.indexOf(b.set_id)
+          return (aIndex === -1 ? 99 : aIndex) - (bIndex === -1 ? 99 : bIndex)
+        })
+
+        setRecommendedCards(
+          orderedRecommended.slice(0, 6).map((item) => ({
+            id: item.set_id,
+            title: item.title,
+            image: resolveAssetUrl(item.thumbnail_url),
+            onClick: () => navigate(`/ingame/${item.set_id}`),
+          }))
+        )
+        setRecentCards(
+          recent.slice(0, 6).map((item) => ({
+            id: item.card_id,
+            title: item.word,
+            image: resolveAssetUrl(item.image_url),
+            onClick: () => navigate(`/ingame/${item.set_id}`),
+          }))
+        )
+      } catch (error) {
+        if (!isMounted) return
+
+        console.error('홈 콘텐츠를 불러오지 못했습니다:', error)
+        setRecommendedCards([
+          { id: 'fallback_hospital', title: '병원', image: normalMascot },
+          { id: 'fallback_school', title: '고등학교', image: winterMascot },
+          { id: 'fallback_bank', title: '은행', image: normalMascot },
+          { id: 'fallback_university', title: '대학교', image: winterMascot },
+        ])
+        setRecentCards([
+          { id: 'fallback_recent_1', title: '쓰다', image: normalMascot },
+          { id: 'fallback_recent_2', title: '눈', image: winterMascot },
+          { id: 'fallback_recent_3', title: '쓰다', image: normalMascot },
+          { id: 'fallback_recent_4', title: '바람', image: winterMascot },
+        ])
+      } finally {
+        if (isMounted) setIsLoading(false)
+      }
+    }
+
+    loadHomeContents()
+
+    return () => {
+      isMounted = false
+    }
+  }, [navigate])
 
   return (
-    <Layout className="h-[770px]">
-      <div className="w-80 h-[718px] mx-auto flex flex-col justify-start items-center gap-4">
+    <Layout className="min-h-screen !px-5 pt-10 pb-28">
+      <div className="w-full max-w-80 mx-auto flex flex-col justify-start items-center gap-3">
 
         {/* HomeTopContainer */}
         <HomeTopContainer mascotSrc={mascot} onHelp={() => { }} />
@@ -54,12 +141,12 @@ function HomePage() {
 
 
         {/* Title */}
-        <h1 className="self-stretch justify-start text-text text-2xl font-extrabold font-sans">
+        <h1 className="self-stretch justify-start text-text text-[26px] font-extrabold font-sans leading-tight">
           아리, 수리와 헷갈리는 단어를 학습하세요
         </h1>
 
         {/* Login Banner */}
-        <div className="self-stretch px-4 py-4 relative bg-bg rounded-[20px] outline outline-[2.40px] outline-offset-[-1.20px] outline-text flex flex-col justify-center items-center gap-1">
+        <div className="self-stretch h-[96px] px-4 relative bg-bg rounded-[20px] outline outline-[2.40px] outline-offset-[-1.20px] outline-text flex flex-col justify-center items-center gap-1">
           <p className="self-stretch justify-start text-text text-xl font-extrabold font-sans">로그인</p>
           <p className="self-stretch justify-start text-text text-base font-semibold font-sans">더 나은 학습을 위해 로그인하세요.</p>
           <div className="left-[262px] top-[-26px] absolute">
@@ -87,26 +174,16 @@ function HomePage() {
 
         {/* Recommended Content */}
         <ContentSection
-          label="추천 컨텐츠"
+          label={isLoading ? '불러오는 중' : '추천 컨텐츠'}
           bg="bg-soori-primary"
-          cards={[
-            { title: '병원', image: normalMascot },
-            { title: '고등학교', image: winterMascot },
-            { title: '은행', image: normalMascot },
-            { title: '학교', image: winterMascot },
-          ]}
+          cards={recommendedCards}
         />
 
         {/* Recent Records */}
         <ContentSection
           label="최근 기록"
           bg="bg-bg-softdark"
-          cards={[
-            { title: '쓰다', image: normalMascot },
-            { title: '눈', image: winterMascot },
-            { title: '쓰다', image: normalMascot },
-            { title: '바람', image: winterMascot },
-          ]}
+          cards={recentCards}
         />
 
       </div>
@@ -119,4 +196,3 @@ function HomePage() {
 }
 
 export default HomePage;
-

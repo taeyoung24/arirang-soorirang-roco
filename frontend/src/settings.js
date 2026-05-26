@@ -19,7 +19,7 @@ function requireEnv(key, defaultValue) {
 }
 
 export const GLOBAL_CONFIG = {
-  API_BASE_URL: requireEnv('VITE_API_BASE_URL', 'http://localhost:3000'),
+  API_BASE_URL: requireEnv('VITE_API_BASE_URL', 'http://localhost:8000'),
   MODE: import.meta.env.MODE,
   IS_DEV: import.meta.env.DEV,
 };

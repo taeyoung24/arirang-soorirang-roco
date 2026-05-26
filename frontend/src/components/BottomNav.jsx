@@ -5,7 +5,7 @@ const BottomNav = ({ activeTab = "Home" }) => {
   const navigate = useNavigate();
 
   return (
-    <div className="fixed bottom-13 left-1/2 -translate-x-1/2 z-50">
+    <div className="fixed bottom-5 left-1/2 -translate-x-1/2 z-50">
       <div 
         data-layer="bottom-nav" 
         data-select={activeTab} 

@@ -48,14 +48,14 @@ SET_TITLE = {
 }
 
 SET_THUMBNAIL_MAPPING = {
-    "set_school_01": "/assets/categories/school.png",
-    "set_hospital_01": "/assets/categories/hospital.png",
-    "set_bank_01": "/assets/categories/bank.png",
-    "set_hanging_with_01": "/assets/cards/placeholder.png",
-    "set_cafe_01": "/assets/cards/placeholder.png",
-    "set_pc_game_01": "/assets/cards/placeholder.png",
-    "set_university_01": "/assets/cards/placeholder.png",
-    "set_test_01": "/assets/cards/placeholder.png",
+    "set_school_01": "word-image-write.png",
+    "set_hospital_01": "word-image-write.png",
+    "set_bank_01": "word-image-snow.png",
+    "set_hanging_with_01": "word-image-snow.png",
+    "set_cafe_01": "word-image-snow.png",
+    "set_pc_game_01": "word-image-snow.png",
+    "set_university_01": "word-image-snow.png",
+    "set_test_01": "word-image-snow.png",
 }
 
 
@@ -85,15 +85,20 @@ def seed_categories(session):
 def seed_learning_sets(session):
     for set_id, category_id in SET_TO_CATEGORY.items():
         learning_set = session.get(LearningSetDB, set_id)
+        thumbnail_url = SET_THUMBNAIL_MAPPING.get(set_id)
         if learning_set is None:
             session.add(
                 LearningSetDB(
                     set_id=set_id,
                     title=SET_TITLE.get(set_id, "정보 없음"),
                     category_id=category_id,
-                    thumbnail_url=SET_THUMBNAIL_MAPPING.get(set_id),
+                    thumbnail_url=thumbnail_url,
                 )
             )
+        else:
+            learning_set.title = SET_TITLE.get(set_id, learning_set.title)
+            learning_set.category_id = category_id
+            learning_set.thumbnail_url = thumbnail_url
 
 
 def seed_words(session, words):

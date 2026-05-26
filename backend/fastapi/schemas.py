@@ -33,6 +33,7 @@ class RecentCard(BaseModel):
     """
 
     card_id: str
+    set_id: str
     word: str
     image_url: str
     last_viewed_at: str

@@ -27,6 +27,7 @@ from db_models import (
     SentenceDB,
     QuizDB,
     QuizChoiceDB,
+    RecentLearningRecordDB,
 )  # noqa: E402
 
 database_url = os.getenv("DATABASE_URL")

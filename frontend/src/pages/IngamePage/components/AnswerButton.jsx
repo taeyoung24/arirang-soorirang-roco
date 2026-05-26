@@ -65,28 +65,28 @@ export default function AnswerButton({ parts, status = 'Default', onClick }) {
   return (
     <button 
       onClick={onClick}
-      className={`self-stretch h-[52px] w-full ${bgClass} ${opacityClass} rounded-[20px] outline outline-[2.40px] outline-offset-[-1.20px] outline-text inline-flex justify-between items-center transition-transform active:scale-[0.98] cursor-pointer`}
+      className={`self-stretch min-h-[52px] w-full ${bgClass} ${opacityClass} rounded-[20px] outline outline-[2.40px] outline-offset-[-1.20px] outline-text inline-flex justify-between items-center transition-transform active:scale-[0.98] cursor-pointer`}
     >
 
 
 
-      <div className="flex-1 self-stretch pl-4 inline-flex flex-col justify-center items-start gap-2.5">
-        <div className="self-stretch inline-flex justify-start items-center gap-0.5 flex-wrap content-center">
+      <div className="flex-1 self-stretch min-w-0 px-4 py-2 inline-flex flex-col justify-center items-start gap-2.5">
+        <div className="self-stretch inline-flex justify-start items-center gap-0.5 flex-wrap content-center break-keep">
           {parts.map((part, index) => {
             if (part.type === 'highlight') {
               return (
                 <div key={index} className={`px-0.5 border-b-[1.60px] ${highlightBorderClass} flex justify-center items-center gap-2.5`}>
-                  <span className={`${textColorClass} text-base font-extrabold font-sans`}>{part.text}</span>
+                  <span className={`${textColorClass} text-[15px] font-extrabold font-sans leading-snug`}>{part.text}</span>
                 </div>
               );
             }
             return (
-              <span key={index} className={`${textColorClass} text-base font-semibold font-sans`}>{part.text}</span>
+              <span key={index} className={`${textColorClass} text-[15px] font-semibold font-sans leading-snug`}>{part.text}</span>
             );
           })}
         </div>
       </div>
-      <div className="w-12 self-stretch inline-flex flex-col justify-center items-center overflow-hidden">
+      <div className="w-12 self-stretch shrink-0 inline-flex flex-col justify-center items-center overflow-hidden">
         <div className="relative">
           {iconSvg}
         </div>

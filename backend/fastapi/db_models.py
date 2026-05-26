@@ -1,4 +1,4 @@
-from sqlalchemy import Boolean, Column, ForeignKey, Integer, String, Text
+from sqlalchemy import Boolean, Column, DateTime, ForeignKey, Integer, String, Text
 from sqlalchemy.orm import relationship
 
 from database import Base
@@ -93,3 +93,13 @@ class QuizChoiceDB(Base):
     is_correct = Column(Boolean, nullable=False, default=False)
 
     quiz = relationship("QuizDB", back_populates="choices")
+
+
+class RecentLearningRecordDB(Base):
+    __tablename__ = "recent_learning_records"
+
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    card_id = Column(String, ForeignKey("quizzes.card_id"), nullable=False, unique=True)
+    last_viewed_at = Column(DateTime(timezone=True), nullable=False, index=True)
+
+    quiz = relationship("QuizDB")

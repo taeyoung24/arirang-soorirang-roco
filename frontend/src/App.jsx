@@ -13,6 +13,7 @@ function App() {
         <Route path="/home" element={<HomePage />} />
         <Route path="/selection" element={<SelectionPage />} />
         <Route path="/ingame" element={<IngamePage />} />
+        <Route path="/ingame/:setId" element={<IngamePage />} />
         <Route path="/saves" element={<SavesPage />} />
       </Routes>
     </BrowserRouter>

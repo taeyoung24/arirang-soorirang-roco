@@ -22,4 +22,9 @@ export const GLOBAL_CONFIG = {
   API_BASE_URL: requireEnv('VITE_API_BASE_URL', 'http://localhost:3000'),
   MODE: import.meta.env.MODE,
   IS_DEV: import.meta.env.DEV,
+
+  // Theme Colors (for PWA Status Bar)
+  colorSooriPrimary: '#5e58fb',
+  colorBg: '#f2ede7',
+  colorYellowPrimary: '#f2ce40',
 };

@@ -1,0 +1,98 @@
+.topArea {
+  align-self: stretch;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 0.625rem;
+}
+
+.textArea {
+  align-self: stretch;
+  height: 3.5rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.title {
+  align-self: stretch;
+  display: flex;
+  justify-content: flex-start;
+  color: var(--color-text);
+  font-size: var(--font-size-h2);
+  font-weight: var(--font-weight-bold);
+  font-family: var(--font-sans);
+}
+
+.questionWrapper {
+  align-self: stretch;
+  padding-top: 0.5rem;
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  gap: 0.25rem;
+  flex-wrap: wrap;
+  align-content: center;
+}
+
+.normalText {
+  color: var(--color-text);
+  font-size: var(--font-size-h4);
+  font-weight: var(--font-weight-semibold);
+  font-family: var(--font-sans);
+}
+
+.highlightBlock {
+  padding: 0 0.125rem;
+  border-bottom-width: 1.6px;
+  border-bottom-style: solid;
+  border-bottom-color: var(--color-text);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 0.625rem;
+}
+
+.highlightText {
+  color: var(--color-text);
+  font-size: var(--font-size-h4);
+  font-weight: var(--font-weight-bold);
+  font-family: var(--font-sans);
+}
+
+.imageWrapper {
+  position: relative;
+  align-self: stretch;
+}
+
+.feedImage {
+  width: 100%;
+  flex: 1;
+  min-height: 0;
+  object-fit: cover;
+  border-radius: var(--radius-global-round);
+  outline: var(--spacing-border-main) solid var(--color-text);
+  outline-offset: -2.4px;
+}
+
+.heartButtonPos {
+  position: absolute;
+  right: 1rem;
+  bottom: 1rem;
+}
+
+.footer {
+  align-self: stretch;
+  flex: 1;
+  min-height: 240px;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 0.625rem;
+  margin-top: 0.5rem;
+  flex-shrink: 0;
+}

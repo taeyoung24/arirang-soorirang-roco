@@ -1,0 +1,142 @@
+.layout {
+  background-color: var(--color-yellow-primary);
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  position: relative; /* 뷰포트 조명이 절대좌표로 붙을 기준점 확보 */
+}
+
+.mainContainer {
+  width: 20rem;
+  height: 100%;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: center;
+  gap: 1rem;
+}
+
+.scrollArea {
+  align-self: stretch;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  scroll-snap-type: y mandatory;
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+  -webkit-overflow-scrolling: touch; /* iOS 우선 모멘텀 스크롤 활성화 */
+  will-change: transform;            /* GPU 레이어 생성 힌트 */
+  overscroll-behavior: none;         /* 과도 스크롤로 인한 부모 스크롤 전파 차단 */
+}
+
+.scrollArea::-webkit-scrollbar {
+  display: none;
+}
+
+.scrollUnlocked {
+  overflow-y: scroll;
+}
+
+.scrollLocked {
+  overflow-y: hidden;
+}
+
+.stageItem {
+  scroll-snap-align: start;
+  scroll-snap-stop: always;
+  width: 100%;
+  height: 100%;
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  padding-bottom: 1rem;
+  contain: layout style; /* 스테이지별 레이아웃 계산을 그 안으로 격리 시켜 리페인트 범위 축소 */
+}
+
+.fadeIn {
+  animation: fadeIn 0.5s ease-in-out forwards;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.fadeOut {
+  animation: fadeOut 0.5s ease-in-out forwards;
+}
+
+@keyframes fadeOut {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+
+.bounceWrapper {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  /* 스크롤 컨테이너의 실제 높이를 stageItem들이 채울 수 있도록 높이 위임 */
+  min-height: 100%;
+}
+
+.bounceHint {
+  animation: unlockBounce 1.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+}
+
+@keyframes unlockBounce {
+  0% {
+    transform: translateY(0);
+  }
+  20% {
+    transform: translateY(-8px);   /* 8px로 거리를 극도로 압축하여 눈이 가장 편안한 마이크로 텐션 완성 */
+  }
+  50% {
+    transform: translateY(-8px);   /* 공중에서 부드럽게 머무르는 우아한 유지 구간 */
+  }
+  75% {
+    transform: translateY(1.5px);   /* 낙하 시 충격을 1.5px의 초미세 반동으로 실키하게 분산 */
+  }
+  90% {
+    transform: translateY(-0.5px); /* 마지막 미세 마무리 반동 */
+  }
+  100% {
+    transform: translateY(0);
+  }
+}
+
+.topAmbientGlow {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 240px; /* 화면 윗부분 전체에 은은하게 퍼지도록 충분한 그라데이션 반원 높이 설정 */
+  background: radial-gradient(ellipse at top, rgba(255, 255, 255, 0.45) 0%, rgba(255, 255, 255, 0) 70%);
+  pointer-events: none;
+  z-index: 5; /* 뷰포트 맨 앞단에서 은은하게 빛이 흘러내리도록 설정 */
+  animation: ambientFadeInOut 1.4s ease-in-out forwards;
+}
+
+@keyframes ambientFadeInOut {
+  0% {
+    opacity: 0;
+  }
+  25% {
+    opacity: 1; /* 바운스가 조심스럽게 올라갈 때 스르르 켜짐 */
+  }
+  65% {
+    opacity: 1; /* 바운스가 상단에 머무는 동안 환함 유지 */
+  }
+  100% {
+    opacity: 0; /* 원위치로 복귀하면서 서서히 자연스럽게 어두워짐 */
+  }
+}

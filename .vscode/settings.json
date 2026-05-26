@@ -3,7 +3,7 @@
   "editor.insertSpaces": true,
   "editor.detectIndentation": false,
   "files.associations": {
-    "*.css": "tailwindcss"
+    "*.css": "css"
   },
   "css.lint.unknownAtRules": "ignore",
   "[javascript]": {
@@ -27,10 +27,10 @@
   "[html]": {
     "editor.tabSize": 2
   },
-	"[css]": {
-		"editor.tabSize": 2
-	},
-	"[markdown]": {
-		"editor.tabSize": 4
-	}
+  "[css]": {
+    "editor.tabSize": 2,
+  },
+  "[markdown]": {
+    "editor.tabSize": 4
+  }
 }

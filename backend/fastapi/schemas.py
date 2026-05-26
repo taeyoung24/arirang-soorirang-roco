@@ -105,11 +105,13 @@ class LearningCard(BaseModel):
     """
 
     card_id: str
+    sentence_id: Optional[str] = None
     polysemy_word: str
     prompt_sentence: str
     choices: List[Choice]
     pronunciation_target: str
-    image_url: str
+    tts_url: Optional[str] = None
+    image_url: Optional[str] = None
     card_order: int
 
 
@@ -139,6 +141,14 @@ class AnswerSubmitRequest(BaseModel):
     """
 
     choice_id: str
+
+
+class TtsUrlUpdateRequest(BaseModel):
+    """
+    TTS URL 갱신 Request 모델
+    """
+
+    tts_url: str
 
 
 class AnswerResult(BaseModel):

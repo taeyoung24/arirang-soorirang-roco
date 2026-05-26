@@ -55,20 +55,26 @@ class SentenceDB(Base):
     )
     content = Column(Text, nullable=False)
     highlight = Column(String, nullable=True)
+    tts_url = Column(String, nullable=True)
 
     meaning = relationship("MeaningDB", back_populates="sentences")
+    quizzes = relationship("QuizDB", back_populates="sentence")
 
 
 class QuizDB(Base):
     __tablename__ = "quizzes"
 
     card_id = Column(String, primary_key=True, index=True)
+    sentence_id = Column(
+        String, ForeignKey("sentences.sentence_id"), nullable=True, index=True
+    )
     meaning_id = Column(
         String, ForeignKey("meanings.meaning_id"), nullable=False, index=True
     )
     polysemy_word = Column(String, nullable=False)
     prompt_sentence = Column(Text, nullable=False)
     pronunciation_target = Column(String, nullable=True)
+    tts_url = Column(String, nullable=True)
     image_url = Column(String, nullable=True)
     card_order = Column(Integer, nullable=False)
     set_id = Column(
@@ -76,6 +82,7 @@ class QuizDB(Base):
     )
 
     meaning = relationship("MeaningDB", back_populates="quizzes")
+    sentence = relationship("SentenceDB", back_populates="quizzes")
     learning_set = relationship("LearningSetDB", back_populates="quizzes")
     choices = relationship(
         "QuizChoiceDB", back_populates="quiz", cascade="all, delete-orphan"

@@ -1,7 +1,7 @@
 """create recent learning records
 
 Revision ID: 9b2d7f6a4c31
-Revises: 42116df0ca1f
+Revises: 7b8c2d4f1a90
 Create Date: 2026-05-23 00:00:00
 """
 
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 
 
 revision = "9b2d7f6a4c31"
-down_revision = "42116df0ca1f"
+down_revision = "7b8c2d4f1a90"
 branch_labels = None
 depends_on = None
 

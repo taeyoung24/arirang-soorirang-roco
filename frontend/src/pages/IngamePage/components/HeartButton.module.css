@@ -1,0 +1,42 @@
+.heartButton {
+  height: 52px;
+  padding: 0 0.875rem;
+  background-color: var(--color-bg);
+  border-radius: var(--radius-global-round-hard, 32px);
+  outline: var(--spacing-border-main) solid var(--color-text);
+  outline-offset: -2.4px;
+  display: inline-flex;
+  justify-content: flex-start;
+  align-items: center;
+  gap: 1.5rem;
+  overflow: hidden;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.heartButton:active {
+  transform: scale(0.95);
+}
+
+.innerContainer {
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.iconWrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.countText {
+  display: flex;
+  justify-content: flex-start;
+  color: var(--color-text);
+  font-size: var(--font-size-h4);
+  font-weight: var(--font-weight-semibold);
+  font-family: var(--font-sans);
+}

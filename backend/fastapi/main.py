@@ -36,6 +36,7 @@ from schemas import (
     SetCardsData,
     SetCardsResponse,
     AnswerSubmitRequest,
+    TtsUrlUpdateRequest,
     AnswerResult,
     AnswerSubmitResponse,
     PronunciationResult,
@@ -45,7 +46,7 @@ from schemas import (
 )
 
 from database import get_db
-from db_models import CategoryDB, LearningSetDB, QuizDB, QuizChoiceDB
+from db_models import CategoryDB, LearningSetDB, QuizDB, QuizChoiceDB, SentenceDB
 
 # =============================================================================
 # FastAPI 앱 초기화
@@ -157,10 +158,12 @@ def get_cards_for_set(db: Session, set_id: str):
         cards.append(
             LearningCard(
                 card_id=quiz.card_id,
+                sentence_id=quiz.sentence_id,
                 polysemy_word=quiz.polysemy_word,
                 prompt_sentence=quiz.prompt_sentence,
                 choices=choices,
                 pronunciation_target=quiz.pronunciation_target,
+                tts_url=quiz.tts_url,
                 image_url=quiz.image_url,
                 card_order=quiz.card_order,
             )
@@ -355,7 +358,57 @@ async def get_set_cards(set_id: str, db: Session = Depends(get_db)):
 
 
 # =============================================================================
-# 6. 의미 테스트 답안 제출
+# 6. TTS URL 갱신
+# =============================================================================
+
+
+@app.patch("/api/v1/sentences/{sentence_id}/tts-url")
+async def update_sentence_tts_url(
+    sentence_id: str,
+    request: TtsUrlUpdateRequest,
+    db: Session = Depends(get_db),
+):
+    """
+    문장 TTS URL 갱신 API
+
+    AI가 TTS 파일을 Object Storage에 업로드한 뒤 받은 URL을 전달하면,
+    문장과 해당 문장을 프롬프트로 사용하는 카드에 URL을 저장합니다.
+    """
+
+    sentence = (
+        db.query(SentenceDB).filter(SentenceDB.sentence_id == sentence_id).one_or_none()
+    )
+    if sentence is None:
+        return {
+            "success": False,
+            "data": None,
+            "message": "존재하지 않는 문장입니다.",
+        }
+
+    sentence.tts_url = request.tts_url
+    updated_cards = (
+        db.query(QuizDB)
+        .filter(QuizDB.sentence_id == sentence_id)
+        .all()
+    )
+    for quiz in updated_cards:
+        quiz.tts_url = request.tts_url
+
+    db.commit()
+
+    return {
+        "success": True,
+        "data": {
+            "sentence_id": sentence_id,
+            "tts_url": request.tts_url,
+            "updated_card_count": len(updated_cards),
+        },
+        "message": None,
+    }
+
+
+# =============================================================================
+# 7. 의미 테스트 답안 제출
 # =============================================================================
 
 
@@ -421,7 +474,7 @@ async def submit_card_answer(
 
 
 # =============================================================================
-# 7. 발음 평가 요청
+# 8. 발음 평가 요청
 # =============================================================================
 
 
@@ -430,6 +483,7 @@ async def evaluate_pronunciation(
     card_id: str,
     target_text: str = Form(...),
     audio_file: UploadFile = File(...),
+    db: Session = Depends(get_db),
 ):
     """
     발음 평가 요청 API
@@ -440,9 +494,8 @@ async def evaluate_pronunciation(
     현재는 실제 음성 분석 모델 없이 고정 더미 결과를 반환합니다. (추후 AI 모델 연동 예정)
     """
 
-    allowed_card_ids = {f"card_{i:03d}" for i in range(1, 36)}
-
-    if card_id not in allowed_card_ids:
+    quiz = db.query(QuizDB).filter(QuizDB.card_id == card_id).one_or_none()
+    if quiz is None:
         return PronunciationResponse(
             success=False,
             data=None,
@@ -472,7 +525,7 @@ async def evaluate_pronunciation(
 
 
 # =============================================================================
-# 8. 저장 단어 목록 조회
+# 9. 저장 단어 목록 조회
 # =============================================================================
 
 

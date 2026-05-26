@@ -1,0 +1,178 @@
+<svg width="1600" height="1100" viewBox="0 0 1600 1100" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <style>
+      .bg { fill: #f8fbff; }
+      .title { font: 700 50px Arial, sans-serif; fill: #0f172a; }
+      .subtitle { font: 700 32px Arial, sans-serif; fill: #174a86; }
+      .caption { font: 600 24px Arial, sans-serif; fill: #4b5563; }
+      .table { fill: #ffffff; stroke: #0b2f66; stroke-width: 2.4; }
+      .head { fill: #eef6ff; stroke: #0b2f66; stroke-width: 2.4; }
+      .name { font: 700 23px Arial, sans-serif; fill: #10254a; }
+      .cell { font: 600 19px Arial, sans-serif; fill: #111827; }
+      .muted { font: 400 16px Arial, sans-serif; fill: #374151; font-style: italic; }
+      .pkfk { font: 700 18px Arial, sans-serif; fill: #1d4ed8; }
+      .noteTitle { font: 700 28px Arial, sans-serif; }
+      .note { font: 600 20px Arial, sans-serif; fill: #111827; }
+      .tiny { font: 600 17px Arial, sans-serif; fill: #111827; }
+      .line { stroke: #111827; stroke-width: 2.8; fill: none; }
+      .dash { stroke: #0b2f66; stroke-width: 2.2; stroke-dasharray: 8 7; fill: none; }
+    </style>
+    <marker id="crow" markerWidth="18" markerHeight="18" refX="16" refY="9" orient="auto">
+      <path d="M1,1 L16,9 L1,17 M16,9 L1,9" stroke="#111827" stroke-width="2" fill="none"/>
+    </marker>
+    <marker id="one" markerWidth="12" markerHeight="12" refX="11" refY="6" orient="auto">
+      <path d="M10,1 L10,11" stroke="#111827" stroke-width="2"/>
+    </marker>
+  </defs>
+
+  <rect class="bg" width="1600" height="1100"/>
+  <text class="title" x="800" y="65" text-anchor="middle">Arirang-Soorirang Backend DB ERD</text>
+  <text class="subtitle" x="800" y="112" text-anchor="middle">PostgreSQL + SQLAlchemy + Alembic</text>
+  <text class="caption" x="800" y="152" text-anchor="middle">Updated: sentences.json 기반 문제 생성 + TTS URL 저장/응답</text>
+
+  <!-- categories -->
+  <g transform="translate(40,185)">
+    <rect class="table" width="260" height="205" rx="8"/>
+    <rect class="head" width="260" height="52" rx="8"/>
+    <text class="name" x="130" y="34" text-anchor="middle">categories</text>
+    <line class="line" x1="0" y1="52" x2="260" y2="52"/>
+    <line class="line" x1="68" y1="52" x2="68" y2="205"/>
+    <text class="pkfk" x="34" y="90" text-anchor="middle">PK</text>
+    <text class="cell" x="86" y="90">category_id</text>
+    <text class="cell" x="86" y="135">name_ko</text>
+    <text class="cell" x="86" y="175">name_en</text>
+  </g>
+
+  <!-- learning_sets -->
+  <g transform="translate(385,185)">
+    <rect class="table" width="310" height="250" rx="8"/>
+    <rect class="head" width="310" height="52" rx="8"/>
+    <text class="name" x="155" y="34" text-anchor="middle">learning_sets</text>
+    <line class="line" x1="0" y1="52" x2="310" y2="52"/>
+    <line class="line" x1="68" y1="52" x2="68" y2="250"/>
+    <text class="pkfk" x="34" y="90" text-anchor="middle">PK</text>
+    <text class="cell" x="86" y="90">set_id</text>
+    <text class="cell" x="86" y="132">title</text>
+    <text class="pkfk" x="34" y="174" text-anchor="middle">FK</text>
+    <text class="cell" x="86" y="174">category_id</text>
+    <text class="muted" x="86" y="200">(FK → categories.category_id)</text>
+    <text class="cell" x="86" y="232">thumbnail_url</text>
+  </g>
+
+  <!-- quizzes -->
+  <g transform="translate(830,185)">
+    <rect class="table" width="380" height="430" rx="8"/>
+    <rect class="head" width="380" height="52" rx="8"/>
+    <text class="name" x="190" y="34" text-anchor="middle">quizzes</text>
+    <line class="line" x1="0" y1="52" x2="380" y2="52"/>
+    <line class="line" x1="68" y1="52" x2="68" y2="430"/>
+    <text class="pkfk" x="34" y="90" text-anchor="middle">PK</text>
+    <text class="cell" x="86" y="90">card_id</text>
+    <text class="pkfk" x="34" y="132" text-anchor="middle">FK</text>
+    <text class="cell" x="86" y="132">sentence_id</text>
+    <text class="muted" x="86" y="156">(FK → sentences.sentence_id)</text>
+    <text class="pkfk" x="34" y="195" text-anchor="middle">FK</text>
+    <text class="cell" x="86" y="195">meaning_id</text>
+    <text class="muted" x="86" y="219">(FK → meanings.meaning_id)</text>
+    <text class="cell" x="86" y="252">polysemy_word</text>
+    <text class="cell" x="86" y="282">prompt_sentence</text>
+    <text class="cell" x="86" y="312">pronunciation_target</text>
+    <text class="cell" x="86" y="342">tts_url</text>
+    <text class="muted" x="86" y="366">(Object Storage URL)</text>
+    <text class="cell" x="86" y="396">image_url</text>
+    <text class="pkfk" x="34" y="420" text-anchor="middle">FK</text>
+    <text class="cell" x="86" y="420">card_order / set_id</text>
+  </g>
+
+  <!-- quiz_choices -->
+  <g transform="translate(1295,185)">
+    <rect class="table" width="255" height="330" rx="8"/>
+    <rect class="head" width="255" height="52" rx="8"/>
+    <text class="name" x="128" y="34" text-anchor="middle">quiz_choices</text>
+    <line class="line" x1="0" y1="52" x2="255" y2="52"/>
+    <line class="line" x1="68" y1="52" x2="68" y2="330"/>
+    <text class="pkfk" x="34" y="90" text-anchor="middle">PK</text>
+    <text class="cell" x="86" y="90">id</text>
+    <text class="muted" x="86" y="116">(autoincrement)</text>
+    <text class="pkfk" x="34" y="158" text-anchor="middle">FK</text>
+    <text class="cell" x="86" y="158">card_id</text>
+    <text class="muted" x="86" y="184">(FK → quizzes.card_id)</text>
+    <text class="cell" x="86" y="222">choice_id</text>
+    <text class="cell" x="86" y="252">text</text>
+    <text class="cell" x="86" y="282">meaning_id</text>
+    <text class="cell" x="86" y="312">is_correct</text>
+  </g>
+
+  <!-- words -->
+  <g transform="translate(55,575)">
+    <rect class="table" width="275" height="185" rx="8"/>
+    <rect class="head" width="275" height="52" rx="8"/>
+    <text class="name" x="138" y="34" text-anchor="middle">words</text>
+    <line class="line" x1="0" y1="52" x2="275" y2="52"/>
+    <line class="line" x1="68" y1="52" x2="68" y2="185"/>
+    <text class="pkfk" x="34" y="90" text-anchor="middle">PK</text>
+    <text class="cell" x="86" y="90">id</text>
+    <text class="muted" x="86" y="116">(autoincrement)</text>
+    <text class="cell" x="86" y="150">word</text>
+    <text class="muted" x="86" y="174">(UNIQUE)</text>
+  </g>
+
+  <!-- meanings -->
+  <g transform="translate(505,650)">
+    <rect class="table" width="275" height="200" rx="8"/>
+    <rect class="head" width="275" height="52" rx="8"/>
+    <text class="name" x="138" y="34" text-anchor="middle">meanings</text>
+    <line class="line" x1="0" y1="52" x2="275" y2="52"/>
+    <line class="line" x1="68" y1="52" x2="68" y2="200"/>
+    <text class="pkfk" x="34" y="90" text-anchor="middle">PK</text>
+    <text class="cell" x="86" y="90">meaning_id</text>
+    <text class="cell" x="86" y="138">word</text>
+    <text class="cell" x="86" y="178">definition</text>
+  </g>
+
+  <!-- sentences -->
+  <g transform="translate(1170,650)">
+    <rect class="table" width="350" height="260" rx="8"/>
+    <rect class="head" width="350" height="52" rx="8"/>
+    <text class="name" x="175" y="34" text-anchor="middle">sentences</text>
+    <line class="line" x1="0" y1="52" x2="350" y2="52"/>
+    <line class="line" x1="68" y1="52" x2="68" y2="260"/>
+    <text class="pkfk" x="34" y="90" text-anchor="middle">PK</text>
+    <text class="cell" x="86" y="90">sentence_id</text>
+    <text class="pkfk" x="34" y="132" text-anchor="middle">FK</text>
+    <text class="cell" x="86" y="132">meaning_id</text>
+    <text class="muted" x="86" y="158">(FK → meanings.meaning_id)</text>
+    <text class="cell" x="86" y="198">content</text>
+    <text class="cell" x="86" y="228">highlight</text>
+    <text class="cell" x="86" y="252">tts_url</text>
+  </g>
+
+  <!-- relationships -->
+  <path class="line" marker-start="url(#one)" marker-end="url(#crow)" d="M300 288 C335 288 350 310 385 310"/>
+  <text class="tiny" x="315" y="270">1</text><text class="tiny" x="358" y="337">N</text>
+  <path class="line" marker-start="url(#one)" marker-end="url(#crow)" d="M695 310 C745 310 770 352 830 352"/>
+  <text class="tiny" x="712" y="290">1</text><text class="tiny" x="800" y="380">N</text>
+  <path class="line" marker-start="url(#one)" marker-end="url(#crow)" d="M1210 310 C1245 310 1260 350 1295 350"/>
+  <text class="tiny" x="1225" y="292">1</text><text class="tiny" x="1268" y="378">N</text>
+  <path class="line" marker-start="url(#one)" marker-end="url(#crow)" d="M780 742 C945 742 980 778 1170 778"/>
+  <text class="tiny" x="800" y="720">1</text><text class="tiny" x="1138" y="805">N</text>
+  <path class="line" marker-start="url(#one)" marker-end="url(#crow)" d="M780 690 C805 650 815 545 830 545"/>
+  <text class="tiny" x="792" y="668">1</text><text class="tiny" x="805" y="573">N</text>
+  <path class="line" marker-start="url(#one)" marker-end="url(#crow)" d="M1345 650 C1345 610 1020 655 1020 615"/>
+  <text class="tiny" x="1358" y="638">1</text><text class="tiny" x="1030" y="640">N</text>
+
+  <!-- notes -->
+  <rect x="40" y="800" width="380" height="100" rx="14" fill="#ffffff" stroke="#0b2f66" stroke-width="2" stroke-dasharray="8 7"/>
+  <text class="note" x="72" y="845">words는 standalone 테이블이며,</text>
+  <text class="note" x="72" y="875">meanings와 직접 FK 관계가 없습니다.</text>
+
+  <rect x="25" y="945" width="720" height="120" rx="12" fill="#f0fdf4" stroke="#15803d" stroke-width="2"/>
+  <text class="noteTitle" x="150" y="997" fill="#166534">Seed source</text>
+  <text class="note" x="150" y="1040">words.json, meanings.json, sentences.json</text>
+  <text class="tiny" x="150" y="1063">quizzes.json은 image_url / set_id / tts_url / legacy card_id override 용도</text>
+
+  <rect x="800" y="945" width="760" height="120" rx="12" fill="#fff7ed" stroke="#c2410c" stroke-width="2"/>
+  <text class="noteTitle" x="940" y="997" fill="#c2410c">TTS update API</text>
+  <text class="note" x="940" y="1040">PATCH /api/v1/sentences/{sentence_id}/tts-url</text>
+  <text class="tiny" x="940" y="1063">AI → Object Storage 업로드 → URL을 백엔드에 전달 → sentences/quizzes 반영</text>
+</svg>

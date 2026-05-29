@@ -1,680 +1,1682 @@
 [
   {
-    "id": "3c9979ce",
+    "id": "9253e71f",
     "meaning_id": "8dfa7526",
-    "content": "저는 매일 저녁에 일기를 써요.",
-    "highlight": "써요"
+    "content": "오늘 일기 썼어?",
+    "highlight": "썼어?",
+    "tts_url": null
   },
   {
-    "id": "2e427ab5",
+    "id": "e6675082",
     "meaning_id": "8dfa7526",
-    "content": "글씨 쓰는 연습을 하세요.",
-    "highlight": "쓰는"
+    "content": "여기에 이름 써 줘.",
+    "highlight": "써",
+    "tts_url": null
   },
   {
-    "id": "42d142e9",
+    "id": "f5d4248c",
+    "meaning_id": "8dfa7526",
+    "content": "붓으로 글을 쓴다.",
+    "highlight": "쓴다.",
+    "tts_url": null
+  },
+  {
+    "id": "35399ee4",
+    "meaning_id": "8dfa7526",
+    "content": "주소를 정확히 써라.",
+    "highlight": "써라.",
+    "tts_url": null
+  },
+  {
+    "id": "a8dcb435",
+    "meaning_id": "8dfa7526",
+    "content": "내 이름을 크게 썼어.",
+    "highlight": "썼어.",
+    "tts_url": null
+  },
+  {
+    "id": "123931b6",
+    "meaning_id": "03c7ae56",
+    "content": "안전모를 쓰고 작업에 임한다.",
+    "highlight": "쓰고",
+    "tts_url": null
+  },
+  {
+    "id": "3665b325",
+    "meaning_id": "03c7ae56",
+    "content": "외출 시 모자를 쓰는 것이 좋다.",
+    "highlight": "쓰는",
+    "tts_url": null
+  },
+  {
+    "id": "e7368332",
+    "meaning_id": "03c7ae56",
+    "content": "강한 햇볕에 밀짚모자를 썼다.",
+    "highlight": "썼다",
+    "tts_url": null
+  },
+  {
+    "id": "d3079cab",
+    "meaning_id": "03c7ae56",
+    "content": "그는 검은색 헬멧을 썼음.",
+    "highlight": "썼음",
+    "tts_url": null
+  },
+  {
+    "id": "a45e67d1",
+    "meaning_id": "03c7ae56",
+    "content": "어린이가 노란 모자를 씁니다.",
+    "highlight": "씁니다",
+    "tts_url": null
+  },
+  {
+    "id": "ddf15bc9",
     "meaning_id": "f7a4b128",
-    "content": "어제 쓴 우산을 말리고 있어요.",
-    "highlight": "쓴"
+    "content": "망치를 써서 못을 박으세요.",
+    "highlight": "써서",
+    "tts_url": null
   },
   {
-    "id": "d19cd710",
-    "meaning_id": "03c7ae56",
-    "content": "모자 쓴 사람을 보았어요.",
-    "highlight": "쓴"
-  },
-  {
-    "id": "a2944059",
-    "meaning_id": "2a00e9ac",
-    "content": "이 소스는 조금 쓰네요.",
-    "highlight": "쓰네요"
-  },
-  {
-    "id": "0f9d9cf0",
-    "meaning_id": "03c7ae56",
-    "content": "수술용 모자를 쓰세요.",
-    "highlight": "쓰세요"
-  },
-  {
-    "id": "11798b5d",
-    "meaning_id": "03c7ae56",
-    "content": "교복 모자를 써라.",
-    "highlight": "써라"
-  },
-  {
-    "id": "18bb6132",
-    "meaning_id": "03c7ae56",
-    "content": "안전모를 꼭 씁시다.",
-    "highlight": "씁시다"
-  },
-  {
-    "id": "cb6d46b0",
-    "meaning_id": "03c7ae56",
-    "content": "학사모를 높이 써보자.",
-    "highlight": "써보자"
-  },
-  {
-    "id": "1cca1566",
-    "meaning_id": "03c7ae56",
-    "content": "군밤 모자를 써봐.",
-    "highlight": "써봐"
-  },
-  {
-    "id": "3c573d31",
-    "meaning_id": "03c7ae56",
-    "content": "공사장에선 안전모를 꼭 써라.",
-    "highlight": "써라."
-  },
-  {
-    "id": "c7390267",
-    "meaning_id": "03c7ae56",
-    "content": "수술용 모자를 바르게 쓰세요.",
-    "highlight": "쓰세요."
-  },
-  {
-    "id": "0f85cffe",
-    "meaning_id": "03c7ae56",
-    "content": "편의점 갈 때 이 모자 써봐.",
-    "highlight": "써봐."
-  },
-  {
-    "id": "89d054da",
-    "meaning_id": "03c7ae56",
-    "content": "초등학교 등굣길엔 모자를 씁시다.",
-    "highlight": "씁시다."
-  },
-  {
-    "id": "d4bf11d9",
-    "meaning_id": "03c7ae56",
-    "content": "교복 입고 학년 모자 높이 써.",
-    "highlight": "써."
-  },
-  {
-    "id": "1ef24963",
-    "meaning_id": "03c7ae56",
-    "content": "등굣길엔 노란 모자를 써요.",
-    "highlight": "써요"
-  },
-  {
-    "id": "a3b98ce9",
-    "meaning_id": "03c7ae56",
-    "content": "학사모를 쓰고 추억을 남겨.",
-    "highlight": "쓰고"
-  },
-  {
-    "id": "fa623d79",
-    "meaning_id": "03c7ae56",
-    "content": "공사장에선 안전모를 씁시다.",
-    "highlight": "씁시다"
-  },
-  {
-    "id": "dcfb3c33",
-    "meaning_id": "03c7ae56",
-    "content": "학년이 바뀌면 새 모자를 써.",
-    "highlight": "써"
-  },
-  {
-    "id": "c96022f7",
-    "meaning_id": "03c7ae56",
-    "content": "편의점 갈 때도 모자를 쓴다.",
-    "highlight": "쓴다"
-  },
-  {
-    "id": "20e16be2",
-    "meaning_id": "03c7ae56",
-    "content": "학사모를 바르게 씁시다?",
-    "highlight": "씁시다"
-  },
-  {
-    "id": "39e68c6e",
-    "meaning_id": "03c7ae56",
-    "content": "교복에 모자를 쓸까요?",
-    "highlight": "쓸까요"
-  },
-  {
-    "id": "d429ba0b",
-    "meaning_id": "03c7ae56",
-    "content": "등굣길엔 모자를 써요?",
-    "highlight": "써요"
-  },
-  {
-    "id": "fc730b73",
-    "meaning_id": "03c7ae56",
-    "content": "군밤 모자 쓴 아이예요?",
-    "highlight": "쓴"
-  },
-  {
-    "id": "53b17d48",
-    "meaning_id": "03c7ae56",
-    "content": "환자가 모자를 썼나요?",
-    "highlight": "썼나요"
-  },
-  {
-    "id": "3bc39e12",
-    "meaning_id": "8dfa7526",
-    "content": "알림장에 숙제를 써.",
-    "highlight": "써"
-  },
-  {
-    "id": "eb2a3cd0",
-    "meaning_id": "8dfa7526",
-    "content": "처방전을 써 줄게.",
-    "highlight": "써"
-  },
-  {
-    "id": "69533845",
-    "meaning_id": "8dfa7526",
-    "content": "편의점에서 명부 써.",
-    "highlight": "써"
-  },
-  {
-    "id": "ead1ef20",
-    "meaning_id": "8dfa7526",
-    "content": "칠판에 답을 써 봐.",
-    "highlight": "써"
-  },
-  {
-    "id": "4143025d",
-    "meaning_id": "8dfa7526",
-    "content": "연습장에 이름을 써.",
-    "highlight": "써"
-  },
-  {
-    "id": "e039f251",
-    "meaning_id": "8dfa7526",
-    "content": "연습장에 답을 써 봐.",
-    "highlight": "써"
-  },
-  {
-    "id": "e9c4d0e9",
-    "meaning_id": "8dfa7526",
-    "content": "칠판에 이름을 쓰세요.",
-    "highlight": "쓰세요"
-  },
-  {
-    "id": "e5676ab4",
-    "meaning_id": "8dfa7526",
-    "content": "알림장에 숙제를 써라.",
-    "highlight": "써라"
-  },
-  {
-    "id": "ffaa9a11",
-    "meaning_id": "8dfa7526",
-    "content": "처방전을 써 주십시오.",
-    "highlight": "써"
-  },
-  {
-    "id": "ebf58e7f",
-    "meaning_id": "8dfa7526",
-    "content": "편의점 명부를 쓰자.",
-    "highlight": "쓰자"
-  },
-  {
-    "id": "dd1bd4bb",
-    "meaning_id": "8dfa7526",
-    "content": "방문자 명부에 이름을 쓰세요.",
-    "highlight": "쓰세요."
-  },
-  {
-    "id": "dc8d8afd",
-    "meaning_id": "8dfa7526",
-    "content": "연습장에 수학 문제를 써요.",
-    "highlight": "써요."
-  },
-  {
-    "id": "87eabf4d",
-    "meaning_id": "8dfa7526",
-    "content": "의사 선생님이 처방전을 씁니다.",
-    "highlight": "씁니다."
-  },
-  {
-    "id": "53e1ae60",
-    "meaning_id": "8dfa7526",
-    "content": "선생님이 칠판에 글을 써요.",
-    "highlight": "써요."
-  },
-  {
-    "id": "f0f89b84",
-    "meaning_id": "8dfa7526",
-    "content": "준비물을 알림장에 쓰세요.",
-    "highlight": "쓰세요."
-  },
-  {
-    "id": "64a5c577",
-    "meaning_id": "8dfa7526",
-    "content": "선생님이 지루한 글을 또 써라 하신다.",
-    "highlight": "써라"
-  },
-  {
-    "id": "efec8691",
-    "meaning_id": "8dfa7526",
-    "content": "알림장에 남길 숙제나 쓰며 시간을 죽인다.",
-    "highlight": "쓰며"
-  },
-  {
-    "id": "5cc50a1d",
-    "meaning_id": "8dfa7526",
-    "content": "의사는 기계처럼 처방전을 씁니다.",
-    "highlight": "씁니다"
-  },
-  {
-    "id": "316b41ec",
-    "meaning_id": "8dfa7526",
-    "content": "편의점 알바가 유통기한을 대충 써요.",
-    "highlight": "써요"
-  },
-  {
-    "id": "cd2d9319",
-    "meaning_id": "8dfa7526",
-    "content": "수학 문제를 억지로 써 내려가는 중이다.",
-    "highlight": "써"
-  },
-  {
-    "id": "e079f41b",
-    "meaning_id": "2a00e9ac",
-    "content": "처방약이 매우 쓰니 주의 바랍니다.",
-    "highlight": "쓰니"
-  },
-  {
-    "id": "2ca17e88",
-    "meaning_id": "2a00e9ac",
-    "content": "초등생용 시럽도 맛이 쓸 수 있습니다.",
-    "highlight": "쓸"
-  },
-  {
-    "id": "7b0974f9",
-    "meaning_id": "2a00e9ac",
-    "content": "중학교 급식의 채소가 써서 남겼습니다.",
-    "highlight": "써서"
-  },
-  {
-    "id": "62137784",
-    "meaning_id": "2a00e9ac",
-    "content": "편의점 커피가 너무 써서 못 마셨습니다.",
-    "highlight": "써서"
-  },
-  {
-    "id": "1f793a2a",
-    "meaning_id": "2a00e9ac",
-    "content": "편의점 커피가 쓰니 시럽을 넣으세요.",
-    "highlight": "쓰니"
-  },
-  {
-    "id": "78118b2c",
-    "meaning_id": "2a00e9ac",
-    "content": "약 맛이 써도 참고 다 마시기 바랍니다.",
-    "highlight": "써도"
-  },
-  {
-    "id": "dd1f871e",
-    "meaning_id": "2a00e9ac",
-    "content": "초등학교 급식 반찬이 쓸 테니 주의해.",
-    "highlight": "쓸"
-  },
-  {
-    "id": "7bf5e4b8",
-    "meaning_id": "2a00e9ac",
-    "content": "중학교 매점 커피가 쓰면 물을 타라.",
-    "highlight": "쓰면"
-  },
-  {
-    "id": "41f59c7c",
-    "meaning_id": "2a00e9ac",
-    "content": "처방약이 너무 써서 시럽도 섞었어.",
-    "highlight": "써서"
-  },
-  {
-    "id": "d618b060",
-    "meaning_id": "2a00e9ac",
-    "content": "입안이 써서 밥을 남겼습니다.",
-    "highlight": "써서"
-  },
-  {
-    "id": "732ec918",
-    "meaning_id": "2a00e9ac",
-    "content": "편의점 커피가 쓰면 물을 더 부어.",
-    "highlight": "쓰면"
-  },
-  {
-    "id": "c8dc1638",
-    "meaning_id": "2a00e9ac",
-    "content": "초등학교 때 먹은 한약은 참 썼어.",
-    "highlight": "썼어"
-  },
-  {
-    "id": "47307f4d",
-    "meaning_id": "2a00e9ac",
-    "content": "병원 약이 유독 쓰다.",
-    "highlight": "쓰다."
-  },
-  {
-    "id": "a9203895",
-    "meaning_id": "2a00e9ac",
-    "content": "물을 더 부어 맛이 쓰다.",
-    "highlight": "쓰다."
-  },
-  {
-    "id": "e14f8e1b",
-    "meaning_id": "2a00e9ac",
-    "content": "편의점 커피가 매우 씀.",
-    "highlight": "씀."
-  },
-  {
-    "id": "76225a59",
-    "meaning_id": "2a00e9ac",
-    "content": "약을 섞었어 맛이 쓰다.",
-    "highlight": "쓰다."
-  },
-  {
-    "id": "13c19d7a",
-    "meaning_id": "2a00e9ac",
-    "content": "가루약이 너무 쓰니 조심해.",
-    "highlight": "쓰니"
-  },
-  {
-    "id": "a9f69593",
-    "meaning_id": "2a00e9ac",
-    "content": "약이 써도 참고 먹자.",
-    "highlight": "써도"
-  },
-  {
-    "id": "3ebb06b7",
-    "meaning_id": "2a00e9ac",
-    "content": "급식의 채소가 쓰면 남겨라.",
-    "highlight": "쓰면"
-  },
-  {
-    "id": "872cae25",
-    "meaning_id": "2a00e9ac",
-    "content": "편의점 커피가 쓰니 물 타.",
-    "highlight": "쓰니"
-  },
-  {
-    "id": "3241afc1",
+    "id": "4222eff4",
     "meaning_id": "f7a4b128",
-    "content": "겨우 이깟 일에 내 운을 쓰고 싶지 않아.",
-    "highlight": "쓰고"
+    "content": "이 도구를 조심해서 쓰렴.",
+    "highlight": "쓰렴",
+    "tts_url": null
   },
   {
-    "id": "1a854d1b",
+    "id": "1bbcc6ed",
     "meaning_id": "f7a4b128",
-    "content": "편의점 알바에 학력을 써서 뭐 하니?",
-    "highlight": "써서"
+    "content": "다른 수단을 써 봅시다.",
+    "highlight": "써",
+    "tts_url": null
   },
   {
-    "id": "ebb93534",
+    "id": "37cc299a",
     "meaning_id": "f7a4b128",
-    "content": "치료에 비싼 약을 써봐야 다 헛수고지.",
-    "highlight": "써봐야"
+    "content": "양념을 아끼지 말고 쓰거라.",
+    "highlight": "쓰거라",
+    "tts_url": null
   },
   {
-    "id": "7d0c489c",
+    "id": "1060e6f6",
     "meaning_id": "f7a4b128",
-    "content": "놀이공원에 돈을 쓰는 꼴이 참 한심하다.",
-    "highlight": "쓰는"
+    "content": "컴퓨터를 지금 써 주세요.",
+    "highlight": "써",
+    "tts_url": null
   },
   {
-    "id": "b13f079c",
-    "meaning_id": "f7a4b128",
-    "content": "돈을 써서 놀이기구 타자.",
-    "highlight": "써서"
+    "id": "aeda49cd",
+    "meaning_id": "a1441af7",
+    "content": "선산에 묘를 썼다.",
+    "highlight": "썼다",
+    "tts_url": null
   },
   {
-    "id": "7565f6c2",
-    "meaning_id": "f7a4b128",
-    "content": "겨우 학력을 써서 취직했어.",
-    "highlight": "써서"
+    "id": "caafb8a2",
+    "meaning_id": "a1441af7",
+    "content": "명당에 묫자리를 씀.",
+    "highlight": "씀",
+    "tts_url": null
   },
   {
-    "id": "467f60db",
-    "meaning_id": "f7a4b128",
-    "content": "편의점 카드를 써서 결제해.",
-    "highlight": "써서"
+    "id": "9b9df296",
+    "meaning_id": "a1441af7",
+    "content": "가족 묘지에 묘를 써.",
+    "highlight": "써",
+    "tts_url": null
   },
   {
-    "id": "3e55dced",
-    "meaning_id": "f7a4b128",
-    "content": "초등학교 때 연필을 썼어.",
-    "highlight": "썼어"
+    "id": "65752383",
+    "meaning_id": "a1441af7",
+    "content": "양지에 무덤을 썼다.",
+    "highlight": "썼다",
+    "tts_url": null
   },
   {
-    "id": "11c4cda4",
-    "meaning_id": "f7a4b128",
-    "content": "편의점에서 카드를 써서 결제해라.",
-    "highlight": "써서"
+    "id": "22122d7c",
+    "meaning_id": "a1441af7",
+    "content": "고인을 선산에 씀.",
+    "highlight": "씀",
+    "tts_url": null
   },
   {
-    "id": "9d4c1c1e",
-    "meaning_id": "f7a4b128",
-    "content": "놀이공원 갈 때 머리띠를 써 보자.",
-    "highlight": "써"
+    "id": "d195aecd",
+    "meaning_id": "396a688b",
+    "content": "말을 신중히 쓰세요.",
+    "highlight": "쓰세요",
+    "tts_url": null
   },
   {
-    "id": "0ca89487",
-    "meaning_id": "f7a4b128",
-    "content": "초등학교 때 배운 연필을 다 써라.",
-    "highlight": "써라"
+    "id": "53a52892",
+    "meaning_id": "396a688b",
+    "content": "어떤 말을 쓸까요?",
+    "highlight": "쓸까요",
+    "tts_url": null
   },
   {
-    "id": "52b29370",
-    "meaning_id": "f7a4b128",
-    "content": "병원에서 마스크를 쓰고 대기해.",
-    "highlight": "쓰고"
+    "id": "87c73b59",
+    "meaning_id": "396a688b",
+    "content": "말을 잘 써야 합니다.",
+    "highlight": "써야",
+    "tts_url": null
   },
   {
-    "id": "5061eb31",
-    "meaning_id": "f7a4b128",
-    "content": "편의점에서 카드를 써요.",
-    "highlight": "써요"
+    "id": "9281f776",
+    "meaning_id": "396a688b",
+    "content": "이번엔 말을 쓰십시오.",
+    "highlight": "쓰십시오",
+    "tts_url": null
   },
   {
-    "id": "040b0228",
-    "meaning_id": "f7a4b128",
-    "content": "놀이기구에 예산을 씁니다.",
-    "highlight": "씁니다"
+    "id": "687638fb",
+    "meaning_id": "396a688b",
+    "content": "말을 잘못 썼습니다.",
+    "highlight": "썼습니다",
+    "tts_url": null
   },
   {
-    "id": "43a45ce3",
-    "meaning_id": "f7a4b128",
-    "content": "이 꼴이 안 나게 돈을 써.",
-    "highlight": "써"
+    "id": "31491d35",
+    "meaning_id": "2a00e9ac",
+    "content": "이 약은 너무 써요.",
+    "highlight": "써요",
+    "tts_url": null
   },
   {
-    "id": "6c9674c2",
-    "meaning_id": "f7a4b128",
-    "content": "헛수고지, 힘만 썼습니다.",
-    "highlight": "썼습니다"
+    "id": "2c131e55",
+    "meaning_id": "2a00e9ac",
+    "content": "입안이 무척 씁니다.",
+    "highlight": "씁니다",
+    "tts_url": null
   },
   {
-    "id": "5cddabfb",
+    "id": "7286da48",
+    "meaning_id": "2a00e9ac",
+    "content": "커피가 아주 쓰네요.",
+    "highlight": "쓰네요",
+    "tts_url": null
+  },
+  {
+    "id": "9a52a3ab",
+    "meaning_id": "2a00e9ac",
+    "content": "약이 써서 못 먹겠어요.",
+    "highlight": "써서",
+    "tts_url": null
+  },
+  {
+    "id": "c41a64d8",
+    "meaning_id": "2a00e9ac",
+    "content": "채소 맛이 조금 씁니다.",
+    "highlight": "씁니다",
+    "tts_url": null
+  },
+  {
+    "id": "b2420a0a",
     "meaning_id": "a08b020d",
-    "content": "눈에 안약을 넣어야 해.",
-    "highlight": "눈에"
+    "content": "눈을 크게 뜨세요.",
+    "highlight": "눈을",
+    "tts_url": null
   },
   {
-    "id": "baf7461c",
+    "id": "489862c4",
     "meaning_id": "a08b020d",
-    "content": "초등학교 때 시력 검사했어.",
-    "highlight": "시력"
+    "content": "눈을 감고 쉬어라.",
+    "highlight": "눈을",
+    "tts_url": null
   },
   {
-    "id": "59c8fc03",
+    "id": "177cb74b",
     "meaning_id": "a08b020d",
-    "content": "편의점에서 안대 하나 사자.",
-    "highlight": "안대"
+    "content": "아픈 눈을 치료하자.",
+    "highlight": "눈을",
+    "tts_url": null
   },
   {
-    "id": "f5c4d0db",
+    "id": "1028953b",
     "meaning_id": "a08b020d",
-    "content": "놀이공원 가니 눈이 즐겁네.",
-    "highlight": "눈이"
+    "content": "눈에 안약을 넣어라.",
+    "highlight": "눈에",
+    "tts_url": null
   },
   {
-    "id": "6d178be5",
+    "id": "5878e91a",
     "meaning_id": "a08b020d",
-    "content": "편의점에서 안대를 사서 눈에 썼습니다.",
-    "highlight": "눈에"
+    "content": "나쁜 눈을 보호해요.",
+    "highlight": "눈을",
+    "tts_url": null
   },
   {
-    "id": "eec51a45",
-    "meaning_id": "a08b020d",
-    "content": "병원에서 눈 상태를 검사했어.",
-    "highlight": "눈"
+    "id": "75d10cda",
+    "meaning_id": "f74ae230",
+    "content": "온도계 눈은 여전히 영하에 머문다.",
+    "highlight": "눈은",
+    "tts_url": null
   },
   {
-    "id": "2d0d3569",
-    "meaning_id": "a08b020d",
-    "content": "초등학교 가니 눈 관리 잘해라.",
-    "highlight": "눈"
+    "id": "4fb8ded9",
+    "meaning_id": "f74ae230",
+    "content": "저울 눈이 내 탐욕을 비웃는구나.",
+    "highlight": "눈이",
+    "tts_url": null
   },
   {
-    "id": "84f41fe9",
-    "meaning_id": "a08b020d",
-    "content": "눈에 안약을 넣어야 할 듯합니다.",
-    "highlight": "눈에"
+    "id": "fe988014",
+    "meaning_id": "f74ae230",
+    "content": "자 눈을 읽는 게 뭐 그리 대수라고.",
+    "highlight": "눈을",
+    "tts_url": null
   },
   {
-    "id": "a3387e90",
-    "meaning_id": "a08b020d",
-    "content": "눈 상태를 확인해 볼까요?",
-    "highlight": "눈"
+    "id": "24c368c6",
+    "meaning_id": "f74ae230",
+    "content": "계량컵 눈은 나를 속이지 않지.",
+    "highlight": "눈은",
+    "tts_url": null
   },
   {
-    "id": "6348cfcc",
-    "meaning_id": "a08b020d",
-    "content": "눈에 이물질이 들어갔나요?",
-    "highlight": "눈에"
+    "id": "1274b9ec",
+    "meaning_id": "f74ae230",
+    "content": "희망 수치는 눈 씻고 봐도 없다.",
+    "highlight": "눈",
+    "tts_url": null
   },
   {
-    "id": "bcc643fb",
-    "meaning_id": "a08b020d",
-    "content": "초등학생 눈이 왜 빨갛죠?",
-    "highlight": "눈이"
+    "id": "38af2476",
+    "meaning_id": "c070986f",
+    "content": "그물 눈이 너무 커서 고기가 다 빠져나가.",
+    "highlight": "눈이",
+    "tts_url": null
   },
   {
-    "id": "7dcd8412",
-    "meaning_id": "a08b020d",
-    "content": "안약 하나 넣어줄까요?",
-    "highlight": "하나"
+    "id": "4b71588c",
+    "meaning_id": "c070986f",
+    "content": "촘촘한 눈 사이로 모래가 다 걸러졌어.",
+    "highlight": "눈",
+    "tts_url": null
   },
   {
-    "id": "c744f5b2",
-    "meaning_id": "a08b020d",
-    "content": "아픈 눈에 안약을 넣어줄까요?",
-    "highlight": "눈에"
+    "id": "7659c7da",
+    "meaning_id": "c070986f",
+    "content": "네가 짠 그물은 눈이 정말 일정하다.",
+    "highlight": "눈이",
+    "tts_url": null
   },
   {
-    "id": "7219af74",
-    "meaning_id": "a08b020d",
-    "content": "충혈된 눈이 꽤 빨갛죠?",
-    "highlight": "눈이"
+    "id": "e7b77654",
+    "meaning_id": "c070986f",
+    "content": "이 투망은 눈마다 매듭이 아주 단단해.",
+    "highlight": "눈마다",
+    "tts_url": null
   },
   {
-    "id": "ab32d47f",
-    "meaning_id": "a08b020d",
-    "content": "초등학생의 맑은 눈은 보석 같다.",
-    "highlight": "눈은"
+    "id": "4857e044",
+    "meaning_id": "c070986f",
+    "content": "그물 눈을 하나하나 꼼꼼하게 수선하자.",
+    "highlight": "눈을",
+    "tts_url": null
   },
   {
-    "id": "91323e3e",
-    "meaning_id": "a08b020d",
-    "content": "피곤한 눈이 감길 듯합니다.",
-    "highlight": "눈이"
+    "id": "a41dc869",
+    "meaning_id": "92d56853",
+    "content": "죽은 나뭇가지에 눈이 텄네. 뻔뻔해.",
+    "highlight": "눈이",
+    "tts_url": null
   },
   {
-    "id": "777724c4",
+    "id": "8cf08061",
+    "meaning_id": "92d56853",
+    "content": "겨울을 버티고 눈을 틔우다니, 질기다.",
+    "highlight": "눈을",
+    "tts_url": null
+  },
+  {
+    "id": "71b07ad2",
+    "meaning_id": "92d56853",
+    "content": "고작 저 눈 하나가 희망이라니 우습군.",
+    "highlight": "눈",
+    "tts_url": null
+  },
+  {
+    "id": "91be365c",
+    "meaning_id": "92d56853",
+    "content": "새로 돋은 눈도 결국 시들어 버리겠지.",
+    "highlight": "눈도",
+    "tts_url": null
+  },
+  {
+    "id": "ddd45011",
+    "meaning_id": "92d56853",
+    "content": "작은 눈 따위가 세상을 바꿀 순 없어.",
+    "highlight": "눈",
+    "tts_url": null
+  },
+  {
+    "id": "a84cea9e",
     "meaning_id": "607998e2",
-    "content": "놀이공원에 눈이 올까요?",
-    "highlight": "눈이"
+    "content": "밖에는 눈이 내려요.",
+    "highlight": "눈이",
+    "tts_url": null
   },
   {
-    "id": "0a597dd2",
+    "id": "fc4fc716",
     "meaning_id": "607998e2",
-    "content": "초등학교 운동장에 눈 왔니?",
-    "highlight": "눈"
+    "content": "어제는 함박눈이 왔어요.",
+    "highlight": "함박눈이",
+    "tts_url": null
   },
   {
-    "id": "19029815",
+    "id": "56178943",
     "meaning_id": "607998e2",
-    "content": "편의점 앞에 눈 치웠어?",
-    "highlight": "눈"
+    "content": "눈을 굴려 눈사람을 만들어요.",
+    "highlight": "눈을",
+    "tts_url": null
   },
   {
-    "id": "30686360",
+    "id": "cb794763",
     "meaning_id": "607998e2",
-    "content": "병원 가는 길에 눈 쌓였니?",
-    "highlight": "눈"
+    "content": "길에 쌓인 눈이 녹았어요.",
+    "highlight": "눈이",
+    "tts_url": null
   },
   {
-    "id": "e902d478",
+    "id": "89fce61e",
     "meaning_id": "607998e2",
-    "content": "놀이공원에 눈이 내려.",
-    "highlight": "눈이"
+    "content": "하얀 눈으로 덮인 산이에요.",
+    "highlight": "눈으로",
+    "tts_url": null
   },
   {
-    "id": "f052794f",
-    "meaning_id": "607998e2",
-    "content": "편의점 앞에 눈이 쌓였니?",
-    "highlight": "눈이"
+    "id": "a37e9868",
+    "meaning_id": "a8256efc",
+    "content": "너무 많이 먹어서 배가 불러요.",
+    "highlight": "배가",
+    "tts_url": null
   },
   {
-    "id": "0f16336f",
-    "meaning_id": "607998e2",
-    "content": "학교 앞 눈은 다 치웠어?",
-    "highlight": "눈은"
+    "id": "c3d2ab39",
+    "meaning_id": "a8256efc",
+    "content": "차가운 것을 먹으니 배가 아파요.",
+    "highlight": "배가",
+    "tts_url": null
   },
   {
-    "id": "1a39d9b8",
-    "meaning_id": "607998e2",
-    "content": "병원 창가에 눈꽃이 폈어.",
-    "highlight": "눈꽃이"
+    "id": "b54b2afa",
+    "meaning_id": "a8256efc",
+    "content": "아기가 배를 드러내고 자고 있어요.",
+    "highlight": "배를",
+    "tts_url": null
   },
   {
-    "id": "33df1189",
-    "meaning_id": "607998e2",
-    "content": "운동장에 눈이 쌓였어.",
-    "highlight": "눈이"
+    "id": "0a4f651b",
+    "meaning_id": "a8256efc",
+    "content": "복근 운동을 하니 배에 힘이 들어가요.",
+    "highlight": "배에",
+    "tts_url": null
   },
   {
-    "id": "8a4843ef",
-    "meaning_id": "607998e2",
-    "content": "편의점 앞 눈 치워라.",
-    "highlight": "눈"
+    "id": "b8fc6071",
+    "meaning_id": "a8256efc",
+    "content": "강아지가 배를 보이며 애교를 부려요.",
+    "highlight": "배를",
+    "tts_url": null
   },
   {
-    "id": "1b1545b3",
-    "meaning_id": "607998e2",
-    "content": "하늘에서 눈이 내려.",
-    "highlight": "눈이"
+    "id": "152993da",
+    "meaning_id": "acb76ba5",
+    "content": "항구에 큰 배가 들어와요.",
+    "highlight": "배가",
+    "tts_url": null
   },
   {
-    "id": "2dac5a46",
-    "meaning_id": "607998e2",
-    "content": "눈 보러 밖으로 왔니?",
-    "highlight": "눈"
+    "id": "e6d2d4f9",
+    "meaning_id": "acb76ba5",
+    "content": "우리는 배를 타고 섬에 가요.",
+    "highlight": "배를",
+    "tts_url": null
   },
   {
-    "id": "df8daad8",
-    "meaning_id": "607998e2",
-    "content": "초등학교 길에 눈꽃이 핀들 무슨 소용인가.",
-    "highlight": "눈꽃이"
+    "id": "cc3bbb7f",
+    "meaning_id": "acb76ba5",
+    "content": "강물 위에 작은 배가 떠요.",
+    "highlight": "배가",
+    "tts_url": null
   },
   {
-    "id": "0c26e738",
-    "meaning_id": "607998e2",
-    "content": "병원 창밖으로 눈 내리는 꼴이 참 처량하네.",
-    "highlight": "눈"
+    "id": "a472bed3",
+    "meaning_id": "acb76ba5",
+    "content": "어부들이 배에서 내려요.",
+    "highlight": "배에서",
+    "tts_url": null
   },
   {
-    "id": "6ecfe423",
-    "meaning_id": "607998e2",
-    "content": "편의점 앞엔 눈 녹은 구정물만 가득하군.",
-    "highlight": "눈"
+    "id": "911f323f",
+    "meaning_id": "acb76ba5",
+    "content": "저 배는 정말 속도가 빨라요.",
+    "highlight": "배는",
+    "tts_url": null
   },
   {
-    "id": "24b08ea4",
-    "meaning_id": "607998e2",
-    "content": "놀이공원에 눈 맞으러 왔니? 참 한가하구나.",
-    "highlight": "눈"
+    "id": "502cff9d",
+    "meaning_id": "cc92f8d0",
+    "content": "시원한 배를 먹어요.",
+    "highlight": "배를",
+    "tts_url": null
+  },
+  {
+    "id": "b752d288",
+    "meaning_id": "cc92f8d0",
+    "content": "배가 아주 달아요.",
+    "highlight": "배가",
+    "tts_url": null
+  },
+  {
+    "id": "3266a617",
+    "meaning_id": "cc92f8d0",
+    "content": "후식으로 배가 나와요.",
+    "highlight": "배가",
+    "tts_url": null
+  },
+  {
+    "id": "1176a490",
+    "meaning_id": "cc92f8d0",
+    "content": "잘 익은 배를 깎았어요.",
+    "highlight": "배를",
+    "tts_url": null
+  },
+  {
+    "id": "838dc9ed",
+    "meaning_id": "cc92f8d0",
+    "content": "냉장고에 배 한 알 있죠?",
+    "highlight": "배",
+    "tts_url": null
+  },
+  {
+    "id": "0b179cad",
+    "meaning_id": "f7f5bdd7",
+    "content": "시원하게 한 배 드시지요.",
+    "highlight": "배",
+    "tts_url": null
+  },
+  {
+    "id": "628cf845",
+    "meaning_id": "f7f5bdd7",
+    "content": "술 한 배에 시름을 잊어요.",
+    "highlight": "배에",
+    "tts_url": null
+  },
+  {
+    "id": "add4b0ff",
+    "meaning_id": "f7f5bdd7",
+    "content": "그는 차 한 배를 권했습니다.",
+    "highlight": "배를",
+    "tts_url": null
+  },
+  {
+    "id": "74d92e0d",
+    "meaning_id": "f7f5bdd7",
+    "content": "반가운 마음에 한 배 했어요.",
+    "highlight": "배",
+    "tts_url": null
+  },
+  {
+    "id": "effcdcf0",
+    "meaning_id": "f7f5bdd7",
+    "content": "약주 한 배 더 올릴까요?",
+    "highlight": "배",
+    "tts_url": null
+  },
+  {
+    "id": "43b206d8",
+    "meaning_id": "b0d04bd0",
+    "content": "공손하게 배를 올리세요.",
+    "highlight": "배를",
+    "tts_url": null
+  },
+  {
+    "id": "5d784d8b",
+    "meaning_id": "b0d04bd0",
+    "content": "어르신께 배를 드립니다.",
+    "highlight": "배를",
+    "tts_url": null
+  },
+  {
+    "id": "bd0bdfb7",
+    "meaning_id": "b0d04bd0",
+    "content": "서서 하는 배가 예의죠.",
+    "highlight": "배가",
+    "tts_url": null
+  },
+  {
+    "id": "acd39c44",
+    "meaning_id": "b0d04bd0",
+    "content": "정중히 배로 인사해요.",
+    "highlight": "배로",
+    "tts_url": null
+  },
+  {
+    "id": "93d91263",
+    "meaning_id": "b0d04bd0",
+    "content": "예법에 맞춰 배를 해요.",
+    "highlight": "배를",
+    "tts_url": null
+  },
+  {
+    "id": "48ec1ab1",
+    "meaning_id": "346e6111",
+    "content": "수익이 작년보다 두 배 늘었어요.",
+    "highlight": "배",
+    "tts_url": null
+  },
+  {
+    "id": "51b7a010",
+    "meaning_id": "346e6111",
+    "content": "기쁨이 배가 되는 순간입니다.",
+    "highlight": "배가",
+    "tts_url": null
+  },
+  {
+    "id": "505a8718",
+    "meaning_id": "346e6111",
+    "content": "가격이 몇 배나 껑충 뛰었네요.",
+    "highlight": "배나",
+    "tts_url": null
+  },
+  {
+    "id": "9fd86cf5",
+    "meaning_id": "346e6111",
+    "content": "노력을 세 배는 더 해야 합니다.",
+    "highlight": "배는",
+    "tts_url": null
+  },
+  {
+    "id": "3d139127",
+    "meaning_id": "346e6111",
+    "content": "인원이 배로 많아져서 놀랐어요.",
+    "highlight": "배로",
+    "tts_url": null
+  },
+  {
+    "id": "48f3e617",
+    "meaning_id": "243b672e",
+    "content": "배 선생님은 친절해요.",
+    "highlight": "배",
+    "tts_url": null
+  },
+  {
+    "id": "38ad79d1",
+    "meaning_id": "243b672e",
+    "content": "제 친구 성은 배씨예요.",
+    "highlight": "배씨예요",
+    "tts_url": null
+  },
+  {
+    "id": "83e647d3",
+    "meaning_id": "243b672e",
+    "content": "배 의원님이 오셨어요.",
+    "highlight": "배",
+    "tts_url": null
+  },
+  {
+    "id": "88c60b09",
+    "meaning_id": "243b672e",
+    "content": "배 대리님은 성실해요.",
+    "highlight": "배",
+    "tts_url": null
+  },
+  {
+    "id": "7ad98884",
+    "meaning_id": "243b672e",
+    "content": "배 작가님을 만났어요.",
+    "highlight": "배",
+    "tts_url": null
+  },
+  {
+    "id": "84f541d7",
+    "meaning_id": "ca6eff3f",
+    "content": "따뜻한 차 한 잔 어때요?",
+    "highlight": "차",
+    "tts_url": null
+  },
+  {
+    "id": "3ff53fa0",
+    "meaning_id": "ca6eff3f",
+    "content": "식후에 차를 마셨습니다.",
+    "highlight": "차를",
+    "tts_url": null
+  },
+  {
+    "id": "6e32cabd",
+    "meaning_id": "ca6eff3f",
+    "content": "이 차는 향이 참 좋네요.",
+    "highlight": "차는",
+    "tts_url": null
+  },
+  {
+    "id": "244fa387",
+    "meaning_id": "ca6eff3f",
+    "content": "손님께 차를 대접했어요.",
+    "highlight": "차를",
+    "tts_url": null
+  },
+  {
+    "id": "14bff941",
+    "meaning_id": "ca6eff3f",
+    "content": "우린 차가 아주 고소해요.",
+    "highlight": "차가",
+    "tts_url": null
+  },
+  {
+    "id": "d31987fa",
+    "meaning_id": "bc61cf1a",
+    "content": "이번이 벌써 세 번째 차례입니다.",
+    "highlight": "차례입니다",
+    "tts_url": null
+  },
+  {
+    "id": "321f047d",
+    "meaning_id": "bc61cf1a",
+    "content": "방문한 지 2회 차가 되었어요.",
+    "highlight": "차가",
+    "tts_url": null
+  },
+  {
+    "id": "4446646b",
+    "meaning_id": "bc61cf1a",
+    "content": "올해로 5년 차 직장인입니다.",
+    "highlight": "차",
+    "tts_url": null
+  },
+  {
+    "id": "06d48699",
+    "meaning_id": "bc61cf1a",
+    "content": "다음 차례는 누구인가요?",
+    "highlight": "차례는",
+    "tts_url": null
+  },
+  {
+    "id": "bcb25657",
+    "meaning_id": "bc61cf1a",
+    "content": "공사는 2차 시기까지 계속돼요.",
+    "highlight": "2차",
+    "tts_url": null
+  },
+  {
+    "id": "3f3bccad",
+    "meaning_id": "07e30556",
+    "content": "차 사안은 매우 중대합니다.",
+    "highlight": "차",
+    "tts_url": null
+  },
+  {
+    "id": "f8b07c7b",
+    "meaning_id": "07e30556",
+    "content": "차 회의의 안건을 보십시오.",
+    "highlight": "차",
+    "tts_url": null
+  },
+  {
+    "id": "c26d3d6c",
+    "meaning_id": "07e30556",
+    "content": "차 조항은 삭제가 필요해요.",
+    "highlight": "차",
+    "tts_url": null
+  },
+  {
+    "id": "6edfe401",
+    "meaning_id": "07e30556",
+    "content": "차 구역은 주차 금지입니다.",
+    "highlight": "차",
+    "tts_url": null
+  },
+  {
+    "id": "b42867da",
+    "meaning_id": "07e30556",
+    "content": "차 서류를 검토해 주세요.",
+    "highlight": "차",
+    "tts_url": null
+  },
+  {
+    "id": "d8b279ac",
+    "meaning_id": "8e98e3c7",
+    "content": "길에 차가 많아요.",
+    "highlight": "차가",
+    "tts_url": null
+  },
+  {
+    "id": "e8d1ffbb",
+    "meaning_id": "8e98e3c7",
+    "content": "새 차를 샀습니다.",
+    "highlight": "차를",
+    "tts_url": null
+  },
+  {
+    "id": "5345141a",
+    "meaning_id": "8e98e3c7",
+    "content": "차가 멈춰 섰어요.",
+    "highlight": "차가",
+    "tts_url": null
+  },
+  {
+    "id": "ef59c7ee",
+    "meaning_id": "8e98e3c7",
+    "content": "차에 짐을 실어요.",
+    "highlight": "차에",
+    "tts_url": null
+  },
+  {
+    "id": "3ac95f50",
+    "meaning_id": "8e98e3c7",
+    "content": "검은 차가 지나가요.",
+    "highlight": "차가",
+    "tts_url": null
+  },
+  {
+    "id": "2839fd7c",
+    "meaning_id": "5a2079ad",
+    "content": "제 친구 성은 차 씨예요.",
+    "highlight": "차",
+    "tts_url": null
+  },
+  {
+    "id": "00dc83d8",
+    "meaning_id": "5a2079ad",
+    "content": "차 씨 성을 가진 선배님이죠.",
+    "highlight": "차",
+    "tts_url": null
+  },
+  {
+    "id": "634c30f5",
+    "meaning_id": "5a2079ad",
+    "content": "연안 차 씨 가문을 아세요?",
+    "highlight": "차",
+    "tts_url": null
+  },
+  {
+    "id": "c71b4e42",
+    "meaning_id": "5a2079ad",
+    "content": "차 씨는 본관이 다양합니다.",
+    "highlight": "차",
+    "tts_url": null
+  },
+  {
+    "id": "e9b6ada4",
+    "meaning_id": "5a2079ad",
+    "content": "옆집에는 차 씨 가족이 살아요.",
+    "highlight": "차",
+    "tts_url": null
+  },
+  {
+    "id": "b9f921e0",
+    "meaning_id": "bc9003fd",
+    "content": "실력 차가 꽤 큽니다.",
+    "highlight": "차가",
+    "tts_url": null
+  },
+  {
+    "id": "c9bfcb91",
+    "meaning_id": "bc9003fd",
+    "content": "점수 차를 좁혔어요.",
+    "highlight": "차를",
+    "tts_url": null
+  },
+  {
+    "id": "71e4214b",
+    "meaning_id": "bc9003fd",
+    "content": "가격 차가 심하네요.",
+    "highlight": "차가",
+    "tts_url": null
+  },
+  {
+    "id": "fc533023",
+    "meaning_id": "bc9003fd",
+    "content": "두 제품의 차는 적어요.",
+    "highlight": "차는",
+    "tts_url": null
+  },
+  {
+    "id": "23a15dff",
+    "meaning_id": "bc9003fd",
+    "content": "생각 차가 존재합니다.",
+    "highlight": "차가",
+    "tts_url": null
+  },
+  {
+    "id": "d614759c",
+    "meaning_id": "8f48c6d3",
+    "content": "말을 예쁘게 하시네요.",
+    "highlight": "말을",
+    "tts_url": null
+  },
+  {
+    "id": "56dd93d0",
+    "meaning_id": "8f48c6d3",
+    "content": "가는 말이 고와야 해요.",
+    "highlight": "말이",
+    "tts_url": null
+  },
+  {
+    "id": "b123e3e6",
+    "meaning_id": "8f48c6d3",
+    "content": "제 말 좀 들어 보세요.",
+    "highlight": "말",
+    "tts_url": null
+  },
+  {
+    "id": "6bd57578",
+    "meaning_id": "8f48c6d3",
+    "content": "따뜻한 말 한마디예요.",
+    "highlight": "말",
+    "tts_url": null
+  },
+  {
+    "id": "6635833b",
+    "meaning_id": "8f48c6d3",
+    "content": "말보다 행동이 중요하죠.",
+    "highlight": "말보다",
+    "tts_url": null
+  },
+  {
+    "id": "1fe5ad17",
+    "meaning_id": "78ed9a93",
+    "content": "쌀 한 말을 샀어요.",
+    "highlight": "말을",
+    "tts_url": null
+  },
+  {
+    "id": "61f72e30",
+    "meaning_id": "78ed9a93",
+    "content": "콩 한 말은 무거워요.",
+    "highlight": "말은",
+    "tts_url": null
+  },
+  {
+    "id": "7e580432",
+    "meaning_id": "78ed9a93",
+    "content": "보리 두 말을 담았죠.",
+    "highlight": "말을",
+    "tts_url": null
+  },
+  {
+    "id": "b83c6af5",
+    "meaning_id": "78ed9a93",
+    "content": "이 그릇은 한 말이죠.",
+    "highlight": "말이죠",
+    "tts_url": null
+  },
+  {
+    "id": "72efb777",
+    "meaning_id": "78ed9a93",
+    "content": "깨 한 말을 가져와요.",
+    "highlight": "말을",
+    "tts_url": null
+  },
+  {
+    "id": "db02d205",
+    "meaning_id": "f00f8257",
+    "content": "초원을 달리는 말이 멋져요.",
+    "highlight": "말이",
+    "tts_url": null
+  },
+  {
+    "id": "2b89b113",
+    "meaning_id": "f00f8257",
+    "content": "제주도에서 말을 탔습니다.",
+    "highlight": "말을",
+    "tts_url": null
+  },
+  {
+    "id": "38369708",
+    "meaning_id": "f00f8257",
+    "content": "검은색 말은 정말 힘이 세요.",
+    "highlight": "말은",
+    "tts_url": null
+  },
+  {
+    "id": "c2931763",
+    "meaning_id": "f00f8257",
+    "content": "승마장에서 말에게 먹이를 줘요.",
+    "highlight": "말에게",
+    "tts_url": null
+  },
+  {
+    "id": "0bae1af7",
+    "meaning_id": "f00f8257",
+    "content": "말이 갈기를 휘날리며 뜁니다.",
+    "highlight": "말이",
+    "tts_url": null
+  },
+  {
+    "id": "1d87fd38",
+    "meaning_id": "a5a36638",
+    "content": "말을 어디로 옮길까요?",
+    "highlight": "말을",
+    "tts_url": null
+  },
+  {
+    "id": "e4c5a0cd",
+    "meaning_id": "a5a36638",
+    "content": "상대방 말을 잡았어요.",
+    "highlight": "말을",
+    "tts_url": null
+  },
+  {
+    "id": "4b51b494",
+    "meaning_id": "a5a36638",
+    "content": "말 네 개가 다 났어요.",
+    "highlight": "말",
+    "tts_url": null
+  },
+  {
+    "id": "ff7c6cb8",
+    "meaning_id": "a5a36638",
+    "content": "말을 업고 가겠습니다.",
+    "highlight": "말을",
+    "tts_url": null
+  },
+  {
+    "id": "7a5001b2",
+    "meaning_id": "a5a36638",
+    "content": "이번에는 말을 바꿔요.",
+    "highlight": "말을",
+    "tts_url": null
+  },
+  {
+    "id": "8db4df73",
+    "meaning_id": "18f0c19a",
+    "content": "이번 달 말에 만나요.",
+    "highlight": "말에",
+    "tts_url": null
+  },
+  {
+    "id": "8bfe6ee9",
+    "meaning_id": "18f0c19a",
+    "content": "올해 말까지 끝내세요.",
+    "highlight": "말까지",
+    "tts_url": null
+  },
+  {
+    "id": "a2b54547",
+    "meaning_id": "18f0c19a",
+    "content": "학기 말이라 바쁩니다.",
+    "highlight": "말이라",
+    "tts_url": null
+  },
+  {
+    "id": "ca4dbdae",
+    "meaning_id": "18f0c19a",
+    "content": "공사는 다음 달 말입니다.",
+    "highlight": "말입니다",
+    "tts_url": null
+  },
+  {
+    "id": "13660b7b",
+    "meaning_id": "18f0c19a",
+    "content": "지난해 말에 입사했어요.",
+    "highlight": "말에",
+    "tts_url": null
+  },
+  {
+    "id": "6742eaf0",
+    "meaning_id": "82f9e98b",
+    "content": "장작이 활활 타요.",
+    "highlight": "타요",
+    "tts_url": null
+  },
+  {
+    "id": "849fa0c1",
+    "meaning_id": "82f9e98b",
+    "content": "산불이 크게 탔습니다.",
+    "highlight": "탔습니다",
+    "tts_url": null
+  },
+  {
+    "id": "78224117",
+    "meaning_id": "82f9e98b",
+    "content": "고기가 검게 탔어요.",
+    "highlight": "탔어요",
+    "tts_url": null
+  },
+  {
+    "id": "4972910f",
+    "meaning_id": "82f9e98b",
+    "content": "촛불이 타고 있습니다.",
+    "highlight": "타고",
+    "tts_url": null
+  },
+  {
+    "id": "ac674c4c",
+    "meaning_id": "82f9e98b",
+    "content": "종이가 금방 타네요.",
+    "highlight": "타네요",
+    "tts_url": null
+  },
+  {
+    "id": "39136582",
+    "meaning_id": "28afc71d",
+    "content": "버스에 타려고 서둘러요.",
+    "highlight": "타려고",
+    "tts_url": null
+  },
+  {
+    "id": "a303d7dd",
+    "meaning_id": "28afc71d",
+    "content": "말을 타는 기분은 최고예요.",
+    "highlight": "타는",
+    "tts_url": null
+  },
+  {
+    "id": "9a0ae806",
+    "meaning_id": "28afc71d",
+    "content": "지하철을 타면 금방 가요.",
+    "highlight": "타면",
+    "tts_url": null
+  },
+  {
+    "id": "c5a223d7",
+    "meaning_id": "28afc71d",
+    "content": "배를 타고 섬에 들어갔어요.",
+    "highlight": "타고",
+    "tts_url": null
+  },
+  {
+    "id": "614fdb9a",
+    "meaning_id": "28afc71d",
+    "content": "자전거를 타니 정말 시원해요.",
+    "highlight": "타니",
+    "tts_url": null
+  },
+  {
+    "id": "f72f335f",
+    "meaning_id": "b6f94505",
+    "content": "커피에 설탕을 타서 드세요.",
+    "highlight": "타서",
+    "tts_url": null
+  },
+  {
+    "id": "9a71496d",
+    "meaning_id": "b6f94505",
+    "content": "우유에 시럽을 타면 맛있어요.",
+    "highlight": "타면",
+    "tts_url": null
+  },
+  {
+    "id": "5855393d",
+    "meaning_id": "b6f94505",
+    "content": "따뜻한 물에 차를 탔습니다.",
+    "highlight": "탔습니다",
+    "tts_url": null
+  },
+  {
+    "id": "b62968e6",
+    "meaning_id": "b6f94505",
+    "content": "미숫가루를 연하게 탈까요?",
+    "highlight": "탈까요?",
+    "tts_url": null
+  },
+  {
+    "id": "bc470566",
+    "meaning_id": "b6f94505",
+    "content": "찬물에 가루약을 잘 타세요.",
+    "highlight": "타세요",
+    "tts_url": null
+  },
+  {
+    "id": "0cb66808",
+    "meaning_id": "137efda3",
+    "content": "이번에 월급을 탔어요.",
+    "highlight": "탔어요",
+    "tts_url": null
+  },
+  {
+    "id": "0d335015",
+    "meaning_id": "137efda3",
+    "content": "장학금을 타게 됐습니다.",
+    "highlight": "타게",
+    "tts_url": null
+  },
+  {
+    "id": "ea4e21cc",
+    "meaning_id": "137efda3",
+    "content": "경품으로 자전거를 탔다.",
+    "highlight": "탔다",
+    "tts_url": null
+  },
+  {
+    "id": "bc2bcd6e",
+    "meaning_id": "137efda3",
+    "content": "상금을 얼마나 탔나요?",
+    "highlight": "탔나요?",
+    "tts_url": null
+  },
+  {
+    "id": "b3a9c431",
+    "meaning_id": "137efda3",
+    "content": "보너스를 타면 쏠게요.",
+    "highlight": "타면",
+    "tts_url": null
+  },
+  {
+    "id": "bf19ab17",
+    "meaning_id": "a9cd96bb",
+    "content": "거문고를 타는 소리가 들려요.",
+    "highlight": "타는",
+    "tts_url": null
+  },
+  {
+    "id": "bef7da6f",
+    "meaning_id": "a9cd96bb",
+    "content": "가야금을 아주 잘 타시네요.",
+    "highlight": "타시네요",
+    "tts_url": null
+  },
+  {
+    "id": "e3a18ef1",
+    "meaning_id": "a9cd96bb",
+    "content": "그는 가야금을 타며 노래해요.",
+    "highlight": "타며",
+    "tts_url": null
+  },
+  {
+    "id": "10b127a3",
+    "meaning_id": "a9cd96bb",
+    "content": "선생님께서 거문고를 탑니다.",
+    "highlight": "탑니다",
+    "tts_url": null
+  },
+  {
+    "id": "ad4b33f8",
+    "meaning_id": "a9cd96bb",
+    "content": "악기를 타는 모습이 멋져요.",
+    "highlight": "타는",
+    "tts_url": null
+  },
+  {
+    "id": "a64a5485",
+    "meaning_id": "2e2d2670",
+    "content": "책이 손을 타서 낡았어요.",
+    "highlight": "타서",
+    "tts_url": null
+  },
+  {
+    "id": "2ba0b20a",
+    "meaning_id": "2e2d2670",
+    "content": "물건이 손을 타면 상해요.",
+    "highlight": "타면",
+    "tts_url": null
+  },
+  {
+    "id": "f6bb0bd4",
+    "meaning_id": "2e2d2670",
+    "content": "기계가 너무 손을 탔어요.",
+    "highlight": "탔어요",
+    "tts_url": null
+  },
+  {
+    "id": "e9b5c63c",
+    "meaning_id": "2e2d2670",
+    "content": "옷이 남의 손을 탔네요.",
+    "highlight": "탔네요",
+    "tts_url": null
+  },
+  {
+    "id": "3cb12b1a",
+    "meaning_id": "2e2d2670",
+    "content": "손을 탄 가구는 약해져요.",
+    "highlight": "탄",
+    "tts_url": null
+  },
+  {
+    "id": "f3f5a8a1",
+    "meaning_id": "cb1549b3",
+    "content": "정답이 맞는지 확인해요.",
+    "highlight": "맞는지",
+    "tts_url": null
+  },
+  {
+    "id": "1c6c1666",
+    "meaning_id": "cb1549b3",
+    "content": "계산 결과가 정확히 맞아요.",
+    "highlight": "맞아요",
+    "tts_url": null
+  },
+  {
+    "id": "14a7f4f4",
+    "meaning_id": "cb1549b3",
+    "content": "빈칸에 맞는 답을 쓰세요.",
+    "highlight": "맞는",
+    "tts_url": null
+  },
+  {
+    "id": "4eb47792",
+    "meaning_id": "cb1549b3",
+    "content": "이 문제는 답이 맞습니다.",
+    "highlight": "맞습니다",
+    "tts_url": null
+  },
+  {
+    "id": "e7f6e950",
+    "meaning_id": "cb1549b3",
+    "content": "풀이 과정이 맞는지 봐요.",
+    "highlight": "맞는지",
+    "tts_url": null
+  },
+  {
+    "id": "db683ef4",
+    "meaning_id": "33fb6658",
+    "content": "손님을 반갑게 맞아요.",
+    "highlight": "맞아요",
+    "tts_url": null
+  },
+  {
+    "id": "24c2ab70",
+    "meaning_id": "33fb6658",
+    "content": "웃으며 친구를 맞았다.",
+    "highlight": "맞았다",
+    "tts_url": null
+  },
+  {
+    "id": "732d06a7",
+    "meaning_id": "33fb6658",
+    "content": "신부를 맞으러 가요.",
+    "highlight": "맞으러",
+    "tts_url": null
+  },
+  {
+    "id": "16845ea4",
+    "meaning_id": "33fb6658",
+    "content": "귀빈을 정중히 맞습니다.",
+    "highlight": "맞습니다",
+    "tts_url": null
+  },
+  {
+    "id": "2ca6b46c",
+    "meaning_id": "33fb6658",
+    "content": "새해를 기쁘게 맞이해요.",
+    "highlight": "맞이해요",
+    "tts_url": null
+  },
+  {
+    "id": "a07d1486",
+    "meaning_id": "70e3c63e",
+    "content": "어제 친구에게 세게 맞았어요.",
+    "highlight": "맞았어요",
+    "tts_url": null
+  },
+  {
+    "id": "d181cec9",
+    "meaning_id": "70e3c63e",
+    "content": "공에 머리를 맞아서 아파요.",
+    "highlight": "맞아서",
+    "tts_url": null
+  },
+  {
+    "id": "b0f5a098",
+    "meaning_id": "70e3c63e",
+    "content": "누구에게도 절대 맞지 마세요.",
+    "highlight": "맞지",
+    "tts_url": null
+  },
+  {
+    "id": "92f4bcc9",
+    "meaning_id": "70e3c63e",
+    "content": "뺨을 맞으니 정신이 번쩍 나요.",
+    "highlight": "맞으니",
+    "tts_url": null
+  },
+  {
+    "id": "2e5a49ce",
+    "meaning_id": "70e3c63e",
+    "content": "그는 몽둥이로 등을 맞았습니다.",
+    "highlight": "맞았습니다",
+    "tts_url": null
+  },
+  {
+    "id": "18dcb497",
+    "meaning_id": "50ffc067",
+    "content": "맞다, 숙제 안 했어요.",
+    "highlight": "맞다,",
+    "tts_url": null
+  },
+  {
+    "id": "38463ad1",
+    "meaning_id": "50ffc067",
+    "content": "아 맞다, 약속 잊었네요.",
+    "highlight": "맞다,",
+    "tts_url": null
+  },
+  {
+    "id": "7489935a",
+    "meaning_id": "50ffc067",
+    "content": "맞다, 우산 두고 왔어요.",
+    "highlight": "맞다,",
+    "tts_url": null
+  },
+  {
+    "id": "badab5d3",
+    "meaning_id": "50ffc067",
+    "content": "맞다, 불은 끄고 왔나요?",
+    "highlight": "맞다,",
+    "tts_url": null
+  },
+  {
+    "id": "41533344",
+    "meaning_id": "50ffc067",
+    "content": "맞다, 지갑은 챙겼어요?",
+    "highlight": "맞다,",
+    "tts_url": null
+  },
+  {
+    "id": "7863417a",
+    "meaning_id": "9b34c2be",
+    "content": "참 정겨운 시골 마을이네요.",
+    "highlight": "정겨운",
+    "tts_url": null
+  },
+  {
+    "id": "2afbacf0",
+    "meaning_id": "9b34c2be",
+    "content": "그는 참 익살맞은 사람이에요.",
+    "highlight": "익살맞은",
+    "tts_url": null
+  },
+  {
+    "id": "605793f3",
+    "meaning_id": "9b34c2be",
+    "content": "동생은 유난히 심술맞아요.",
+    "highlight": "심술맞아요",
+    "tts_url": null
+  },
+  {
+    "id": "e492de3c",
+    "meaning_id": "9b34c2be",
+    "content": "오늘은 정말 복스러운 날이죠.",
+    "highlight": "복스러운",
+    "tts_url": null
+  },
+  {
+    "id": "0098f302",
+    "meaning_id": "9b34c2be",
+    "content": "말투가 정말 방정맞네요.",
+    "highlight": "방정맞네요",
+    "tts_url": null
+  },
+  {
+    "id": "b888d989",
+    "meaning_id": "9dac1b43",
+    "content": "오래 걸어서 다리가 아파요.",
+    "highlight": "다리가",
+    "tts_url": null
+  },
+  {
+    "id": "7bd77c5e",
+    "meaning_id": "9dac1b43",
+    "content": "의자에 앉아 다리를 꼬아요.",
+    "highlight": "다리를",
+    "tts_url": null
+  },
+  {
+    "id": "0469d299",
+    "meaning_id": "9dac1b43",
+    "content": "운동 후 다리에 힘이 없어요.",
+    "highlight": "다리에",
+    "tts_url": null
+  },
+  {
+    "id": "9ecb01ff",
+    "meaning_id": "9dac1b43",
+    "content": "강아지 다리는 짧아서 귀여워요.",
+    "highlight": "다리는",
+    "tts_url": null
+  },
+  {
+    "id": "79a2bd9b",
+    "meaning_id": "9dac1b43",
+    "content": "다리를 쭉 펴고 잠시 쉬세요.",
+    "highlight": "다리를",
+    "tts_url": null
+  },
+  {
+    "id": "a6e8e955",
+    "meaning_id": "45d8ee73",
+    "content": "한강 다리를 건너요.",
+    "highlight": "다리를",
+    "tts_url": null
+  },
+  {
+    "id": "c493ea38",
+    "meaning_id": "45d8ee73",
+    "content": "다리 밑에서 쉬어요.",
+    "highlight": "다리",
+    "tts_url": null
+  },
+  {
+    "id": "cfb0b2dc",
+    "meaning_id": "45d8ee73",
+    "content": "마을에 다리가 생겨요.",
+    "highlight": "다리가",
+    "tts_url": null
+  },
+  {
+    "id": "026b060c",
+    "meaning_id": "45d8ee73",
+    "content": "예쁜 다리를 지나가요.",
+    "highlight": "다리를",
+    "tts_url": null
+  },
+  {
+    "id": "224e3639",
+    "meaning_id": "45d8ee73",
+    "content": "저 다리는 아주 길어요.",
+    "highlight": "다리는",
+    "tts_url": null
+  },
+  {
+    "id": "b8f108b8",
+    "meaning_id": "21691117",
+    "content": "이곳은 토양이 참 걸어요.",
+    "highlight": "걸어요",
+    "tts_url": null
+  },
+  {
+    "id": "7c7ccf39",
+    "meaning_id": "21691117",
+    "content": "땅이 걸어야 농사가 잘돼요.",
+    "highlight": "걸어야",
+    "tts_url": null
+  },
+  {
+    "id": "a914ef46",
+    "meaning_id": "21691117",
+    "content": "거름을 주어 땅이 겄습니다.",
+    "highlight": "겄습니다",
+    "tts_url": null
+  },
+  {
+    "id": "d196f5ed",
+    "meaning_id": "21691117",
+    "content": "이 밭은 흙이 매우 겁니다.",
+    "highlight": "겁니다",
+    "tts_url": null
+  },
+  {
+    "id": "76562436",
+    "meaning_id": "21691117",
+    "content": "걸진 땅에서 수확이 늘어요.",
+    "highlight": "걸진",
+    "tts_url": null
+  },
+  {
+    "id": "9e1ee1b9",
+    "meaning_id": "d66e1784",
+    "content": "벽에 가족사진을 걸었습니다.",
+    "highlight": "걸었습니다",
+    "tts_url": null
+  },
+  {
+    "id": "d68c4dd3",
+    "meaning_id": "d66e1784",
+    "content": "옷걸이에 외투를 거세요.",
+    "highlight": "거세요",
+    "tts_url": null
+  },
+  {
+    "id": "450427b5",
+    "meaning_id": "d66e1784",
+    "content": "입구에 안내판을 걸어 둬요.",
+    "highlight": "걸어",
+    "tts_url": null
+  },
+  {
+    "id": "fd48c4f1",
+    "meaning_id": "d66e1784",
+    "content": "못에 모자를 걸어 놓으세요.",
+    "highlight": "걸어",
+    "tts_url": null
+  },
+  {
+    "id": "cc0cfc4c",
+    "meaning_id": "d66e1784",
+    "content": "그림을 거실 벽에 겁니다.",
+    "highlight": "겁니다",
+    "tts_url": null
+  },
+  {
+    "id": "a8c1e463",
+    "meaning_id": "09669b6e",
+    "content": "집에 일찍 드세요.",
+    "highlight": "드세요",
+    "tts_url": null
+  },
+  {
+    "id": "d9cc29b1",
+    "meaning_id": "09669b6e",
+    "content": "방 안으로 드시지요.",
+    "highlight": "드시지요",
+    "tts_url": null
+  },
+  {
+    "id": "fb6fc4ec",
+    "meaning_id": "09669b6e",
+    "content": "볕이 잘 드는 방이야.",
+    "highlight": "드는",
+    "tts_url": null
+  },
+  {
+    "id": "7221fd9a",
+    "meaning_id": "09669b6e",
+    "content": "어서 안으로 들어요.",
+    "highlight": "들어요",
+    "tts_url": null
+  },
+  {
+    "id": "41fd6158",
+    "meaning_id": "09669b6e",
+    "content": "그늘로 들어 가세요.",
+    "highlight": "들어",
+    "tts_url": null
+  },
+  {
+    "id": "c88f8404",
+    "meaning_id": "9a58cfe4",
+    "content": "비가 그치고 볕이 드네요.",
+    "highlight": "드네요",
+    "tts_url": null
+  },
+  {
+    "id": "6d830382",
+    "meaning_id": "9a58cfe4",
+    "content": "날이 들면 산책 가요.",
+    "highlight": "들면",
+    "tts_url": null
+  },
+  {
+    "id": "6fb8606a",
+    "meaning_id": "9a58cfe4",
+    "content": "오후에는 날이 들겠습니다.",
+    "highlight": "들겠습니다",
+    "tts_url": null
+  },
+  {
+    "id": "f6ef950f",
+    "meaning_id": "9a58cfe4",
+    "content": "눈이 멈추고 날이 들어요.",
+    "highlight": "들어요",
+    "tts_url": null
+  },
+  {
+    "id": "090db26f",
+    "meaning_id": "9a58cfe4",
+    "content": "드디어 날이 말끔히 들었네요.",
+    "highlight": "들었네요",
+    "tts_url": null
+  },
+  {
+    "id": "fd7ee753",
+    "meaning_id": "fac8adf4",
+    "content": "칼이 아주 잘 들어요.",
+    "highlight": "들어요",
+    "tts_url": null
+  },
+  {
+    "id": "66db2b2e",
+    "meaning_id": "fac8adf4",
+    "content": "날이 잘 들어서 편해요.",
+    "highlight": "들어서",
+    "tts_url": null
+  },
+  {
+    "id": "9e533c2f",
+    "meaning_id": "fac8adf4",
+    "content": "가위가 잘 들지 않아요.",
+    "highlight": "들지",
+    "tts_url": null
+  },
+  {
+    "id": "48d9dd3a",
+    "meaning_id": "fac8adf4",
+    "content": "이 칼은 정말 잘 듭니다.",
+    "highlight": "듭니다",
+    "tts_url": null
+  },
+  {
+    "id": "877aee3e",
+    "meaning_id": "fac8adf4",
+    "content": "날이 선 칼이 잘 들죠.",
+    "highlight": "들죠",
+    "tts_url": null
+  },
+  {
+    "id": "e5098bd8",
+    "meaning_id": "3a398c0b",
+    "content": "양손에 짐을 들어요.",
+    "highlight": "들어요",
+    "tts_url": null
+  },
+  {
+    "id": "a48114a4",
+    "meaning_id": "3a398c0b",
+    "content": "가방을 직접 들게요.",
+    "highlight": "들게요",
+    "tts_url": null
+  },
+  {
+    "id": "51b16c14",
+    "meaning_id": "3a398c0b",
+    "content": "오른손에 펜을 듭니다.",
+    "highlight": "듭니다",
+    "tts_url": null
+  },
+  {
+    "id": "a6a92802",
+    "meaning_id": "3a398c0b",
+    "content": "우산을 높이 드세요.",
+    "highlight": "드세요",
+    "tts_url": null
+  },
+  {
+    "id": "fc8a620c",
+    "meaning_id": "3a398c0b",
+    "content": "컵을 조심히 들었나요?",
+    "highlight": "들었나요?",
+    "tts_url": null
   }
 ]

@@ -126,7 +126,8 @@ def main():
         logger.info(f"--- Starting Iteration {i+1}/{args.iterations} ---")
 
         # 이번 이터레이션에 사용할 랜덤 톤 선택
-        current_tone = random.choice(tones)
+        # current_tone = random.choice(tones)
+        current_tone = tones[0]
         logger.info(f"Selected Tone for this iteration: {current_tone}")
 
         # 누적된 단어 풀에서 최대 5개를 무작위 추출

@@ -12,6 +12,7 @@ from db_models import (
     SentenceDB,
     WordDB,
 )
+from tts_client import generate_tts_url
 
 BASE_DIR = Path(__file__).resolve().parents[2]
 DATA_DIR = BASE_DIR / "content_data" / "data"
@@ -270,6 +271,11 @@ def seed_quizzes(session, quizzes):
             continue
 
         quiz = session.get(QuizDB, card_id)
+        if not item.get("tts_url") and (quiz is None or not quiz.tts_url):
+            tts_url = generate_tts_url(item.get("prompt_sentence", ""))
+            if tts_url:
+                item["tts_url"] = tts_url
+
         if quiz is None:
             quiz = QuizDB(
                 card_id=card_id,

@@ -25,8 +25,17 @@ services:
     restart: always
     environment:
       DATABASE_URL: postgresql+psycopg://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB}
+      MDD_API_BASE_URL: http://ml-api:8000
+      BACKEND_TTS_GENERATION_ENABLED: ${BACKEND_TTS_GENERATION_ENABLED:-true}
+      BACKEND_TTS_GENERATION_REQUIRED: ${BACKEND_TTS_GENERATION_REQUIRED:-false}
+      BACKEND_TTS_GENERATION_RETRIES: ${BACKEND_TTS_GENERATION_RETRIES:-5}
+      BACKEND_TTS_GENERATION_RETRY_SECONDS: ${BACKEND_TTS_GENERATION_RETRY_SECONDS:-2}
+      BACKEND_PRONUNCIATION_ANALYSIS_ENDPOINT: ${BACKEND_PRONUNCIATION_ANALYSIS_ENDPOINT:-/analyze-pronunciation-llm}
+      BACKEND_PRONUNCIATION_ANALYSIS_TIMEOUT_SECONDS: ${BACKEND_PRONUNCIATION_ANALYSIS_TIMEOUT_SECONDS:-180}
     depends_on:
       db:
+        condition: service_healthy
+      ml-api:
         condition: service_healthy
     networks:
       - default
@@ -44,8 +53,104 @@ services:
     networks:
       - proxy-net
 
+  ml-api:
+    build:
+      context: ./ml_core
+      dockerfile: Dockerfile.api
+    container_name: mdd-api
+    ports:
+      - "8000:8000"
+    environment:
+      MDD_SERVICE_MODE: api
+      MDD_INFERENCE_BASE_URL: http://ml-inference:8080
+      MDD_INFERENCE_TIMEOUT_SECONDS: 120
+      MDD_ALIGNER_BASE_URL: http://ml-aligner:8090
+      MDD_ALIGNER_TIMEOUT_SECONDS: 120
+      MDD_ALIGNER_LANGUAGE: Korean
+      MDD_GEMINI_API_KEY: ${MDD_GEMINI_API_KEY:-}
+      MDD_GEMINI_MODEL: ${MDD_GEMINI_MODEL:-gemini-2.5-flash}
+      MDD_GEMINI_TIMEOUT_SECONDS: ${MDD_GEMINI_TIMEOUT_SECONDS:-30}
+      MDD_OBJECT_STORAGE_ENABLED: ${MDD_OBJECT_STORAGE_ENABLED:-true}
+      MDD_OBJECT_STORAGE_ENDPOINT: ml-minio:9000
+      MDD_OBJECT_STORAGE_ACCESS_KEY: ${MDD_OBJECT_STORAGE_ACCESS_KEY:-mddadmin}
+      MDD_OBJECT_STORAGE_SECRET_KEY: ${MDD_OBJECT_STORAGE_SECRET_KEY:-mddadmin123}
+      MDD_OBJECT_STORAGE_BUCKET: ${MDD_OBJECT_STORAGE_BUCKET:-mdd-reference-cache}
+      MDD_OBJECT_STORAGE_SECURE: ${MDD_OBJECT_STORAGE_SECURE:-false}
+      MDD_TTS_PROVIDER: ${MDD_TTS_PROVIDER:-edge}
+      MDD_TTS_MODEL: ${MDD_TTS_MODEL:-edge-tts}
+      MDD_TTS_VOICE_ID: ${MDD_TTS_VOICE_ID:-ko-KR-SunHiNeural}
+      MDD_TTS_SPEAKING_RATE: ${MDD_TTS_SPEAKING_RATE:-1.0}
+      MDD_TTS_ASSET_PUBLIC_BASE_URL: ${MDD_TTS_ASSET_PUBLIC_BASE_URL:-/ml}
+    depends_on:
+      - ml-minio
+    healthcheck:
+      test: ["CMD-SHELL", "python -c \"import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/health', timeout=5).read()\""]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+    networks:
+      - default
+      - proxy-net
+    restart: unless-stopped
+
+  ml-inference:
+    build:
+      context: ./ml_core
+      dockerfile: Dockerfile.inference
+    container_name: mdd-inference
+    environment:
+      MDD_SERVICE_MODE: inference
+      MDD_MODEL_PATH: /opt/mdd/checkpoints/checkpoint_mdd_sjr.pt
+      MDD_INFER_SCRIPT_PATH: /opt/fairseq/examples/speech_recognition/infer.py
+      MDD_DICT_PATH: /opt/mdd/service/assets/dict.phn.txt
+      MDD_TEMP_ROOT: /tmp/mdd-inference
+      PYTHONPATH: /opt/fairseq
+      LD_LIBRARY_PATH: /opt/conda/envs/main/lib/python3.9/site-packages/flashlight-1.0.0-py3.9-linux-x86_64.egg:/usr/local/nvidia/lib:/usr/local/nvidia/lib64
+      NVIDIA_VISIBLE_DEVICES: all
+      NVIDIA_DRIVER_CAPABILITIES: compute,utility
+    volumes:
+      - "./ml_core/models:/opt/mdd/checkpoints:ro"
+    runtime: nvidia
+    ipc: host
+    profiles:
+      - ml-gpu
+    restart: unless-stopped
+
+  ml-aligner:
+    build:
+      context: ./ml_core
+      dockerfile: Dockerfile.aligner
+    container_name: mdd-aligner
+    environment:
+      MDD_SERVICE_MODE: aligner
+      MDD_HOST: 0.0.0.0
+      MDD_PORT: 8090
+      MDD_ALIGNER_MODEL_ID: Qwen/Qwen3-ForcedAligner-0.6B
+      NVIDIA_VISIBLE_DEVICES: all
+      NVIDIA_DRIVER_CAPABILITIES: compute,utility
+    runtime: nvidia
+    ipc: host
+    profiles:
+      - ml-gpu
+    restart: unless-stopped
+
+  ml-minio:
+    image: minio/minio:latest
+    container_name: mdd-minio
+    command: server /data --console-address ":9001"
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    environment:
+      MINIO_ROOT_USER: ${MDD_OBJECT_STORAGE_ACCESS_KEY:-mddadmin}
+      MINIO_ROOT_PASSWORD: ${MDD_OBJECT_STORAGE_SECRET_KEY:-mddadmin123}
+    volumes:
+      - ml_minio_data:/data
+    restart: unless-stopped
+
 volumes:
   postgres_data:
+  ml_minio_data:
 
 networks:
   proxy-net:

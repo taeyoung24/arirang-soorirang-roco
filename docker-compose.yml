@@ -59,7 +59,7 @@ services:
       dockerfile: Dockerfile.api
     container_name: mdd-api
     ports:
-      - "8000:8000"
+      - "${MDD_API_HOST_PORT:-18080}:8000"
     environment:
       MDD_SERVICE_MODE: api
       MDD_INFERENCE_BASE_URL: http://ml-inference:8080
@@ -110,10 +110,8 @@ services:
       NVIDIA_DRIVER_CAPABILITIES: compute,utility
     volumes:
       - "./ml_core/models:/opt/mdd/checkpoints:ro"
-    runtime: nvidia
+    gpus: all
     ipc: host
-    profiles:
-      - ml-gpu
     restart: unless-stopped
 
   ml-aligner:
@@ -128,10 +126,8 @@ services:
       MDD_ALIGNER_MODEL_ID: Qwen/Qwen3-ForcedAligner-0.6B
       NVIDIA_VISIBLE_DEVICES: all
       NVIDIA_DRIVER_CAPABILITIES: compute,utility
-    runtime: nvidia
+    gpus: all
     ipc: host
-    profiles:
-      - ml-gpu
     restart: unless-stopped
 
   ml-minio:
@@ -139,8 +135,8 @@ services:
     container_name: mdd-minio
     command: server /data --console-address ":9001"
     ports:
-      - "9000:9000"
-      - "9001:9001"
+      - "${MDD_MINIO_HOST_PORT:-19000}:9000"
+      - "${MDD_MINIO_CONSOLE_HOST_PORT:-19001}:9001"
     environment:
       MINIO_ROOT_USER: ${MDD_OBJECT_STORAGE_ACCESS_KEY:-mddadmin}
       MINIO_ROOT_PASSWORD: ${MDD_OBJECT_STORAGE_SECRET_KEY:-mddadmin123}

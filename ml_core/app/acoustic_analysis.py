@@ -14,6 +14,7 @@ from app.acoustic_schemas import (
     AudioQualitySummary,
     EvidencePolicy,
     ForcedAlignmentResponse,
+    PronunciationScore,
     PronunciationAnalysisResponse,
 )
 from app.acoustic_feature_extractor import AcousticFeatureExtractor, AudioBuffer, create_default_feature_extractor
@@ -95,6 +96,14 @@ class AcousticAnalyzer:
             prosody,
             quality,
         )
+        pronunciation_score = self._score_pronunciation(
+            canonical=prediction.canonical_phonemes,
+            phoneme_edits=phoneme_edits,
+            target_scores=prediction.target_phoneme_scores,
+            prosody=prosody,
+            quality=quality,
+            diagnostic_count=len(diagnostics),
+        )
         if used_forced_alignment:
             notes = [
                 "Word and syllable timings come from Qwen3 forced alignment.",
@@ -129,6 +138,7 @@ class AcousticAnalyzer:
             script=prediction.script,
             canonical_phonemes=prediction.canonical_phonemes,
             predicted_phonemes=prediction.predicted_phonemes,
+            pronunciation_score=pronunciation_score,
             model_score=prediction.model_score,
             predicted_phoneme_scores=prediction.predicted_phoneme_scores,
             target_phoneme_scores=prediction.target_phoneme_scores,
@@ -141,6 +151,76 @@ class AcousticAnalyzer:
             notes=notes,
         )
         return response, evidence
+
+    @staticmethod
+    def _score_pronunciation(
+        canonical: str,
+        phoneme_edits,
+        target_scores,
+        prosody: ProsodySummary,
+        quality: AudioQualitySummary,
+        diagnostic_count: int,
+    ) -> PronunciationScore:
+        scored_targets = [score for score in target_scores if score.edit_type != "insertion"]
+        if scored_targets:
+            segmental = 100.0 * sum(AcousticAnalyzer._target_score_value(score) for score in scored_targets) / len(scored_targets)
+        elif canonical:
+            segmental = 100.0 * max(0, len(canonical) - len(phoneme_edits)) / len(canonical)
+        else:
+            segmental = 0.0
+
+        prosody_score = AcousticAnalyzer._prosody_score(prosody)
+        audio_quality_score = AcousticAnalyzer._audio_quality_score(quality)
+        overall = 0.85 * segmental + 0.15 * prosody_score
+        if diagnostic_count:
+            overall -= min(12.0, diagnostic_count * 2.0)
+
+        note = (
+            "Heuristic 0-100 score from target phoneme confidence, timing/prosody evidence, "
+            "and diagnostic penalties. Audio quality is reported separately and does not affect the score. "
+            "It is not externally calibrated."
+        )
+        return PronunciationScore(
+            overall=round(max(0.0, min(100.0, overall)), 1),
+            segmental=round(max(0.0, min(100.0, segmental)), 1),
+            prosody=round(max(0.0, min(100.0, prosody_score)), 1),
+            audio_quality=round(audio_quality_score, 1),
+            note=note,
+        )
+
+    @staticmethod
+    def _target_score_value(score) -> float:
+        if score.edit_type == "match":
+            return score.confidence if score.confidence is not None else 1.0
+        if score.edit_type == "substitution":
+            return 0.35 * (score.confidence if score.confidence is not None else 0.5)
+        if score.edit_type == "deletion":
+            return 0.0
+        return 0.0
+
+    @staticmethod
+    def _prosody_score(prosody: ProsodySummary) -> float:
+        score = 100.0
+        if prosody.speech_duration_ratio is not None:
+            ratio = prosody.speech_duration_ratio
+            if ratio > 1.15:
+                score -= min(35.0, (ratio - 1.15) * 22.0)
+            elif ratio < 0.75:
+                score -= min(25.0, (0.75 - ratio) * 30.0)
+        score -= min(25.0, prosody.interior_pause_total_ms / 160.0)
+        score -= min(15.0, len(prosody.stretched_intervals) * 4.0)
+        if prosody.rate_reliability == "low":
+            score = max(score, 65.0)
+        return score
+
+    @staticmethod
+    def _audio_quality_score(quality: AudioQualitySummary) -> float:
+        base = {"high": 100.0, "medium": 82.0, "low": 60.0}[quality.overall_reliability]
+        if quality.clipping_detected:
+            base -= 15.0
+        if quality.snr_db is not None and quality.snr_db < 12.0:
+            base -= min(20.0, (12.0 - quality.snr_db) * 2.0)
+        return max(0.0, min(100.0, base))
 
     @classmethod
     def _decompose_hangul(cls, text: str) -> str:

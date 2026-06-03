@@ -54,6 +54,7 @@ class TTSAssetManifest(BaseModel):
     object_bucket: str
     audio_object_key: str
     manifest_object_key: str
+    audio_url: str | None = None
     created_at: str
 
 
@@ -68,12 +69,18 @@ class TTSAssetStore:
     def get_manifest(self, key: str) -> TTSAssetManifest | None:
         raise NotImplementedError
 
+    def get_audio(self, key: str) -> bytes | None:
+        raise NotImplementedError
+
     def put_asset(self, request: TTSAssetRequest, audio_bytes: bytes) -> TTSAssetManifest:
         raise NotImplementedError
 
 
 class DisabledTTSAssetStore(TTSAssetStore):
     def get_manifest(self, key: str) -> TTSAssetManifest | None:
+        return None
+
+    def get_audio(self, key: str) -> bytes | None:
         return None
 
     def put_asset(self, request: TTSAssetRequest, audio_bytes: bytes) -> TTSAssetManifest:
@@ -115,6 +122,20 @@ class MinioTTSAssetStore(TTSAssetStore):
         manifest = TTSAssetManifest.model_validate_json(payload)
         manifest.status = "cached"
         return manifest
+
+    def get_audio(self, key: str) -> bytes | None:
+        keys = self._keys(key)
+        try:
+            response = self.client.get_object(self.bucket, keys.audio)
+            try:
+                return response.read()
+            finally:
+                response.close()
+                response.release_conn()
+        except Exception as exc:
+            if self._is_not_found(exc):
+                return None
+            raise
 
     def put_asset(self, request: TTSAssetRequest, audio_bytes: bytes) -> TTSAssetManifest:
         self._ensure_bucket()

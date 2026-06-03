@@ -13,4 +13,4 @@ COPY content_data/data /app/content_data/data
 
 EXPOSE 8000
 
-CMD ["sh", "-c", "until python -c 'from database import engine; conn = engine.connect(); conn.close()'; do sleep 2; done; python seed.py; uvicorn main:app --host 0.0.0.0 --port 8000"]
+CMD ["sh", "-c", "set -e; python migrate.py; python seed.py; exec uvicorn main:app --host 0.0.0.0 --port 8000"]

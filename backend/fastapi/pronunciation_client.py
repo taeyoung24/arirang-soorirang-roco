@@ -1,4 +1,6 @@
 import os
+import subprocess
+import tempfile
 
 import httpx
 
@@ -17,6 +19,31 @@ class PronunciationAnalysisError(RuntimeError):
     pass
 
 
+def _convert_webm_to_wav(webm_bytes: bytes) -> bytes:
+    with tempfile.NamedTemporaryFile(suffix=".webm", delete=False) as f_in:
+        f_in.write(webm_bytes)
+        input_path = f_in.name
+
+    output_path = input_path.replace(".webm", ".wav")
+
+    try:
+        subprocess.run(
+            [
+                "ffmpeg", "-y", "-i", input_path,
+                "-ac", "1", "-ar", "16000", "-sample_fmt", "s16",
+                output_path,
+            ],
+            check=True,
+            capture_output=True,
+        )
+        with open(output_path, "rb") as f_out:
+            return f_out.read()
+    finally:
+        import os as _os
+        _os.unlink(input_path)
+        _os.unlink(output_path)
+
+
 async def analyze_pronunciation(audio_bytes, filename, target_text):
     if not MDD_API_BASE_URL:
         raise PronunciationAnalysisError("MDD_API_BASE_URL 환경변수가 설정되어 있지 않습니다.")
@@ -24,6 +51,13 @@ async def analyze_pronunciation(audio_bytes, filename, target_text):
     endpoint = PRONUNCIATION_ANALYSIS_ENDPOINT
     if not endpoint.startswith("/"):
         endpoint = f"/{endpoint}"
+
+    # webm → wav 변환 (ml_core sox는 webm 미지원)
+    actual_bytes = audio_bytes
+    actual_filename = filename or "recording.wav"
+    if actual_filename.lower().endswith(".webm"):
+        actual_bytes = _convert_webm_to_wav(audio_bytes)
+        actual_filename = actual_filename[:-5] + ".wav"
 
     data = {
         "script": target_text,
@@ -33,7 +67,7 @@ async def analyze_pronunciation(audio_bytes, filename, target_text):
         "debug": "false",
     }
     files = {
-        "audio": (filename or "recording.webm", audio_bytes, "application/octet-stream"),
+        "audio": (actual_filename, actual_bytes, "application/octet-stream"),
     }
 
     try:

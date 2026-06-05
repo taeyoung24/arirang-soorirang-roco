@@ -133,13 +133,6 @@
     "tts_url": null
   },
   {
-    "id": "22122d7c",
-    "meaning_id": "a1441af7",
-    "content": "고인을 선산에 씀.",
-    "highlight": "씀",
-    "tts_url": null
-  },
-  {
     "id": "d195aecd",
     "meaning_id": "396a688b",
     "content": "말을 신중히 쓰세요.",
@@ -182,13 +175,6 @@
     "tts_url": null
   },
   {
-    "id": "2c131e55",
-    "meaning_id": "2a00e9ac",
-    "content": "입안이 무척 씁니다.",
-    "highlight": "씁니다",
-    "tts_url": null
-  },
-  {
     "id": "7286da48",
     "meaning_id": "2a00e9ac",
     "content": "커피가 아주 쓰네요.",
@@ -217,31 +203,10 @@
     "tts_url": null
   },
   {
-    "id": "489862c4",
-    "meaning_id": "a08b020d",
-    "content": "눈을 감고 쉬어라.",
-    "highlight": "눈을",
-    "tts_url": null
-  },
-  {
-    "id": "177cb74b",
-    "meaning_id": "a08b020d",
-    "content": "아픈 눈을 치료하자.",
-    "highlight": "눈을",
-    "tts_url": null
-  },
-  {
     "id": "1028953b",
     "meaning_id": "a08b020d",
     "content": "눈에 안약을 넣어라.",
     "highlight": "눈에",
-    "tts_url": null
-  },
-  {
-    "id": "5878e91a",
-    "meaning_id": "a08b020d",
-    "content": "나쁜 눈을 보호해요.",
-    "highlight": "눈을",
     "tts_url": null
   },
   {
@@ -266,90 +231,6 @@
     "tts_url": null
   },
   {
-    "id": "24c368c6",
-    "meaning_id": "f74ae230",
-    "content": "계량컵 눈은 나를 속이지 않지.",
-    "highlight": "눈은",
-    "tts_url": null
-  },
-  {
-    "id": "1274b9ec",
-    "meaning_id": "f74ae230",
-    "content": "희망 수치는 눈 씻고 봐도 없다.",
-    "highlight": "눈",
-    "tts_url": null
-  },
-  {
-    "id": "38af2476",
-    "meaning_id": "c070986f",
-    "content": "그물 눈이 너무 커서 고기가 다 빠져나가.",
-    "highlight": "눈이",
-    "tts_url": null
-  },
-  {
-    "id": "4b71588c",
-    "meaning_id": "c070986f",
-    "content": "촘촘한 눈 사이로 모래가 다 걸러졌어.",
-    "highlight": "눈",
-    "tts_url": null
-  },
-  {
-    "id": "7659c7da",
-    "meaning_id": "c070986f",
-    "content": "네가 짠 그물은 눈이 정말 일정하다.",
-    "highlight": "눈이",
-    "tts_url": null
-  },
-  {
-    "id": "e7b77654",
-    "meaning_id": "c070986f",
-    "content": "이 투망은 눈마다 매듭이 아주 단단해.",
-    "highlight": "눈마다",
-    "tts_url": null
-  },
-  {
-    "id": "4857e044",
-    "meaning_id": "c070986f",
-    "content": "그물 눈을 하나하나 꼼꼼하게 수선하자.",
-    "highlight": "눈을",
-    "tts_url": null
-  },
-  {
-    "id": "a41dc869",
-    "meaning_id": "92d56853",
-    "content": "죽은 나뭇가지에 눈이 텄네. 뻔뻔해.",
-    "highlight": "눈이",
-    "tts_url": null
-  },
-  {
-    "id": "8cf08061",
-    "meaning_id": "92d56853",
-    "content": "겨울을 버티고 눈을 틔우다니, 질기다.",
-    "highlight": "눈을",
-    "tts_url": null
-  },
-  {
-    "id": "71b07ad2",
-    "meaning_id": "92d56853",
-    "content": "고작 저 눈 하나가 희망이라니 우습군.",
-    "highlight": "눈",
-    "tts_url": null
-  },
-  {
-    "id": "91be365c",
-    "meaning_id": "92d56853",
-    "content": "새로 돋은 눈도 결국 시들어 버리겠지.",
-    "highlight": "눈도",
-    "tts_url": null
-  },
-  {
-    "id": "ddd45011",
-    "meaning_id": "92d56853",
-    "content": "작은 눈 따위가 세상을 바꿀 순 없어.",
-    "highlight": "눈",
-    "tts_url": null
-  },
-  {
     "id": "a84cea9e",
     "meaning_id": "607998e2",
     "content": "밖에는 눈이 내려요.",
@@ -371,13 +252,6 @@
     "tts_url": null
   },
   {
-    "id": "cb794763",
-    "meaning_id": "607998e2",
-    "content": "길에 쌓인 눈이 녹았어요.",
-    "highlight": "눈이",
-    "tts_url": null
-  },
-  {
     "id": "89fce61e",
     "meaning_id": "607998e2",
     "content": "하얀 눈으로 덮인 산이에요.",
@@ -394,22 +268,8 @@
   {
     "id": "c3d2ab39",
     "meaning_id": "a8256efc",
-    "content": "차가운 것을 먹으니 배가 아파요.",
+    "content": "잘못 먹어서 배가 아파요.",
     "highlight": "배가",
-    "tts_url": null
-  },
-  {
-    "id": "b54b2afa",
-    "meaning_id": "a8256efc",
-    "content": "아기가 배를 드러내고 자고 있어요.",
-    "highlight": "배를",
-    "tts_url": null
-  },
-  {
-    "id": "0a4f651b",
-    "meaning_id": "a8256efc",
-    "content": "복근 운동을 하니 배에 힘이 들어가요.",
-    "highlight": "배에",
     "tts_url": null
   },
   {
@@ -441,20 +301,6 @@
     "tts_url": null
   },
   {
-    "id": "a472bed3",
-    "meaning_id": "acb76ba5",
-    "content": "어부들이 배에서 내려요.",
-    "highlight": "배에서",
-    "tts_url": null
-  },
-  {
-    "id": "911f323f",
-    "meaning_id": "acb76ba5",
-    "content": "저 배는 정말 속도가 빨라요.",
-    "highlight": "배는",
-    "tts_url": null
-  },
-  {
     "id": "502cff9d",
     "meaning_id": "cc92f8d0",
     "content": "시원한 배를 먹어요.",
@@ -483,83 +329,6 @@
     "tts_url": null
   },
   {
-    "id": "838dc9ed",
-    "meaning_id": "cc92f8d0",
-    "content": "냉장고에 배 한 알 있죠?",
-    "highlight": "배",
-    "tts_url": null
-  },
-  {
-    "id": "0b179cad",
-    "meaning_id": "f7f5bdd7",
-    "content": "시원하게 한 배 드시지요.",
-    "highlight": "배",
-    "tts_url": null
-  },
-  {
-    "id": "628cf845",
-    "meaning_id": "f7f5bdd7",
-    "content": "술 한 배에 시름을 잊어요.",
-    "highlight": "배에",
-    "tts_url": null
-  },
-  {
-    "id": "add4b0ff",
-    "meaning_id": "f7f5bdd7",
-    "content": "그는 차 한 배를 권했습니다.",
-    "highlight": "배를",
-    "tts_url": null
-  },
-  {
-    "id": "74d92e0d",
-    "meaning_id": "f7f5bdd7",
-    "content": "반가운 마음에 한 배 했어요.",
-    "highlight": "배",
-    "tts_url": null
-  },
-  {
-    "id": "effcdcf0",
-    "meaning_id": "f7f5bdd7",
-    "content": "약주 한 배 더 올릴까요?",
-    "highlight": "배",
-    "tts_url": null
-  },
-  {
-    "id": "43b206d8",
-    "meaning_id": "b0d04bd0",
-    "content": "공손하게 배를 올리세요.",
-    "highlight": "배를",
-    "tts_url": null
-  },
-  {
-    "id": "5d784d8b",
-    "meaning_id": "b0d04bd0",
-    "content": "어르신께 배를 드립니다.",
-    "highlight": "배를",
-    "tts_url": null
-  },
-  {
-    "id": "bd0bdfb7",
-    "meaning_id": "b0d04bd0",
-    "content": "서서 하는 배가 예의죠.",
-    "highlight": "배가",
-    "tts_url": null
-  },
-  {
-    "id": "acd39c44",
-    "meaning_id": "b0d04bd0",
-    "content": "정중히 배로 인사해요.",
-    "highlight": "배로",
-    "tts_url": null
-  },
-  {
-    "id": "93d91263",
-    "meaning_id": "b0d04bd0",
-    "content": "예법에 맞춰 배를 해요.",
-    "highlight": "배를",
-    "tts_url": null
-  },
-  {
     "id": "48ec1ab1",
     "meaning_id": "346e6111",
     "content": "수익이 작년보다 두 배 늘었어요.",
@@ -581,20 +350,6 @@
     "tts_url": null
   },
   {
-    "id": "9fd86cf5",
-    "meaning_id": "346e6111",
-    "content": "노력을 세 배는 더 해야 합니다.",
-    "highlight": "배는",
-    "tts_url": null
-  },
-  {
-    "id": "3d139127",
-    "meaning_id": "346e6111",
-    "content": "인원이 배로 많아져서 놀랐어요.",
-    "highlight": "배로",
-    "tts_url": null
-  },
-  {
     "id": "48f3e617",
     "meaning_id": "243b672e",
     "content": "배 선생님은 친절해요.",
@@ -612,13 +367,6 @@
     "id": "83e647d3",
     "meaning_id": "243b672e",
     "content": "배 의원님이 오셨어요.",
-    "highlight": "배",
-    "tts_url": null
-  },
-  {
-    "id": "88c60b09",
-    "meaning_id": "243b672e",
-    "content": "배 대리님은 성실해요.",
     "highlight": "배",
     "tts_url": null
   },
@@ -658,20 +406,6 @@
     "tts_url": null
   },
   {
-    "id": "14bff941",
-    "meaning_id": "ca6eff3f",
-    "content": "우린 차가 아주 고소해요.",
-    "highlight": "차가",
-    "tts_url": null
-  },
-  {
-    "id": "d31987fa",
-    "meaning_id": "bc61cf1a",
-    "content": "이번이 벌써 세 번째 차례입니다.",
-    "highlight": "차례입니다",
-    "tts_url": null
-  },
-  {
     "id": "321f047d",
     "meaning_id": "bc61cf1a",
     "content": "방문한 지 2회 차가 되었어요.",
@@ -700,58 +434,9 @@
     "tts_url": null
   },
   {
-    "id": "3f3bccad",
-    "meaning_id": "07e30556",
-    "content": "차 사안은 매우 중대합니다.",
-    "highlight": "차",
-    "tts_url": null
-  },
-  {
-    "id": "f8b07c7b",
-    "meaning_id": "07e30556",
-    "content": "차 회의의 안건을 보십시오.",
-    "highlight": "차",
-    "tts_url": null
-  },
-  {
-    "id": "c26d3d6c",
-    "meaning_id": "07e30556",
-    "content": "차 조항은 삭제가 필요해요.",
-    "highlight": "차",
-    "tts_url": null
-  },
-  {
-    "id": "6edfe401",
-    "meaning_id": "07e30556",
-    "content": "차 구역은 주차 금지입니다.",
-    "highlight": "차",
-    "tts_url": null
-  },
-  {
-    "id": "b42867da",
-    "meaning_id": "07e30556",
-    "content": "차 서류를 검토해 주세요.",
-    "highlight": "차",
-    "tts_url": null
-  },
-  {
     "id": "d8b279ac",
     "meaning_id": "8e98e3c7",
     "content": "길에 차가 많아요.",
-    "highlight": "차가",
-    "tts_url": null
-  },
-  {
-    "id": "e8d1ffbb",
-    "meaning_id": "8e98e3c7",
-    "content": "새 차를 샀습니다.",
-    "highlight": "차를",
-    "tts_url": null
-  },
-  {
-    "id": "5345141a",
-    "meaning_id": "8e98e3c7",
-    "content": "차가 멈춰 섰어요.",
     "highlight": "차가",
     "tts_url": null
   },
@@ -868,13 +553,6 @@
     "tts_url": null
   },
   {
-    "id": "6635833b",
-    "meaning_id": "8f48c6d3",
-    "content": "말보다 행동이 중요하죠.",
-    "highlight": "말보다",
-    "tts_url": null
-  },
-  {
     "id": "1fe5ad17",
     "meaning_id": "78ed9a93",
     "content": "쌀 한 말을 샀어요.",
@@ -892,20 +570,6 @@
     "id": "7e580432",
     "meaning_id": "78ed9a93",
     "content": "보리 두 말을 담았죠.",
-    "highlight": "말을",
-    "tts_url": null
-  },
-  {
-    "id": "b83c6af5",
-    "meaning_id": "78ed9a93",
-    "content": "이 그릇은 한 말이죠.",
-    "highlight": "말이죠",
-    "tts_url": null
-  },
-  {
-    "id": "72efb777",
-    "meaning_id": "78ed9a93",
-    "content": "깨 한 말을 가져와요.",
     "highlight": "말을",
     "tts_url": null
   },
@@ -931,13 +595,6 @@
     "tts_url": null
   },
   {
-    "id": "c2931763",
-    "meaning_id": "f00f8257",
-    "content": "승마장에서 말에게 먹이를 줘요.",
-    "highlight": "말에게",
-    "tts_url": null
-  },
-  {
     "id": "0bae1af7",
     "meaning_id": "f00f8257",
     "content": "말이 갈기를 휘날리며 뜁니다.",
@@ -959,23 +616,9 @@
     "tts_url": null
   },
   {
-    "id": "4b51b494",
-    "meaning_id": "a5a36638",
-    "content": "말 네 개가 다 났어요.",
-    "highlight": "말",
-    "tts_url": null
-  },
-  {
     "id": "ff7c6cb8",
     "meaning_id": "a5a36638",
     "content": "말을 업고 가겠습니다.",
-    "highlight": "말을",
-    "tts_url": null
-  },
-  {
-    "id": "7a5001b2",
-    "meaning_id": "a5a36638",
-    "content": "이번에는 말을 바꿔요.",
     "highlight": "말을",
     "tts_url": null
   },
@@ -998,13 +641,6 @@
     "meaning_id": "18f0c19a",
     "content": "학기 말이라 바쁩니다.",
     "highlight": "말이라",
-    "tts_url": null
-  },
-  {
-    "id": "ca4dbdae",
-    "meaning_id": "18f0c19a",
-    "content": "공사는 다음 달 말입니다.",
-    "highlight": "말입니다",
     "tts_url": null
   },
   {
@@ -1071,13 +707,6 @@
     "tts_url": null
   },
   {
-    "id": "c5a223d7",
-    "meaning_id": "28afc71d",
-    "content": "배를 타고 섬에 들어갔어요.",
-    "highlight": "타고",
-    "tts_url": null
-  },
-  {
     "id": "614fdb9a",
     "meaning_id": "28afc71d",
     "content": "자전거를 타니 정말 시원해요.",
@@ -1092,13 +721,6 @@
     "tts_url": null
   },
   {
-    "id": "9a71496d",
-    "meaning_id": "b6f94505",
-    "content": "우유에 시럽을 타면 맛있어요.",
-    "highlight": "타면",
-    "tts_url": null
-  },
-  {
     "id": "5855393d",
     "meaning_id": "b6f94505",
     "content": "따뜻한 물에 차를 탔습니다.",
@@ -1106,16 +728,9 @@
     "tts_url": null
   },
   {
-    "id": "b62968e6",
-    "meaning_id": "b6f94505",
-    "content": "미숫가루를 연하게 탈까요?",
-    "highlight": "탈까요?",
-    "tts_url": null
-  },
-  {
     "id": "bc470566",
     "meaning_id": "b6f94505",
-    "content": "찬물에 가루약을 잘 타세요.",
+    "content": "물에 가루약을 잘 타세요.",
     "highlight": "타세요",
     "tts_url": null
   },

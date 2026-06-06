@@ -41,11 +41,15 @@ It is separate from the design document and focuses on current behavior, validat
 - `aligner`
   - `Qwen/Qwen3-ForcedAligner-0.6B`
 
-## Implemented Endpoints
+## Implemented Public Endpoints
 
 - `GET /health`
-- `POST /predict`
 - `POST /analyze-pronunciation-llm`
+- `GET /tts-assets/{cache_key}`
+- `GET /tts-assets/{cache_key}/audio`
+- `POST /tts-assets/generate`
+
+The inference service still keeps its internal `POST /predict` endpoint for API-to-inference calls.
 
 ## Implemented Error Handling
 

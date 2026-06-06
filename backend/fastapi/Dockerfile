@@ -3,6 +3,10 @@ FROM python:3.12-slim
 ENV PYTHONDONTWRITEBYTECODE=1
 ENV PYTHONUNBUFFERED=1
 
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends ffmpeg \
+    && rm -rf /var/lib/apt/lists/*
+
 WORKDIR /app/backend/fastapi
 
 COPY backend/fastapi/requirements.txt ./
@@ -13,4 +17,4 @@ COPY content_data/data /app/content_data/data
 
 EXPOSE 8000
 
-CMD ["sh", "-c", "until python -c 'from database import engine; conn = engine.connect(); conn.close()'; do sleep 2; done; python seed.py; uvicorn main:app --host 0.0.0.0 --port 8000"]
+CMD ["sh", "-c", "set -e; python migrate.py; python seed.py; exec uvicorn main:app --host 0.0.0.0 --port 8000"]

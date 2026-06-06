@@ -19,7 +19,7 @@ It is separate from the design document and focuses on current behavior, validat
 
 ## Current Request Flow
 
-`POST /analyze-pronunciation`
+`POST /analyze-pronunciation-llm`
 
 1. API receives `script` and `audio`.
 2. API calls internal `/predict` on the inference service.
@@ -45,7 +45,7 @@ It is separate from the design document and focuses on current behavior, validat
 
 - `GET /health`
 - `POST /predict`
-- `POST /analyze-pronunciation`
+- `POST /analyze-pronunciation-llm`
 
 ## Implemented Error Handling
 
@@ -120,6 +120,6 @@ This confirms:
 
 ## Remaining Work
 
-- Validate `/analyze-pronunciation` with real Korean speech input.
+- Validate `/analyze-pronunciation-llm` with real Korean speech input.
 - Add native baseline calibration and threshold tuning.
 - Enable and test Gemini output with a real API key.

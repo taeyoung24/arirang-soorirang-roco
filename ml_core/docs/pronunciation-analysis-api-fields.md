@@ -2,13 +2,12 @@
 
 This document explains the response fields for:
 
-- `POST /analyze-pronunciation-basic`
 - `POST /analyze-pronunciation-llm`
 - `POST /reference-cache`
 - `POST /reference-cache/generate`
 - `GET /reference-cache/{cache_key}`
 
-By default, both endpoints return a compact response. Pass `debug=true` to include full alignments and phoneme scores.
+By default, the analysis endpoint returns a compact response. Pass `debug=true` to include full alignments and phoneme scores.
 
 ## Request Fields
 
@@ -63,6 +62,7 @@ tts-reference/{cache_key}/manifest.json
 | `script` | Original target sentence from the request. |
 | `canonical_phonemes` | Target phoneme sequence generated from `script` by G2P and Hangul decomposition. Punctuation is removed. |
 | `predicted_phonemes` | MDD model's predicted phoneme sequence. |
+| `pronunciation_score` | Always-returned 0-100 heuristic pronunciation score summary. |
 | `audio_quality` | Overall recording quality summary. |
 | `phoneme_edits` | Edit-aligned mismatch summary between canonical and predicted phonemes. This is the primary error source. |
 | `diagnostic_candidates` | Candidate pronunciation issues derived from `phoneme_edits` and supporting evidence. |
@@ -81,6 +81,21 @@ The following fields are compacted unless `debug=true`:
 | `model_score` | Removed in compact mode. |
 
 ## Important Confidence Types
+
+## `pronunciation_score`
+
+This top-level score is returned by `/analyze-pronunciation-llm` in both compact and debug responses.
+
+| Field | Description |
+| --- | --- |
+| `overall` | 0-100 combined score. Higher is better. |
+| `segmental` | 0-100 score from target phoneme confidence when available, with edit-alignment fallback. |
+| `prosody` | 0-100 timing/prosody score from speech duration ratio, pauses, and stretched intervals. |
+| `audio_quality` | 0-100 recording quality score derived from reliability, clipping, and SNR. This is reported separately and does not affect `overall`. |
+| `source` | Scoring implementation identifier. Currently `heuristic_v1`. |
+| `note` | Calibration and interpretation note. |
+
+The score is a deterministic heuristic intended for app display and rough ranking. `overall` combines segmental and prosody scores plus diagnostic penalties; it does not include audio quality. It is not an externally calibrated pronunciation grade.
 
 ## Error Behavior
 

@@ -41,6 +41,12 @@ export const resolveAssetUrl = (url) => {
   return `${API_BASE_URL}${url.startsWith('/') ? url : `/${url}`}`
 }
 
+export const resolveMediaUrl = (url) => {
+  if (!url) return ''
+  if (/^https?:\/\//.test(url)) return url
+  return url.startsWith('/') ? url : `/${url}`
+}
+
 /**
  * 기본 fetch 래퍼 함수 (향후 axios로 교체 가능)
  * @param {string} endpoint - API 엔드포인트

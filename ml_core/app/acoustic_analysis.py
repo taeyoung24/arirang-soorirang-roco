@@ -93,6 +93,8 @@ class AcousticAnalyzer:
             prediction.predicted_phonemes,
             phoneme_edits,
             prediction.syllable_candidate_scores,
+            prediction.target_phoneme_scores,
+            prediction.predicted_phoneme_scores,
             prosody,
             quality,
         )
@@ -136,9 +138,17 @@ class AcousticAnalyzer:
             diagnostic_candidates=diagnostics,
             policy=EvidencePolicy(language=feedback_language),
         )
+        display_status = "needs_attention" if diagnostics else "normal"
+        has_segmental_diagnostic = any(item.category == "segmental" for item in diagnostics)
+        display_predicted_text = prediction.predicted_text if has_segmental_diagnostic else prediction.script
+        display_predicted_phonemes = prediction.predicted_phonemes if has_segmental_diagnostic else prediction.canonical_phonemes
         response = PronunciationAnalysisResponse(
             script=prediction.script,
             predicted_text=prediction.predicted_text,
+            display_pronunciation_status=display_status,
+            display_predicted_text=display_predicted_text,
+            display_predicted_phonemes=display_predicted_phonemes,
+            raw_predicted_text=prediction.predicted_text,
             canonical_phonemes=prediction.canonical_phonemes,
             predicted_phonemes=prediction.predicted_phonemes,
             pronunciation_score=pronunciation_score,
@@ -194,8 +204,16 @@ class AcousticAnalyzer:
     @staticmethod
     def _target_score_value(score) -> float:
         if score.edit_type == "match":
-            return score.confidence if score.confidence is not None else 1.0
+            if score.confidence is None:
+                return 1.0
+            return max(0.85, score.confidence)
         if score.edit_type == "substitution":
+            if score.target_posterior is not None:
+                if score.gop_like_score is not None and score.gop_like_score > -0.25:
+                    return max(0.65, score.target_posterior)
+                if score.target_posterior >= 0.45:
+                    return max(0.65, score.target_posterior)
+                return max(0.0, min(0.6, score.target_posterior))
             return 0.35 * (score.confidence if score.confidence is not None else 0.5)
         if score.edit_type == "deletion":
             return 0.0

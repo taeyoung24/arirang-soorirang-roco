@@ -100,7 +100,19 @@ def build_pronunciation_result(analysis):
     feedback_issues = _extract_feedback_issues(analysis)
     practice_focus = _extract_next_practice_focus(analysis)
     heard_text = _extract_heard_text(analysis)
-    return int(round(max(0, min(100, float(score))))), feedback, heard_text, feedback_issues, practice_focus
+    display_status = _extract_display_pronunciation_status(analysis)
+    raw_heard_text = _extract_raw_heard_text(analysis)
+    raw_predicted_phonemes = analysis.get("predicted_phonemes")
+    return (
+        int(round(max(0, min(100, float(score))))),
+        feedback,
+        heard_text,
+        display_status,
+        raw_heard_text,
+        raw_predicted_phonemes if isinstance(raw_predicted_phonemes, str) else None,
+        feedback_issues,
+        practice_focus,
+    )
 
 
 def _extract_feedback(analysis):
@@ -175,7 +187,25 @@ def _confidence_label(value):
 
 
 def _extract_heard_text(analysis):
-    predicted_text = analysis.get("predicted_text")
+    display_text = analysis.get("display_predicted_text")
+    if isinstance(display_text, str) and display_text.strip():
+        return _readable_korean_jamo(display_text.strip())
+    display_phonemes = analysis.get("display_predicted_phonemes")
+    if isinstance(display_phonemes, str) and display_phonemes.strip():
+        return _readable_korean_jamo(display_phonemes.strip())
+    return _extract_raw_heard_text(analysis)
+
+
+def _extract_display_pronunciation_status(analysis):
+    status = analysis.get("display_pronunciation_status")
+    if status in {"normal", "needs_attention"}:
+        return status
+    diagnostics = analysis.get("diagnostic_candidates") or []
+    return "needs_attention" if diagnostics else "normal"
+
+
+def _extract_raw_heard_text(analysis):
+    predicted_text = analysis.get("raw_predicted_text") or analysis.get("predicted_text")
     if isinstance(predicted_text, str) and predicted_text.strip():
         return _readable_korean_jamo(predicted_text.strip())
     predicted_phonemes = analysis.get("predicted_phonemes")

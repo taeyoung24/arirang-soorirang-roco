@@ -13,6 +13,11 @@ PRONUNCIATION_ANALYSIS_ENDPOINT = os.getenv(
 PRONUNCIATION_ANALYSIS_TIMEOUT_SECONDS = float(
     os.getenv("BACKEND_PRONUNCIATION_ANALYSIS_TIMEOUT_SECONDS", "180")
 )
+NO_RECOGNIZABLE_SPEECH_MESSAGE = "음성에서 아무 텍스트도 감지되지 않았습니다. 다시 녹음해 주세요."
+NO_RECOGNIZABLE_SPEECH_MARKERS = (
+    "No recognizable speech was detected in the audio.",
+    "Predicted phoneme sequence is empty.",
+)
 
 
 class PronunciationAnalysisError(RuntimeError):
@@ -81,7 +86,7 @@ async def analyze_pronunciation(audio_bytes, filename, target_text):
             return response.json()
     except httpx.HTTPStatusError as exc:
         detail = _extract_detail(exc.response)
-        raise PronunciationAnalysisError(f"ml_core 발음 분석 실패: {detail}") from exc
+        raise PronunciationAnalysisError(_user_facing_error_message(detail)) from exc
     except httpx.HTTPError as exc:
         raise PronunciationAnalysisError(f"ml_core 발음 분석 서비스 연결 실패: {exc}") from exc
 
@@ -203,3 +208,10 @@ def _extract_detail(response):
     if isinstance(payload, dict) and "detail" in payload:
         return payload["detail"]
     return payload
+
+
+def _user_facing_error_message(detail):
+    detail_text = str(detail)
+    if any(marker in detail_text for marker in NO_RECOGNIZABLE_SPEECH_MARKERS):
+        return NO_RECOGNIZABLE_SPEECH_MESSAGE
+    return f"ml_core 발음 분석 실패: {detail_text}"

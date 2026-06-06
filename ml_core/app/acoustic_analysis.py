@@ -208,8 +208,6 @@ class AcousticAnalyzer:
             ratio = prosody.speech_duration_ratio
             if ratio > 1.15:
                 score -= min(35.0, (ratio - 1.15) * 22.0)
-            elif ratio < 0.75:
-                score -= min(25.0, (0.75 - ratio) * 30.0)
         score -= min(25.0, prosody.interior_pause_total_ms / 160.0)
         score -= min(15.0, len(prosody.stretched_intervals) * 4.0)
         if prosody.rate_reliability == "low":

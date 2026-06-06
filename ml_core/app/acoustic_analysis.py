@@ -12,10 +12,12 @@ from app.acoustic_schemas import (
     AcousticEvidencePacket,
     AlignmentUnit,
     AudioQualitySummary,
+    DiagnosticCandidate,
     EvidencePolicy,
     ForcedAlignmentResponse,
     PronunciationScore,
     PronunciationAnalysisResponse,
+    ProsodySummary,
 )
 from app.acoustic_feature_extractor import AcousticFeatureExtractor, AudioBuffer, create_default_feature_extractor
 from app.diagnostic_engine import DiagnosticEngine
@@ -65,6 +67,7 @@ class AcousticAnalyzer:
         prediction: PredictResponse,
         forced_alignment: Optional[ForcedAlignmentResponse] = None,
         reference_alignment: Optional[ForcedAlignmentResponse] = None,
+        reference_prediction: Optional[PredictResponse] = None,
         include_llm_note: bool = False,
         feedback_language: str = "ko",
     ) -> tuple[PronunciationAnalysisResponse, AcousticEvidencePacket]:
@@ -98,6 +101,8 @@ class AcousticAnalyzer:
             prosody,
             quality,
         )
+        reference_diagnostics = self._reference_segmental_diagnostics(reference_prediction)
+        diagnostics, uncertain_diagnostics = self._split_reference_artifacts(diagnostics, reference_diagnostics)
         pronunciation_score = self._score_pronunciation(
             canonical=prediction.canonical_phonemes,
             phoneme_edits=phoneme_edits,
@@ -106,6 +111,8 @@ class AcousticAnalyzer:
             quality=quality,
             diagnostic_count=len(diagnostics),
         )
+        if not diagnostics:
+            pronunciation_score = self._perfect_score_without_confirmed_diagnostics(pronunciation_score)
         if used_forced_alignment:
             notes = [
                 "Word and syllable timings come from Qwen3 forced alignment.",
@@ -118,6 +125,8 @@ class AcousticAnalyzer:
             notes.append("LLM feedback is generated from structured evidence, not from raw audio.")
         if reference_alignment and reference_alignments:
             notes.append("Prosodic timing diagnostics compare learner speech against cached TTS reference alignment.")
+        if uncertain_diagnostics:
+            notes.append("Some segmental diagnostics were downgraded because the cached TTS reference produced the same model artifact.")
         elif used_forced_alignment:
             notes.append("No TTS reference alignment was supplied, so reference-based prosody diagnostics are unavailable.")
 
@@ -136,6 +145,7 @@ class AcousticAnalyzer:
             alignments=alignments,
             prosody=prosody,
             diagnostic_candidates=diagnostics,
+            uncertain_diagnostic_candidates=uncertain_diagnostics,
             policy=EvidencePolicy(language=feedback_language),
         )
         display_status = "needs_attention" if diagnostics else "normal"
@@ -161,9 +171,62 @@ class AcousticAnalyzer:
             alignments=alignments,
             prosody=prosody,
             diagnostic_candidates=diagnostics,
+            uncertain_diagnostic_candidates=uncertain_diagnostics,
             notes=notes,
         )
         return response, evidence
+
+    def _reference_segmental_diagnostics(self, reference_prediction: PredictResponse | None) -> list[DiagnosticCandidate]:
+        if reference_prediction is None:
+            return []
+        _observed_by_expected, reference_edits = align_phonemes(
+            reference_prediction.canonical_phonemes,
+            reference_prediction.predicted_phonemes,
+        )
+        diagnostics = self.diagnostic_engine.build(
+            reference_prediction.canonical_phonemes,
+            reference_prediction.predicted_phonemes,
+            reference_edits,
+            reference_prediction.syllable_candidate_scores,
+            reference_prediction.target_phoneme_scores,
+            reference_prediction.predicted_phoneme_scores,
+            ProsodySummary(timing_source="none"),
+            AudioQualitySummary(overall_reliability="high"),
+        )
+        return [item for item in diagnostics if item.category == "segmental"]
+
+    @staticmethod
+    def _split_reference_artifacts(
+        diagnostics: list[DiagnosticCandidate],
+        reference_diagnostics: list[DiagnosticCandidate],
+    ) -> tuple[list[DiagnosticCandidate], list[DiagnosticCandidate]]:
+        if not reference_diagnostics:
+            return diagnostics, []
+        reference_keys = {AcousticAnalyzer._diagnostic_calibration_key(item) for item in reference_diagnostics}
+        confirmed = []
+        uncertain = []
+        for item in diagnostics:
+            if item.category == "segmental" and AcousticAnalyzer._diagnostic_calibration_key(item) in reference_keys:
+                uncertain.append(item)
+            else:
+                confirmed.append(item)
+        return confirmed, uncertain
+
+    @staticmethod
+    def _diagnostic_calibration_key(item: DiagnosticCandidate) -> tuple[str, str | None]:
+        return item.diagnosis_code, item.target_unit
+
+
+    @staticmethod
+    def _perfect_score_without_confirmed_diagnostics(score: PronunciationScore) -> PronunciationScore:
+        return score.model_copy(
+            update={
+                "overall": 100.0,
+                "segmental": 100.0,
+                "prosody": 100.0,
+                "note": score.note + " Display scoring is lenient: no confirmed diagnostic candidates yields a perfect score.",
+            }
+        )
 
     @staticmethod
     def _score_pronunciation(

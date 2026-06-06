@@ -84,6 +84,23 @@ class ReferenceCacheStore:
     def get_alignment(self, key: str) -> ForcedAlignmentResponse | None:
         raise NotImplementedError
 
+    def get_audio(self, key: str) -> bytes | None:
+        raise NotImplementedError
+
+    def get_audio(self, key: str) -> bytes | None:
+        keys = self._keys(key)
+        try:
+            response = self.client.get_object(self.bucket, keys.audio)
+            try:
+                return response.read()
+            finally:
+                response.close()
+                response.release_conn()
+        except Exception as exc:
+            if self._is_not_found(exc):
+                return None
+            raise
+
     def put_reference(
         self,
         request: ReferenceCacheRequest,
@@ -104,6 +121,9 @@ class DisabledReferenceCacheStore(ReferenceCacheStore):
         return None
 
     def get_alignment(self, key: str) -> ForcedAlignmentResponse | None:
+        return None
+
+    def get_audio(self, key: str) -> bytes | None:
         return None
 
     def put_reference(

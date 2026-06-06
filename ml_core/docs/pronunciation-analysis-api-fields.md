@@ -297,7 +297,7 @@ Only returned by `/analyze-pronunciation-llm` when Gemini is configured.
 | `overall_confidence` | LLM presentation confidence. |
 | `next_practice_focus` | Suggested practice focus. |
 
-The LLM receives compact structured evidence, not raw audio. It is instructed not to invent errors outside `phoneme_edits` and `diagnostic_candidates`.
+The LLM receives compact structured evidence, not raw audio. The evidence includes the target script/canonical text, model-decoded predicted text, full canonical/predicted phoneme sequences, and compact top-diagnostic support fields. It is instructed to prioritize substantially different target-vs-predicted utterances before local phoneme coaching, and not to invent errors outside the supplied evidence.
 
 ## Recommended Client Usage
 

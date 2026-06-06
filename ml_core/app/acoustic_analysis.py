@@ -121,6 +121,8 @@ class AcousticAnalyzer:
 
         evidence = AcousticEvidencePacket(
             script=prediction.script,
+            canonical_text=prediction.canonical_text,
+            predicted_text=prediction.predicted_text,
             canonical_phonemes=prediction.canonical_phonemes,
             predicted_phonemes=prediction.predicted_phonemes,
             model_score=prediction.model_score,

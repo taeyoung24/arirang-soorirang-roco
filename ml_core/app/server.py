@@ -180,21 +180,31 @@ async def _analyze_pronunciation(
             language=(language or settings.aligner_language),
         )
         reference_alignment = None
+        reference_prediction = None
+        reference_prediction_cache_key = None
         if reference_cache_key:
             reference_alignment = reference_cache.get_alignment(reference_cache_key)
+            reference_prediction_cache_key = reference_cache_key
             if reference_alignment is None:
                 if not use_tts_reference:
                     raise HTTPException(status_code=404, detail="reference cache alignment not found")
                 reference_manifest = await asyncio.to_thread(_get_or_create_tts_reference, script, language)
+                reference_prediction_cache_key = reference_manifest.cache_key
                 reference_alignment = reference_cache.get_alignment(reference_manifest.cache_key)
         elif use_tts_reference:
             reference_manifest = await asyncio.to_thread(_get_or_create_tts_reference, script, language)
+            reference_prediction_cache_key = reference_manifest.cache_key
             reference_alignment = reference_cache.get_alignment(reference_manifest.cache_key)
+        if reference_prediction_cache_key:
+            reference_audio = reference_cache.get_audio(reference_prediction_cache_key)
+            if reference_audio is not None:
+                reference_prediction = client.predict(reference_audio, "tts-reference.wav", script)
         response = analysis_service.analyze(
             payload,
             prediction,
             forced_alignment=forced_alignment,
             reference_alignment=reference_alignment,
+            reference_prediction=reference_prediction,
             feedback_language=feedback_language,
         )
         if not debug:
@@ -283,6 +293,7 @@ def _with_tts_audio_url(manifest: TTSAssetManifest) -> TTSAssetManifest:
 def _compact_analysis_response(response: PronunciationAnalysisResponse) -> None:
     target_units = {item.target_unit for item in response.diagnostic_candidates[:3] if item.target_unit}
     response.diagnostic_candidates = response.diagnostic_candidates[:3]
+    response.uncertain_diagnostic_candidates = response.uncertain_diagnostic_candidates[:3]
     response.alignments = _compact_alignments(response.alignments, target_units)
     response.predicted_phoneme_scores = [
         score for score in response.predicted_phoneme_scores if score.phoneme in target_units

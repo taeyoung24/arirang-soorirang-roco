@@ -134,6 +134,7 @@ class AcousticEvidencePacket(BaseModel):
     alignments: list[AlignmentUnit] = Field(default_factory=list)
     prosody: Optional[ProsodySummary] = None
     diagnostic_candidates: list[DiagnosticCandidate] = Field(default_factory=list)
+    uncertain_diagnostic_candidates: list[DiagnosticCandidate] = Field(default_factory=list)
     policy: EvidencePolicy = Field(default_factory=EvidencePolicy)
 
 
@@ -182,6 +183,7 @@ class PronunciationAnalysisResponse(BaseModel):
     alignments: list[AlignmentUnit] = Field(default_factory=list)
     prosody: Optional[ProsodySummary] = None
     diagnostic_candidates: list[DiagnosticCandidate] = Field(default_factory=list)
+    uncertain_diagnostic_candidates: list[DiagnosticCandidate] = Field(default_factory=list)
     llm_feedback: Optional[AcousticLLMFeedback] = None
     notes: list[str] = Field(default_factory=list)
 

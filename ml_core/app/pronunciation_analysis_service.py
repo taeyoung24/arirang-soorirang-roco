@@ -19,6 +19,7 @@ class PronunciationAnalysisService:
         prediction: PredictResponse,
         forced_alignment: ForcedAlignmentResponse | None = None,
         reference_alignment: ForcedAlignmentResponse | None = None,
+        reference_prediction: PredictResponse | None = None,
         feedback_language: str = "ko",
     ) -> PronunciationAnalysisResponse:
         response, evidence = self.analyzer.analyze(
@@ -26,6 +27,7 @@ class PronunciationAnalysisService:
             prediction=prediction,
             forced_alignment=forced_alignment,
             reference_alignment=reference_alignment,
+            reference_prediction=reference_prediction,
             include_llm_note=self.gemini_client.enabled,
             feedback_language=feedback_language,
         )

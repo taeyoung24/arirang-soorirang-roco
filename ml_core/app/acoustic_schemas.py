@@ -121,6 +121,8 @@ class EvidencePolicy(BaseModel):
 
 class AcousticEvidencePacket(BaseModel):
     script: str
+    canonical_text: Optional[str] = None
+    predicted_text: Optional[str] = None
     canonical_phonemes: str
     predicted_phonemes: Optional[str] = None
     model_score: Optional[ModelScoreSummary] = None

@@ -102,7 +102,7 @@ curl -X POST http://localhost:8000/tts-assets/generate `
 - in-process fairseq backend에서는 hypothesis decoder score를 `model_score`로 노출
 - 앱 표시용 0-100 휴리스틱 종합 점수를 `pronunciation_score`로 항상 노출
 - MDD 음소 mismatch를 중심으로 오류 후보 생성
-- `MDD_GEMINI_API_KEY`가 있으면 상위 진단과 관련 evidence만 압축해 Gemini API로 한국어 피드백 생성
+- `MDD_GEMINI_API_KEY`가 있으면 원문/예측 문장과 전체 음소열을 기준으로, 상위 진단 관련 evidence를 보조 근거로 압축해 Gemini API 피드백 생성
 
 `language`는 forced aligner에 넘기는 발화 언어이며 기본값은 `Korean`입니다.
 `feedback_language`는 LLM 피드백 언어이며 기본값은 `ko`입니다. 예: `ko`, `en`, `ja`, `zh-CN`, `Spanish`.

@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from app.acoustic_schemas import AudioQualitySummary, DiagnosticCandidate, PhonemeEdit, ProsodySummary
-from app.schemas import SyllableCandidateScore
+from app.schemas import PredictedPhonemeScore, SyllableCandidateScore, TargetPhonemeScore
 
 
 class DiagnosticEngine:
@@ -20,6 +20,13 @@ class DiagnosticEngine:
     VERY_STRETCHED_DELTA_MS = 300
     MEDIUM_INTERIOR_PAUSE_MS = 500
     HIGH_INTERIOR_PAUSE_MS = 1200
+    ERROR_TARGET_POSTERIOR = 0.35
+    ERROR_GOP_MARGIN = -0.5
+    PLAUSIBLE_TARGET_POSTERIOR = 0.45
+    PLAUSIBLE_GOP_MARGIN = -0.25
+    DELETION_LOGPROB_MARGIN = 0.7
+    INSERTION_MIN_CONFIDENCE = 0.75
+    INSERTION_MIN_FRAME_COUNT = 2
 
     def build(
         self,
@@ -27,11 +34,20 @@ class DiagnosticEngine:
         predicted: str,
         phoneme_edits: list[PhonemeEdit],
         syllable_candidate_scores: list[SyllableCandidateScore],
+        target_phoneme_scores: list[TargetPhonemeScore],
+        predicted_phoneme_scores: list[PredictedPhonemeScore],
         prosody: ProsodySummary,
         quality: AudioQualitySummary,
     ) -> list[DiagnosticCandidate]:
         diagnostics = []
-        diagnostics.extend(self._phoneme_mismatch_diagnostics(phoneme_edits, syllable_candidate_scores))
+        diagnostics.extend(
+            self._phoneme_mismatch_diagnostics(
+                phoneme_edits,
+                syllable_candidate_scores,
+                target_phoneme_scores,
+                predicted_phoneme_scores,
+            )
+        )
         diagnostics.extend(self._prosody_diagnostics(prosody, quality))
         diagnostics.extend(self._quality_diagnostics(quality))
         return sorted(diagnostics, key=lambda item: (self._severity_rank(item.severity), item.confidence), reverse=True)
@@ -40,12 +56,27 @@ class DiagnosticEngine:
         self,
         phoneme_edits: list[PhonemeEdit],
         syllable_candidate_scores: list[SyllableCandidateScore],
+        target_phoneme_scores: list[TargetPhonemeScore],
+        predicted_phoneme_scores: list[PredictedPhonemeScore],
     ) -> list[DiagnosticCandidate]:
         diagnostics: list[DiagnosticCandidate] = []
+        target_scores_by_index = {score.canonical_index: score for score in target_phoneme_scores}
+        predicted_scores_by_index = {score.predicted_index: score for score in predicted_phoneme_scores}
         for edit in phoneme_edits:
             expected = edit.expected or ""
             observed = edit.actual or ""
             syllable_score = self._syllable_score_for_edit(edit, syllable_candidate_scores)
+            target_score = target_scores_by_index.get(edit.expected_index) if edit.expected_index is not None else None
+            if edit.edit_type == "deletion":
+                if not self._has_strong_deletion_evidence(syllable_score):
+                    continue
+            elif edit.edit_type == "substitution":
+                if not self._has_strong_substitution_evidence(target_score):
+                    continue
+            elif edit.edit_type == "insertion":
+                predicted_score = predicted_scores_by_index.get(edit.actual_index) if edit.actual_index is not None else None
+                if not self._has_strong_insertion_evidence(predicted_score):
+                    continue
             if expected in self.ASPIRATED_TO_LENIS and observed == self.ASPIRATED_TO_LENIS[expected]:
                 diagnostics.append(
                     DiagnosticCandidate(
@@ -331,7 +362,7 @@ class DiagnosticEngine:
     @staticmethod
     def _deletion_confidence(score: SyllableCandidateScore | None) -> float:
         if score is None or score.confidence is None:
-            return 0.72
+            return 0.58
         return round(max(0.5, min(0.95, score.confidence)), 4)
 
     @staticmethod
@@ -357,3 +388,24 @@ class DiagnosticEngine:
         if not details:
             return base
         return f"{base} ({', '.join(details)})"
+
+    def _has_strong_substitution_evidence(self, score: TargetPhonemeScore | None) -> bool:
+        if score is None:
+            return True
+        target_posterior = score.target_posterior
+        gop = score.gop_like_score
+        if target_posterior is None or gop is None:
+            return True
+        if target_posterior >= self.PLAUSIBLE_TARGET_POSTERIOR or gop > self.PLAUSIBLE_GOP_MARGIN:
+            return False
+        return target_posterior <= self.ERROR_TARGET_POSTERIOR and gop <= self.ERROR_GOP_MARGIN
+
+    def _has_strong_deletion_evidence(self, score: SyllableCandidateScore | None) -> bool:
+        if score is None or score.logprob_margin is None:
+            return False
+        return score.logprob_margin >= self.DELETION_LOGPROB_MARGIN
+
+    def _has_strong_insertion_evidence(self, score: PredictedPhonemeScore | None) -> bool:
+        if score is None:
+            return True
+        return score.confidence >= self.INSERTION_MIN_CONFIDENCE and score.frame_count >= self.INSERTION_MIN_FRAME_COUNT

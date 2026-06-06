@@ -166,6 +166,10 @@ class PronunciationScore(BaseModel):
 class PronunciationAnalysisResponse(BaseModel):
     script: str
     predicted_text: Optional[str] = None
+    display_pronunciation_status: Literal["normal", "needs_attention"] = "needs_attention"
+    display_predicted_text: Optional[str] = None
+    display_predicted_phonemes: Optional[str] = None
+    raw_predicted_text: Optional[str] = None
     canonical_phonemes: str
     predicted_phonemes: str
     pronunciation_score: PronunciationScore

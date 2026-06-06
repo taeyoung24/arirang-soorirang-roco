@@ -616,7 +616,16 @@ async def evaluate_pronunciation(
             filename=audio_file.filename or f"{card_id}.webm",
             target_text=target_text,
         )
-        score, feedback, heard_text, feedback_issues, next_practice_focus = build_pronunciation_result(analysis)
+        (
+            score,
+            feedback,
+            heard_text,
+            display_pronunciation_status,
+            raw_heard_text,
+            raw_predicted_phonemes,
+            feedback_issues,
+            next_practice_focus,
+        ) = build_pronunciation_result(analysis)
     except PronunciationAnalysisError as exc:
         return PronunciationResponse(
             success=False,
@@ -632,6 +641,9 @@ async def evaluate_pronunciation(
         score=score,
         feedback=feedback,
         heard_text=heard_text,
+        display_pronunciation_status=display_pronunciation_status,
+        raw_heard_text=raw_heard_text,
+        raw_predicted_phonemes=raw_predicted_phonemes,
         feedback_issues=feedback_issues,
         next_practice_focus=next_practice_focus,
         pronunciation_status="DONE",

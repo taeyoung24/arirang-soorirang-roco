@@ -271,8 +271,14 @@ export default function PronounceArea({ cardId, targetText, ttsUrl, onFinish }) 
           <div className={styles.stepHeader}>
             “{targetText}”에 대한 발음 정확성
           </div>
-          <div className={styles.centerContentGap4}>
+          <div className={styles.resultContent}>
             <div className={styles.scoreText}>{result?.score ?? 0}점</div>
+            {result?.heard_text && (
+              <div className={styles.heardPanel}>
+                <span className={styles.heardLabel}>AI가 들은 발음</span>
+                <span className={styles.heardText}>“{result.heard_text}”</span>
+              </div>
+            )}
             <div className={styles.descText}>
               {result?.feedback || '분석 결과가 없습니다.'}
             </div>

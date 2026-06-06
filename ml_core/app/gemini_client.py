@@ -66,6 +66,8 @@ class GeminiFeedbackClient:
             "requirements": [
                 "Use only the supplied evidence.",
                 "Base issues on diagnostic_candidates and phoneme_edits.",
+                "For each issue, diagnosis must name what was wrong, such as the extra, missing, substituted, stretched, or paused sound.",
+                "For each issue, evidence must compare the target pronunciation with what was heard or decoded.",
                 "Do not copy snake_case diagnosis codes into learner-facing fields.",
                 "Return 1-3 concise issues with concrete coaching.",
                 f"Write learner-facing text in {feedback_language}.",

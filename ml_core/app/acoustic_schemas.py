@@ -165,6 +165,7 @@ class PronunciationScore(BaseModel):
 
 class PronunciationAnalysisResponse(BaseModel):
     script: str
+    predicted_text: Optional[str] = None
     canonical_phonemes: str
     predicted_phonemes: str
     pronunciation_score: PronunciationScore

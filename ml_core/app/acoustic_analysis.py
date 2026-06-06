@@ -138,6 +138,7 @@ class AcousticAnalyzer:
         )
         response = PronunciationAnalysisResponse(
             script=prediction.script,
+            predicted_text=prediction.predicted_text,
             canonical_phonemes=prediction.canonical_phonemes,
             predicted_phonemes=prediction.predicted_phonemes,
             pronunciation_score=pronunciation_score,

@@ -868,13 +868,6 @@
     "tts_url": null
   },
   {
-    "id": "e7f6e950",
-    "meaning_id": "cb1549b3",
-    "content": "풀이 과정이 맞는지 봐요.",
-    "highlight": "맞는지",
-    "tts_url": null
-  },
-  {
     "id": "db683ef4",
     "meaning_id": "33fb6658",
     "content": "손님을 반갑게 맞아요.",
@@ -886,13 +879,6 @@
     "meaning_id": "33fb6658",
     "content": "웃으며 친구를 맞았다.",
     "highlight": "맞았다",
-    "tts_url": null
-  },
-  {
-    "id": "732d06a7",
-    "meaning_id": "33fb6658",
-    "content": "신부를 맞으러 가요.",
-    "highlight": "맞으러",
     "tts_url": null
   },
   {
@@ -940,7 +926,7 @@
   {
     "id": "2e5a49ce",
     "meaning_id": "70e3c63e",
-    "content": "그는 몽둥이로 등을 맞았습니다.",
+    "content": "몽둥이로 맞았습니다.",
     "highlight": "맞았습니다",
     "tts_url": null
   },
@@ -980,13 +966,6 @@
     "tts_url": null
   },
   {
-    "id": "7863417a",
-    "meaning_id": "9b34c2be",
-    "content": "참 정겨운 시골 마을이네요.",
-    "highlight": "정겨운",
-    "tts_url": null
-  },
-  {
     "id": "2afbacf0",
     "meaning_id": "9b34c2be",
     "content": "그는 참 익살맞은 사람이에요.",
@@ -998,13 +977,6 @@
     "meaning_id": "9b34c2be",
     "content": "동생은 유난히 심술맞아요.",
     "highlight": "심술맞아요",
-    "tts_url": null
-  },
-  {
-    "id": "e492de3c",
-    "meaning_id": "9b34c2be",
-    "content": "오늘은 정말 복스러운 날이죠.",
-    "highlight": "복스러운",
     "tts_url": null
   },
   {
@@ -1180,48 +1152,6 @@
     "meaning_id": "09669b6e",
     "content": "어서 안으로 들어요.",
     "highlight": "들어요",
-    "tts_url": null
-  },
-  {
-    "id": "41fd6158",
-    "meaning_id": "09669b6e",
-    "content": "그늘로 들어 가세요.",
-    "highlight": "들어",
-    "tts_url": null
-  },
-  {
-    "id": "c88f8404",
-    "meaning_id": "9a58cfe4",
-    "content": "비가 그치고 볕이 드네요.",
-    "highlight": "드네요",
-    "tts_url": null
-  },
-  {
-    "id": "6d830382",
-    "meaning_id": "9a58cfe4",
-    "content": "날이 들면 산책 가요.",
-    "highlight": "들면",
-    "tts_url": null
-  },
-  {
-    "id": "6fb8606a",
-    "meaning_id": "9a58cfe4",
-    "content": "오후에는 날이 들겠습니다.",
-    "highlight": "들겠습니다",
-    "tts_url": null
-  },
-  {
-    "id": "f6ef950f",
-    "meaning_id": "9a58cfe4",
-    "content": "눈이 멈추고 날이 들어요.",
-    "highlight": "들어요",
-    "tts_url": null
-  },
-  {
-    "id": "090db26f",
-    "meaning_id": "9a58cfe4",
-    "content": "드디어 날이 말끔히 들었네요.",
-    "highlight": "들었네요",
     "tts_url": null
   },
   {

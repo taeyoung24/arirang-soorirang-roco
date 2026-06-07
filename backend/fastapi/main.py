@@ -58,6 +58,11 @@ from db_models import (
     SentenceDB,
     RecentLearningRecordDB,
 )
+from pronunciation_client import (
+    PronunciationAnalysisError,
+    analyze_pronunciation,
+    build_pronunciation_result,
+)
 
 # =============================================================================
 # FastAPI 앱 초기화
@@ -579,7 +584,7 @@ async def evaluate_pronunciation(
     사용자가 녹음한 음성 파일과 발음 대상 텍스트를 전송하면
     발음 점수와 피드백을 반환합니다.
 
-    현재는 실제 음성 분석 모델 없이 고정 더미 결과를 반환합니다. (추후 AI 모델 연동 예정)
+    백엔드는 프론트용 응답 형식을 유지하고, 실제 분석은 ml_core API에 위임합니다.
     """
 
     quiz = db.query(QuizDB).filter(QuizDB.card_id == card_id).one_or_none()
@@ -597,13 +602,35 @@ async def evaluate_pronunciation(
             message="업로드된 음성 파일이 없습니다.",
         )
 
+    audio_bytes = await audio_file.read()
+    if not audio_bytes:
+        return PronunciationResponse(
+            success=False,
+            data=None,
+            message="업로드된 음성 파일이 비어 있습니다.",
+        )
+
+    try:
+        analysis = await analyze_pronunciation(
+            audio_bytes=audio_bytes,
+            filename=audio_file.filename or f"{card_id}.webm",
+            target_text=target_text,
+        )
+        score, feedback = build_pronunciation_result(analysis)
+    except PronunciationAnalysisError as exc:
+        return PronunciationResponse(
+            success=False,
+            data=None,
+            message=str(exc),
+        )
+
     touch_recent_learning_record(db, card_id)
     db.commit()
 
     data = PronunciationResult(
         card_id=card_id,
-        score=89,
-        feedback="전반적인 발음은 정확하나, 일부 음절 연결이 다소 부자연스럽습니다.",
+        score=score,
+        feedback=feedback,
         pronunciation_status="DONE",
         is_card_completed=True,
     )

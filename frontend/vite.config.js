@@ -9,6 +9,15 @@ export default defineConfig({
       src: path.resolve(__dirname, './src')
     }
   },
+  server: {
+    proxy: {
+      '/ml': {
+        target: 'http://localhost:8000',
+        changeOrigin: true,
+        rewrite: (url) => url.replace(/^\/ml/, ''),
+      },
+    },
+  },
   plugins: [
     react(),
     VitePWA({

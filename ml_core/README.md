@@ -72,18 +72,7 @@ curl -X POST http://localhost:8000/predict `
   -F "audio=@.\sample.wav"
 ```
 
-기본 음향 분석 요청:
-
-```powershell
-curl -X POST http://localhost:8000/analyze-pronunciation-basic `
-  -F "script=옷을 입어요" `
-  -F "feedback_language=ko" `
-  -F "use_tts_reference=true" `
-  -F "debug=false" `
-  -F "audio=@.\sample.wav"
-```
-
-LLM 피드백 포함 분석 요청:
+발음 분석 요청:
 
 ```powershell
 curl -X POST http://localhost:8000/analyze-pronunciation-llm `
@@ -111,9 +100,9 @@ curl -X POST http://localhost:8000/tts-assets/generate `
 - 정렬 결과를 바탕으로 음절/단어 구간 생성
 - `use_tts_reference=true`이면 TTS reference를 자동 생성/캐싱하고, cached TTS reference alignment와 사용자 timing을 비교해 늘어짐/중간 공백 후보 생성
 - in-process fairseq backend에서는 hypothesis decoder score를 `model_score`로 노출
+- 앱 표시용 0-100 휴리스틱 종합 점수를 `pronunciation_score`로 항상 노출
 - MDD 음소 mismatch를 중심으로 오류 후보 생성
-- `/analyze-pronunciation-llm`에서는 `MDD_GEMINI_API_KEY`가 있으면 상위 진단과 관련 evidence만 압축해 Gemini API로 한국어 피드백 생성
-- `/analyze-pronunciation-basic`은 Gemini 키가 있어도 LLM을 호출하지 않음
+- `MDD_GEMINI_API_KEY`가 있으면 원문/예측 문장과 전체 음소열을 기준으로, 상위 진단 관련 evidence를 보조 근거로 압축해 Gemini API 피드백 생성
 
 `language`는 forced aligner에 넘기는 발화 언어이며 기본값은 `Korean`입니다.
 `feedback_language`는 LLM 피드백 언어이며 기본값은 `ko`입니다. 예: `ko`, `en`, `ja`, `zh-CN`, `Spanish`.
@@ -124,6 +113,7 @@ curl -X POST http://localhost:8000/tts-assets/generate `
 - 강제정렬은 별도 `aligner` 컨테이너에서 수행됩니다.
 - 분석 API는 강제정렬에 실패하면 fallback 분석을 반환하지 않고 오류를 반환합니다.
 - 발음 오류 판정은 MDD phoneme edit alignment를 우선합니다.
+- `pronunciation_score.overall`은 target phoneme confidence, timing/prosody, diagnostic penalty를 합친 휴리스틱 점수입니다. `audio_quality` 점수는 별도로 표시되며 overall에는 반영되지 않습니다.
 - `model_score`는 calibrated GOP가 아니라 decoder hypothesis score이므로, 음소별 confidence로 쓰려면 추가 calibration/후처리가 필요합니다.
 
 ## CLI

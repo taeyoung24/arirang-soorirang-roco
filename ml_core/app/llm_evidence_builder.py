@@ -16,8 +16,10 @@ class LLMEvidenceBuilder:
         phoneme_edits = self._relevant_edits(evidence.phoneme_edits, target_units, max_diagnostics)
         return AcousticEvidencePacket(
             script=evidence.script,
-            canonical_phonemes="",
-            predicted_phonemes=None,
+            canonical_text=evidence.canonical_text,
+            predicted_text=evidence.predicted_text,
+            canonical_phonemes=evidence.canonical_phonemes,
+            predicted_phonemes=evidence.predicted_phonemes,
             model_score=None,
             predicted_phoneme_scores=[
                 score

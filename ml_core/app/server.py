@@ -3,7 +3,7 @@ from __future__ import annotations
 import asyncio
 
 import httpx
-from fastapi import FastAPI, File, Form, HTTPException, UploadFile
+from fastapi import FastAPI, File, Form, HTTPException, Response, UploadFile
 
 from app.acoustic_analysis import AcousticAnalyzer
 from app.acoustic_schemas import ForcedAlignmentResponse, PronunciationAnalysisResponse
@@ -177,7 +177,15 @@ def get_tts_asset_manifest(cache_key: str) -> TTSAssetManifest:
     manifest = tts_asset_store.get_manifest(cache_key)
     if manifest is None:
         raise HTTPException(status_code=404, detail="TTS asset not found")
-    return manifest
+    return _with_tts_audio_url(manifest)
+
+
+@app.get("/tts-assets/{cache_key}/audio")
+def get_tts_asset_audio(cache_key: str) -> Response:
+    audio = tts_asset_store.get_audio(cache_key)
+    if audio is None:
+        raise HTTPException(status_code=404, detail="TTS asset audio not found")
+    return Response(content=audio, media_type="audio/wav")
 
 
 @app.post(
@@ -195,7 +203,7 @@ def generate_tts_asset(
     audio_format: str = Form("wav_16khz_mono"),
 ) -> TTSAssetManifest:
     try:
-        return _get_or_create_tts_asset(
+        manifest = _get_or_create_tts_asset(
             text=text,
             language=language,
             tts_provider=tts_provider,
@@ -204,36 +212,11 @@ def generate_tts_asset(
             speaking_rate=speaking_rate,
             audio_format=audio_format,
         )
+        return _with_tts_audio_url(manifest)
     except ValueError as exc:
         raise HTTPException(status_code=400, detail=str(exc)) from exc
     except RuntimeError as exc:
         raise HTTPException(status_code=503, detail=str(exc)) from exc
-
-
-@app.post(
-    "/analyze-pronunciation-basic",
-    response_model=PronunciationAnalysisResponse,
-    response_model_exclude_none=True,
-)
-async def analyze_pronunciation_basic(
-    script: str = Form(...),
-    language: str | None = Form(None),
-    feedback_language: str = Form("ko"),
-    reference_cache_key: str | None = Form(None),
-    use_tts_reference: bool = Form(True),
-    debug: bool = Form(False),
-    audio: UploadFile = File(...),
-) -> PronunciationAnalysisResponse:
-    return await _analyze_pronunciation(
-        script=script,
-        language=language,
-        feedback_language=feedback_language,
-        reference_cache_key=reference_cache_key,
-        use_tts_reference=use_tts_reference,
-        debug=debug,
-        audio=audio,
-        include_llm_feedback=False,
-    )
 
 
 @app.post(
@@ -258,7 +241,6 @@ async def analyze_pronunciation_llm(
         use_tts_reference=use_tts_reference,
         debug=debug,
         audio=audio,
-        include_llm_feedback=True,
     )
 
 
@@ -270,7 +252,6 @@ async def _analyze_pronunciation(
     use_tts_reference: bool,
     debug: bool,
     audio: UploadFile,
-    include_llm_feedback: bool,
 ) -> PronunciationAnalysisResponse:
     try:
         payload = await audio.read()
@@ -297,7 +278,6 @@ async def _analyze_pronunciation(
             prediction,
             forced_alignment=forced_alignment,
             reference_alignment=reference_alignment,
-            include_llm_feedback=include_llm_feedback,
             feedback_language=feedback_language,
         )
         if not debug:
@@ -372,6 +352,15 @@ def _get_or_create_tts_asset(
     )
     tts_audio = generator.generate(request.text)
     return tts_asset_store.put_asset(request, tts_audio.audio_bytes)
+
+
+def _with_tts_audio_url(manifest: TTSAssetManifest) -> TTSAssetManifest:
+    audio_path = f"/tts-assets/{manifest.cache_key}/audio"
+    if settings.tts_asset_public_base_url:
+        audio_url = f"{settings.tts_asset_public_base_url}{audio_path}"
+    else:
+        audio_url = audio_path
+    return manifest.model_copy(update={"audio_url": audio_url})
 
 
 def _compact_analysis_response(response: PronunciationAnalysisResponse) -> None:

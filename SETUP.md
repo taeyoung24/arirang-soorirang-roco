@@ -88,6 +88,9 @@ docker compose ps
 
 ### 5. DB 마이그레이션 적용
 
+Docker Compose로 백엔드를 실행하는 경우 컨테이너 시작 시 `alembic upgrade head`가 자동으로 실행됩니다.
+로컬에서 백엔드를 직접 실행하거나 마이그레이션 상태를 수동 확인하려면 아래 명령을 실행합니다.
+
 ```bash
 cd backend/fastapi
 alembic upgrade head
@@ -95,6 +98,33 @@ cd ../..
 ```
 
 마이그레이션은 `backend/fastapi/alembic/versions/` 아래에 있는 revision 파일을 기준으로 PostgreSQL 테이블을 생성합니다.
+
+---
+
+### 5-1. 퀴즈 TTS 자동 생성
+
+Docker Compose로 백엔드를 실행하면 `seed.py`가 퀴즈를 생성할 때 `ml-api`의 `POST /tts-assets/generate`를 호출해 TTS 파일을 생성합니다.
+생성된 오디오는 MinIO에 저장되고, 백엔드 DB의 `quizzes.tts_url`에는 응답의 `audio_url`이 저장됩니다.
+기본 Docker Compose 환경에서는 `audio_url`이 `/ml/tts-assets/{cache_key}/audio` 형태이며, 프론트엔드 Nginx가 이 경로를 `ml-api`로 프록시합니다.
+
+TTS 생성에는 `ml-api`와 `ml-minio`만 필요합니다. GPU 기반 발음 분석 서비스까지 함께 실행하려면 profile을 켭니다.
+
+```bash
+docker compose --profile ml-gpu up -d
+```
+
+기본값은 TTS 생성 실패 시 경고만 출력하고 퀴즈 생성은 계속 진행합니다. TTS 생성 실패 시 백엔드 시작을 중단하려면 `.env`에 아래 값을 설정합니다.
+
+```bash
+BACKEND_TTS_GENERATION_REQUIRED=true
+```
+
+발음 평가는 백엔드의 `POST /api/v1/cards/{card_id}/pronunciation` API가 `ml-api`의 발음 분석 API로 요청을 전달합니다.
+실제 분석에는 `ml-inference`, `ml-aligner`가 필요하므로 아래처럼 GPU profile을 함께 실행해야 합니다.
+
+```bash
+docker compose --profile ml-gpu up -d
+```
 
 ---
 

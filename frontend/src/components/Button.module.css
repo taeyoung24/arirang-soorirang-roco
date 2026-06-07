@@ -50,6 +50,11 @@
   transform: scale(0.95);
 }
 
+.pronounceButton:disabled {
+  cursor: not-allowed;
+  opacity: 0.45;
+}
+
 .pronounceButtonText {
   text-align: center;
   color: var(--color-text);

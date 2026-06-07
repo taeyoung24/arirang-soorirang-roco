@@ -1,5 +1,5 @@
 from typing import List, Optional
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 
 # =============================================================================
@@ -172,6 +172,19 @@ class AnswerSubmitResponse(BaseModel):
     message: Optional[str] = None
 
 
+class PronunciationFeedbackIssue(BaseModel):
+    """
+    발음 피드백 상세 항목 모델
+    """
+
+    unit: Optional[str] = None
+    category: Optional[str] = None
+    diagnosis: str
+    evidence: Optional[str] = None
+    coaching: Optional[str] = None
+    confidence: Optional[str] = None
+
+
 class PronunciationResult(BaseModel):
     """
     발음 평가 결과 모델
@@ -180,6 +193,9 @@ class PronunciationResult(BaseModel):
     card_id: str
     score: int
     feedback: str
+    heard_text: Optional[str] = None
+    feedback_issues: List[PronunciationFeedbackIssue] = Field(default_factory=list)
+    next_practice_focus: List[str] = Field(default_factory=list)
     pronunciation_status: str
     is_card_completed: bool
 

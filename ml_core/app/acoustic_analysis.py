@@ -138,6 +138,7 @@ class AcousticAnalyzer:
         )
         response = PronunciationAnalysisResponse(
             script=prediction.script,
+            predicted_text=prediction.predicted_text,
             canonical_phonemes=prediction.canonical_phonemes,
             predicted_phonemes=prediction.predicted_phonemes,
             pronunciation_score=pronunciation_score,
@@ -207,8 +208,6 @@ class AcousticAnalyzer:
             ratio = prosody.speech_duration_ratio
             if ratio > 1.15:
                 score -= min(35.0, (ratio - 1.15) * 22.0)
-            elif ratio < 0.75:
-                score -= min(25.0, (0.75 - ratio) * 30.0)
         score -= min(25.0, prosody.interior_pause_total_ms / 160.0)
         score -= min(15.0, len(prosody.stretched_intervals) * 4.0)
         if prosody.rate_reliability == "low":
@@ -217,11 +216,11 @@ class AcousticAnalyzer:
 
     @staticmethod
     def _audio_quality_score(quality: AudioQualitySummary) -> float:
-        base = {"high": 100.0, "medium": 82.0, "low": 60.0}[quality.overall_reliability]
+        base = {"high": 100.0, "medium": 92.0, "low": 75.0}[quality.overall_reliability]
         if quality.clipping_detected:
-            base -= 15.0
-        if quality.snr_db is not None and quality.snr_db < 12.0:
-            base -= min(20.0, (12.0 - quality.snr_db) * 2.0)
+            base -= 8.0
+        if quality.snr_db is not None and quality.snr_db < 6.0:
+            base -= min(15.0, (6.0 - quality.snr_db) * 2.0)
         return max(0.0, min(100.0, base))
 
     @classmethod
@@ -322,7 +321,8 @@ class AcousticAnalyzer:
         if len(audio.samples) == 0:
             return AudioQualitySummary(overall_reliability="low")
         peak = float(np.max(np.abs(audio.samples)))
-        clipping_detected = peak >= 0.999
+        clipped_ratio = float(np.mean(np.abs(audio.samples) >= 0.999))
+        clipping_detected = peak >= 0.999 and clipped_ratio >= 0.01
         rms = float(np.sqrt(np.mean(np.square(audio.samples)) + 1e-9))
         tail = audio.samples[-min(len(audio.samples), audio.sample_rate // 3 or 1) :]
         noise_floor = float(np.sqrt(np.mean(np.square(tail)) + 1e-9))
@@ -330,9 +330,9 @@ class AcousticAnalyzer:
         zero_cross = np.mean(np.abs(np.diff(np.signbit(audio.samples))).astype(np.float32))
         voiced_ratio = max(0.0, min(1.0, 1.0 - float(zero_cross)))
         reliability = "high"
-        if clipping_detected or snr_db < 12.0:
+        if snr_db < 6.0:
             reliability = "low"
-        elif snr_db < 20.0:
+        elif clipping_detected or snr_db < 12.0:
             reliability = "medium"
         return AudioQualitySummary(
             snr_db=round(snr_db, 2),

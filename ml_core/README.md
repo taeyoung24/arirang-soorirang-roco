@@ -64,14 +64,6 @@ docker compose up --build
 curl http://localhost:8000/health
 ```
 
-예측 요청:
-
-```powershell
-curl -X POST http://localhost:8000/predict `
-  -F "script=옷을 입어요" `
-  -F "audio=@.\sample.wav"
-```
-
 발음 분석 요청:
 
 ```powershell

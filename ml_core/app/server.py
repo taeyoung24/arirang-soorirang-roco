@@ -13,7 +13,7 @@ from app.gemini_client import GeminiFeedbackClient
 from app.inference_client import InferenceClient
 from app.pronunciation_analysis_service import PronunciationAnalysisService
 from app.reference_cache import ReferenceCacheManifest, ReferenceCacheRequest, create_reference_cache_store
-from app.schemas import HealthResponse, PredictResponse
+from app.schemas import HealthResponse
 from app.tts_asset_cache import TTSAssetManifest, TTSAssetRequest, create_tts_asset_store
 from app.tts_reference import EdgeTTSReferenceGenerator, create_tts_reference_generator
 
@@ -83,89 +83,6 @@ def healthcheck() -> HealthResponse:
         tts_provider=settings.tts_provider,
         tts_voice_id=settings.tts_voice_id,
     )
-
-
-@app.post("/predict", response_model=PredictResponse, response_model_exclude_none=True)
-async def predict(
-    script: str = Form(...),
-    audio: UploadFile = File(...),
-) -> PredictResponse:
-    try:
-        payload = await audio.read()
-        return client.predict(payload, audio.filename or "input.wav", script)
-    except httpx.HTTPStatusError as exc:
-        raise HTTPException(status_code=exc.response.status_code, detail=_extract_upstream_detail(exc)) from exc
-    except httpx.HTTPError as exc:
-        raise HTTPException(status_code=502, detail=f"inference service unavailable: {exc}") from exc
-
-
-@app.get(
-    "/reference-cache/{cache_key}",
-    response_model=ReferenceCacheManifest,
-    response_model_exclude_none=True,
-)
-def get_reference_cache_manifest(cache_key: str) -> ReferenceCacheManifest:
-    manifest = reference_cache.get_manifest(cache_key)
-    if manifest is None:
-        raise HTTPException(status_code=404, detail="reference cache entry not found")
-    return manifest
-
-
-@app.post(
-    "/reference-cache",
-    response_model=ReferenceCacheManifest,
-    response_model_exclude_none=True,
-)
-async def put_reference_cache(
-    script: str = Form(...),
-    alignment_json: str = Form(...),
-    language: str = Form("Korean"),
-    tts_provider: str = Form("unknown"),
-    tts_model: str = Form("unknown"),
-    voice_id: str = Form("default"),
-    speaking_rate: float = Form(1.0),
-    audio_format: str = Form("wav_16khz_mono"),
-    aligner_model_id: str = Form("Qwen/Qwen3-ForcedAligner-0.6B"),
-    alignment_resolution_ms: int = Form(80),
-    audio: UploadFile = File(...),
-) -> ReferenceCacheManifest:
-    try:
-        alignment = ForcedAlignmentResponse.model_validate_json(alignment_json)
-        request = ReferenceCacheRequest(
-            script=script,
-            language=language,
-            tts_provider=tts_provider,
-            tts_model=tts_model,
-            voice_id=voice_id,
-            speaking_rate=speaking_rate,
-            audio_format=audio_format,
-            aligner_model_id=aligner_model_id,
-            alignment_resolution_ms=alignment_resolution_ms,
-        )
-        return reference_cache.put_reference(request, await audio.read(), alignment)
-    except ValueError as exc:
-        raise HTTPException(status_code=400, detail=str(exc)) from exc
-    except RuntimeError as exc:
-        raise HTTPException(status_code=503, detail=str(exc)) from exc
-
-
-@app.post(
-    "/reference-cache/generate",
-    response_model=ReferenceCacheManifest,
-    response_model_exclude_none=True,
-)
-def generate_reference_cache(
-    script: str = Form(...),
-    language: str | None = Form(None),
-) -> ReferenceCacheManifest:
-    try:
-        return _get_or_create_tts_reference(script, language)
-    except httpx.HTTPStatusError as exc:
-        raise HTTPException(status_code=exc.response.status_code, detail=_extract_upstream_detail(exc)) from exc
-    except httpx.HTTPError as exc:
-        raise HTTPException(status_code=502, detail=f"aligner service unavailable: {exc}") from exc
-    except RuntimeError as exc:
-        raise HTTPException(status_code=503, detail=str(exc)) from exc
 
 
 @app.get(

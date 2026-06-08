@@ -3,7 +3,7 @@
 :root {
   /* Colors from design guide */
   --color-text: #2c2c2c;
-  --color-text-dimmed: #7d7d7d;
+  --color-text-dimmed: rgba(44, 44, 44, 0.6);
   --color-text-light: #c7c7c7;
 
   --color-ari-primary: #d95b7a;

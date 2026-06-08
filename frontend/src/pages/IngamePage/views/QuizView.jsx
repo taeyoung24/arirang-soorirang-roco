@@ -94,14 +94,14 @@ export default function QuizView({ card, title = '', progress = '', onStageUnloc
   return (
     <div className={styles.contentWrapper}>
       <div className={styles.textArea}>
-        <div className={styles.title}>
-          {t('quiz_instruction')}
-        </div>
         {(title || progress) && (
-          <div className={styles.normalText}>
+          <div className={styles.metaText}>
             {title} {progress}
           </div>
         )}
+        <div className={styles.title}>
+          {t('quiz_instruction')}
+        </div>
       </div>
 
       <div className={styles.questionWrapper}>

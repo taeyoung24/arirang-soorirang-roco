@@ -63,7 +63,7 @@ class WhisperPronunciationAnalysisService:
         canonical_phonemes = self.analyzer._decompose_hangul(script)
         predicted_phonemes = self.analyzer._decompose_hangul(transcription.text)
         transcript_match = self._transcript_match(script, transcription.text)
-        edits = [] if transcript_match["status"] == "pass" else self._character_edits(script, transcription.text)
+        edits = self._character_edits(script, transcription.text)
         observed_by_expected = list(canonical_phonemes)
         alignments, used_forced_alignment = self.analyzer._resolve_alignments(
             script,
@@ -85,10 +85,13 @@ class WhisperPronunciationAnalysisService:
             prosody,
             quality,
         )
+        if transcript_match["status"] != "pass":
+            # Target-based forced alignment/prosody becomes unreliable when ASR hears different text.
+            diagnostics = [item for item in diagnostics if item.category == "quality"]
         if transcript_match["status"] == "fail":
-            diagnostics.insert(0, self._asr_mismatch_diagnostic(script, transcription.text, transcript_match["cer"]))
+            diagnostics.insert(0, self._asr_mismatch_diagnostic(script, transcription.text, transcript_match["cer"], edits))
         elif transcript_match["status"] == "uncertain":
-            diagnostics.insert(0, self._asr_uncertain_diagnostic(script, transcription.text, transcript_match["cer"]))
+            diagnostics.insert(0, self._asr_uncertain_diagnostic(script, transcription.text, transcript_match["cer"], edits))
 
         score = self._score(transcript_match["cer"], transcript_match["status"], prosody, quality, diagnostics)
         display_status = "needs_attention" if diagnostics else "normal"
@@ -172,7 +175,7 @@ class WhisperPronunciationAnalysisService:
             return {"cer": 1.0, "status": "fail"}
         similarity = SequenceMatcher(a=target, b=observed).ratio()
         cer = max(0.0, min(1.0, 1.0 - similarity))
-        if cer <= 0.12:
+        if target == observed:
             status = "pass"
         elif cer <= 0.32:
             status = "uncertain"
@@ -188,7 +191,7 @@ class WhisperPronunciationAnalysisService:
             segmental = max(70.0, 92.0 - cer * 100.0)
         else:
             segmental = max(35.0, 85.0 - cer * 120.0)
-        prosody_score = AcousticAnalyzer._prosody_score(prosody)
+        prosody_score = 100.0 if status != "pass" else AcousticAnalyzer._prosody_score(prosody)
         audio_quality_score = AcousticAnalyzer._audio_quality_score(quality)
         overall = 0.78 * segmental + 0.22 * prosody_score
         overall -= min(10.0, len(diagnostics) * 1.5)
@@ -204,28 +207,42 @@ class WhisperPronunciationAnalysisService:
         )
 
     @staticmethod
-    def _asr_mismatch_diagnostic(script: str, transcript: str, cer: float) -> DiagnosticCandidate:
+    def _asr_mismatch_diagnostic(script: str, transcript: str, cer: float, edits: list[PhonemeEdit]) -> DiagnosticCandidate:
         return DiagnosticCandidate(
             diagnosis_code="asr_transcript_mismatch",
             category="segmental",
-            target_unit=None,
+            target_unit=WhisperPronunciationAnalysisService._target_unit_from_edits(edits),
             severity="high",
             confidence=max(0.7, min(0.95, 0.65 + cer)),
             evidence_keys=["whisper_transcript_agreement"],
-            rationale=f"Whisper transcript differs from the target script: target={script!r}, transcript={transcript!r}.",
+            rationale=f"Whisper transcript differs from the target script: target={script!r}, transcript={transcript!r}, edits={WhisperPronunciationAnalysisService._edit_summary(edits)}.",
         )
 
     @staticmethod
-    def _asr_uncertain_diagnostic(script: str, transcript: str, cer: float) -> DiagnosticCandidate:
+    def _asr_uncertain_diagnostic(script: str, transcript: str, cer: float, edits: list[PhonemeEdit]) -> DiagnosticCandidate:
         return DiagnosticCandidate(
             diagnosis_code="asr_transcript_uncertain",
             category="segmental",
-            target_unit=None,
+            target_unit=WhisperPronunciationAnalysisService._target_unit_from_edits(edits),
             severity="medium",
             confidence=max(0.5, min(0.75, 0.45 + cer)),
             evidence_keys=["whisper_transcript_agreement"],
-            rationale=f"Whisper transcript partially differs from the target script: target={script!r}, transcript={transcript!r}.",
+            rationale=f"Whisper transcript partially differs from the target script: target={script!r}, transcript={transcript!r}, edits={WhisperPronunciationAnalysisService._edit_summary(edits)}.",
         )
+
+    @staticmethod
+    def _target_unit_from_edits(edits: list[PhonemeEdit]) -> str | None:
+        for edit in edits:
+            if edit.expected:
+                return edit.expected
+        return None
+
+    @staticmethod
+    def _edit_summary(edits: list[PhonemeEdit]) -> list[dict[str, str | None]]:
+        return [
+            {"type": edit.edit_type, "expected": edit.expected, "actual": edit.actual}
+            for edit in edits[:3]
+        ]
 
     @classmethod
     def _character_edits(cls, script: str, transcript: str) -> list[PhonemeEdit]:

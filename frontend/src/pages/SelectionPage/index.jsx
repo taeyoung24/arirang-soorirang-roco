@@ -178,7 +178,7 @@ export default function SelectionPage() {
                 key={section.category.category_id}
                 title={section.category.name_ko}
                 items={section.items}
-                onItemClick={(item) => handleTransition(`/ingame/${item.set_id}`, 'var(--color-yellow-primary)')}
+                onItemClick={(item) => handleTransition(`/ingame/${item.set_id}?word=${encodeURIComponent(item.word)}`, 'var(--color-yellow-primary)')}
               />
             ))
           ) : (

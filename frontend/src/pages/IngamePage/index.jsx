@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
-import { useNavigate, useParams } from 'react-router-dom'
+import { useNavigate, useParams, useSearchParams } from 'react-router-dom'
 import { getSetCards } from 'src/api'
 import Layout from 'src/components/Layout'
 import { IngameTopContainer } from 'src/components/TopContainer'
@@ -11,6 +11,8 @@ import QuizView from './views/QuizView'
 export default function IngamePage() {
   const navigate = useNavigate()
   const { setId } = useParams()
+  const [searchParams] = useSearchParams()
+  const selectedWord = searchParams.get('word') || ''
 
   const [currentStep] = useState('quiz')
   const [isStageUnlocked, setIsStageUnlocked] = useState(false)
@@ -45,10 +47,17 @@ export default function IngamePage() {
       try {
         setIsLoading(true)
         const data = await getSetCards(setId)
+        const filteredCards = selectedWord
+          ? data.cards.filter((card) => card.polysemy_word === selectedWord)
+          : data.cards
 
         if (!isMounted) return
 
-        setSetData(data)
+        setSetData({
+          ...data,
+          title: selectedWord ? `${data.title} · ${selectedWord}` : data.title,
+          cards: filteredCards,
+        })
         setStageCount(1)
         setCurrentIndex(0)
         currentIndexRef.current = 0
@@ -69,7 +78,7 @@ export default function IngamePage() {
     return () => {
       isMounted = false
     }
-  }, [setId])
+  }, [setId, selectedWord])
 
   const handleBack = () => {
     setIsExiting(true)
@@ -151,6 +160,7 @@ export default function IngamePage() {
                 <div key={index} className={styles.stageItem}>
                   {currentStep === 'quiz' && (
                     <QuizView
+                      key={cards[index]?.card_id}
                       card={cards[index]}
                       title={setData?.title || ''}
                       progress={`${index + 1}/${cards.length}`}

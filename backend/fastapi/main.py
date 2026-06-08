@@ -189,7 +189,7 @@ def get_cards_for_set(db: Session, set_id: str):
     for quiz in set_quizzes:
         choices = [
             Choice(choice_id=choice.choice_id, text=choice.text)
-            for choice in quiz.choices
+            for choice in sorted(quiz.choices, key=lambda choice: choice.choice_id)
         ]
         cards.append(
             LearningCard(

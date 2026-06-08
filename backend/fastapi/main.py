@@ -287,9 +287,6 @@ def get_recent_cards_from_db(db: Session):
             if len(recent_cards) >= 6:
                 return recent_cards
 
-        if recent_cards:
-            return recent_cards
-
     fallback_time = datetime.now(timezone.utc)
     quizzes = (
         db.query(QuizDB)

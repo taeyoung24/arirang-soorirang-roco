@@ -46,8 +46,8 @@ class WhisperPronunciationAnalysisService:
         quality = self.analyzer._analyze_audio_quality(audio)
         canonical_phonemes = self.analyzer._decompose_hangul(script)
         predicted_phonemes = self.analyzer._decompose_hangul(transcription.text)
-        edits = self._character_edits(script, transcription.text)
         transcript_match = self._transcript_match(script, transcription.text)
+        edits = [] if transcript_match["status"] == "pass" else self._character_edits(script, transcription.text)
         observed_by_expected = list(canonical_phonemes)
         alignments, used_forced_alignment = self.analyzer._resolve_alignments(
             script,
@@ -76,7 +76,7 @@ class WhisperPronunciationAnalysisService:
 
         score = self._score(transcript_match["cer"], transcript_match["status"], prosody, quality, diagnostics)
         display_status = "needs_attention" if diagnostics else "normal"
-        display_predicted_text = transcription.text if transcript_match["status"] == "fail" else script
+        display_predicted_text = transcription.text.strip() or script
         notes = [
             "Segmental pronunciation is inferred from Whisper ASR transcript agreement, not from the removed MDD phoneme decoder.",
             f"Whisper transcript match status: {transcript_match['status']} (CER={transcript_match['cer']:.3f}).",
@@ -111,7 +111,7 @@ class WhisperPronunciationAnalysisService:
             predicted_text=transcription.text,
             display_pronunciation_status=display_status,
             display_predicted_text=display_predicted_text,
-            display_predicted_phonemes=predicted_phonemes if transcript_match["status"] == "fail" else canonical_phonemes,
+            display_predicted_phonemes=predicted_phonemes if transcription.text.strip() else canonical_phonemes,
             raw_predicted_text=transcription.text,
             canonical_phonemes=canonical_phonemes,
             predicted_phonemes=predicted_phonemes,

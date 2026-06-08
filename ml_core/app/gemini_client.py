@@ -65,8 +65,10 @@ class GeminiFeedbackClient:
             "response_language": feedback_language,
             "requirements": [
                 "Use only the supplied evidence.",
-                "Base issues on diagnostic_candidates and phoneme_edits.",
-                "For each issue, diagnosis must name what was wrong, such as the extra, missing, substituted, stretched, or paused sound.",
+                "Base issues on diagnostic_candidates. Use phoneme_edits only when a segmental diagnostic candidate is present.",
+                "For segmental issues, diagnosis may name extra, missing, or substituted sounds. For prosodic issues, describe only timing, pauses, speech rate, or stretched units.",
+                "Never say a syllable or sound pronunciation is wrong unless a segmental diagnostic candidate is present.",
+                "When target_text and predicted_text differ, use predicted_text as what the ASR heard.",
                 "For each issue, evidence must compare the target pronunciation with what was heard or decoded.",
                 "Do not copy snake_case diagnosis codes into learner-facing fields.",
                 "Return 1-3 concise issues with concrete coaching.",

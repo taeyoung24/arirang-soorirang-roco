@@ -282,9 +282,9 @@ class StandardAcousticFeatureExtractor:
 
     @staticmethod
     def _pause_level(user_pause_ms: int, duration_delta_ms: int) -> str | None:
-        if user_pause_ms >= 1200 and duration_delta_ms >= 800:
+        if user_pause_ms >= 1500 and duration_delta_ms >= 1000:
             return "high"
-        if user_pause_ms >= 500 and duration_delta_ms >= 300:
+        if user_pause_ms >= 700 and duration_delta_ms >= 450:
             return "medium"
         return None
 

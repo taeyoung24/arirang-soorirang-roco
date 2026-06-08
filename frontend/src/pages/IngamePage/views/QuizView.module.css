@@ -84,6 +84,12 @@
   border-radius: var(--radius-global-round);
   outline: var(--spacing-border-main) solid var(--color-text);
   outline-offset: -2.4px;
+  opacity: 0;
+  transition: opacity 0.3s ease-in-out;
+}
+
+.imageLoaded {
+  opacity: 1;
 }
 
 .heartButtonPos {

@@ -142,3 +142,31 @@
     opacity: 0; /* 원위치로 복귀하면서 서서히 자연스럽게 어두워짐 */
   }
 }
+
+.loaderContainer {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 1.5rem;
+  width: 100%;
+  animation: fadeIn 0.3s ease-in-out;
+}
+
+.loaderText {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--text, #2c2c2c);
+  margin: 0;
+  animation: pulse 1.5s infinite ease-in-out;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 0.6;
+  }
+  50% {
+    opacity: 1;
+  }
+}

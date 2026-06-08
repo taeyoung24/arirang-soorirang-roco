@@ -1,9 +1,10 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { resolveAssetUrl, submitCardAnswer } from 'src/api'
 import AnswerButton from '../components/AnswerButton'
 import PronounceArea from '../components/PronounceArea'
 import styles from './QuizView.module.css'
+import ImageSkeleton from 'src/components/loaders/ImageSkeleton'
 
 const sentenceToParts = (sentence = '', word = '') => {
   const index = sentence.indexOf(word)
@@ -27,6 +28,11 @@ export default function QuizView({ card, title = '', progress = '', onStageUnloc
   const [isAnswered, setIsAnswered] = useState(false)
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [errorMessage, setErrorMessage] = useState('')
+  const [isImageLoaded, setIsImageLoaded] = useState(false)
+
+  useEffect(() => {
+    setIsImageLoaded(false)
+  }, [card?.image_url])
 
   if (!card) {
     return (
@@ -123,10 +129,12 @@ export default function QuizView({ card, title = '', progress = '', onStageUnloc
           />
         ) : (
           <div className={styles.imageWrapper}>
+            {!isImageLoaded && <ImageSkeleton />}
             <img
-              className={styles.feedImage}
+              className={`${styles.feedImage} ${isImageLoaded ? styles.imageLoaded : ''}`}
               src={resolveAssetUrl(card.image_url)}
               alt="feed"
+              onLoad={() => setIsImageLoaded(true)}
             />
           </div>
         )}

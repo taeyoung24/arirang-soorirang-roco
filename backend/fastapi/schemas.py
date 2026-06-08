@@ -194,6 +194,9 @@ class PronunciationResult(BaseModel):
     score: int
     feedback: str
     heard_text: Optional[str] = None
+    display_pronunciation_status: Optional[str] = None
+    raw_heard_text: Optional[str] = None
+    raw_predicted_phonemes: Optional[str] = None
     feedback_issues: List[PronunciationFeedbackIssue] = Field(default_factory=list)
     next_practice_focus: List[str] = Field(default_factory=list)
     pronunciation_status: str

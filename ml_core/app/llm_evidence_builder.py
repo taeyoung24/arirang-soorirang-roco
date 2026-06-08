@@ -79,7 +79,7 @@ class LLMEvidenceBuilder:
         max_edits: int,
     ) -> list[PhonemeEdit]:
         if not target_units:
-            return edits[:max_edits]
+            return []
         result = [
             edit
             for edit in edits

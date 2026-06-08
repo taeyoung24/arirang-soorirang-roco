@@ -19,6 +19,7 @@ class PronunciationAnalysisService:
         prediction: PredictResponse,
         forced_alignment: ForcedAlignmentResponse | None = None,
         reference_alignment: ForcedAlignmentResponse | None = None,
+        reference_prediction: PredictResponse | None = None,
         feedback_language: str = "ko",
     ) -> PronunciationAnalysisResponse:
         response, evidence = self.analyzer.analyze(
@@ -26,6 +27,7 @@ class PronunciationAnalysisService:
             prediction=prediction,
             forced_alignment=forced_alignment,
             reference_alignment=reference_alignment,
+            reference_prediction=reference_prediction,
             include_llm_note=self.gemini_client.enabled,
             feedback_language=feedback_language,
         )
@@ -33,10 +35,20 @@ class PronunciationAnalysisService:
             response.notes.append("Gemini API key is not configured, so LLM feedback was skipped.")
             return response
         llm_evidence = self.llm_evidence_builder.build(evidence)
-        allowed_segmental_units = (
-            {edit.expected for edit in llm_evidence.phoneme_edits if edit.expected}
-            | {edit.actual for edit in llm_evidence.phoneme_edits if edit.actual}
-        )
+        if not llm_evidence.diagnostic_candidates:
+            response.llm_feedback = AcousticLLMFeedback(
+                summary="뚜렷한 발음 오류가 감지되지 않았습니다.",
+                issues=[],
+                overall_confidence="medium",
+                next_practice_focus=[],
+            )
+            response.notes.append("LLM feedback used calibrated diagnostic candidates only; no candidate passed the evidence gate.")
+            return response
+        allowed_segmental_units = {
+            candidate.target_unit
+            for candidate in llm_evidence.diagnostic_candidates
+            if candidate.category == "segmental" and candidate.target_unit
+        }
         allowed_prosodic_units = {
             candidate.target_unit
             for candidate in llm_evidence.diagnostic_candidates

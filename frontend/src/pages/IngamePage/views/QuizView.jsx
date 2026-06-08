@@ -73,6 +73,8 @@ export default function QuizView({ card, title = '', progress = '', onStageUnloc
   }
 
   const selectedChoice = card.choices.find((choice) => choice.choice_id === selectedChoiceId)
+  const correctChoice = card.choices.find((choice) => choice.choice_id === correctChoiceId)
+  const pronunciationTarget = correctChoice?.text || card.pronunciation_target
   const questionParts = sentenceToParts(card.prompt_sentence, card.polysemy_word)
   const selectedChoiceParts = selectedChoice
     ? sentenceToParts(selectedChoice.text, card.polysemy_word)
@@ -113,7 +115,7 @@ export default function QuizView({ card, title = '', progress = '', onStageUnloc
         {correctChoiceId ? (
           <PronounceArea
             cardId={card.card_id}
-            targetText={card.pronunciation_target}
+            targetText={pronunciationTarget}
             ttsUrl={card.tts_url}
             onFinish={onStageUnlock}
           />

@@ -9,6 +9,7 @@ from db_models import (
     MeaningDB,
     QuizChoiceDB,
     QuizDB,
+    RecentLearningRecordDB,
     SentenceDB,
     WordDB,
 )
@@ -79,6 +80,36 @@ def load_json(filename):
 
 def create_tables():
     Base.metadata.create_all(bind=engine)
+
+
+def validate_content_references(meanings, sentences, quiz_overrides):
+    meaning_ids = {item.get("id") for item in meanings if item.get("id")}
+    missing_sentence_refs = [
+        (item.get("id"), item.get("meaning_id"), item.get("content"))
+        for item in sentences
+        if item.get("meaning_id") not in meaning_ids
+    ]
+    missing_quiz_refs = [
+        (item.get("card_id"), item.get("meaning_id"), item.get("prompt_sentence"))
+        for item in quiz_overrides
+        if item.get("meaning_id") and item.get("meaning_id") not in meaning_ids
+    ]
+
+    if missing_sentence_refs or missing_quiz_refs:
+        details = []
+        if missing_sentence_refs:
+            preview = ", ".join(
+                f"sentence_id={sentence_id} meaning_id={meaning_id} content={content!r}"
+                for sentence_id, meaning_id, content in missing_sentence_refs[:5]
+            )
+            details.append(f"sentences.json has missing meaning refs: {preview}")
+        if missing_quiz_refs:
+            preview = ", ".join(
+                f"card_id={card_id} meaning_id={meaning_id} prompt={prompt!r}"
+                for card_id, meaning_id, prompt in missing_quiz_refs[:5]
+            )
+            details.append(f"quizzes.json has missing meaning refs: {preview}")
+        raise ValueError("Invalid content_data references. " + " ".join(details))
 
 
 def seed_categories(session):
@@ -227,6 +258,7 @@ def build_quizzes_from_sentences(meanings, sentences, quiz_overrides):
 
         card_order_by_set[set_id] += 1
         choices = [correct_pool[0], *distractors[:3]]
+        pronunciation_target = correct_pool[0].get("content", "")
 
         generated.append(
             {
@@ -244,8 +276,8 @@ def build_quizzes_from_sentences(meanings, sentences, quiz_overrides):
                     for index, choice in enumerate(choices, start=1)
                 ],
                 "correct_choice_id": "c1",
-                "pronunciation_target": prompt.get("highlight", "") or word,
-                "tts_url": override.get("tts_url") or prompt.get("tts_url"),
+                "pronunciation_target": pronunciation_target,
+                "tts_url": correct_pool[0].get("tts_url"),
                 "image_url": override.get("image_url")
                 or WORD_IMAGE_MAPPING.get(word, "/assets/cards/placeholder.png"),
                 "card_order": card_order_by_set[set_id],
@@ -260,8 +292,17 @@ def seed_quizzes(session, quizzes):
     desired_card_ids = {item.get("card_id") for item in quizzes if item.get("card_id")}
     if desired_card_ids:
         existing_quizzes = session.query(QuizDB).all()
+        stale_card_ids = [
+            quiz.card_id for quiz in existing_quizzes if quiz.card_id not in desired_card_ids
+        ]
+        if stale_card_ids:
+            (
+                session.query(RecentLearningRecordDB)
+                .filter(RecentLearningRecordDB.card_id.in_(stale_card_ids))
+                .delete(synchronize_session=False)
+            )
         for quiz in existing_quizzes:
-            if quiz.card_id not in desired_card_ids:
+            if quiz.card_id in stale_card_ids:
                 session.delete(quiz)
         session.flush()
 
@@ -271,8 +312,10 @@ def seed_quizzes(session, quizzes):
             continue
 
         quiz = session.get(QuizDB, card_id)
-        if not item.get("tts_url") and (quiz is None or not quiz.tts_url):
-            tts_url = generate_tts_url(item.get("prompt_sentence", ""))
+        target_text = item.get("pronunciation_target", "")
+        target_changed = quiz is not None and quiz.pronunciation_target != target_text
+        if not item.get("tts_url") and (quiz is None or not quiz.tts_url or target_changed):
+            tts_url = generate_tts_url(target_text)
             if tts_url:
                 item["tts_url"] = tts_url
 
@@ -298,7 +341,7 @@ def seed_quizzes(session, quizzes):
             quiz.pronunciation_target = item.get(
                 "pronunciation_target", quiz.pronunciation_target
             )
-            if item.get("tts_url"):
+            if item.get("tts_url") or target_changed:
                 quiz.tts_url = item.get("tts_url")
             quiz.image_url = item.get("image_url", quiz.image_url)
             quiz.card_order = item.get("card_order", quiz.card_order)
@@ -337,6 +380,7 @@ def main():
     meanings = load_json("meanings.json")
     sentences = load_json("sentences.json")
     quiz_overrides = load_json("quizzes.json")
+    validate_content_references(meanings, sentences, quiz_overrides)
     quizzes = build_quizzes_from_sentences(meanings, sentences, quiz_overrides)
 
     with SessionLocal() as session:

@@ -134,6 +134,7 @@ class AcousticEvidencePacket(BaseModel):
     alignments: list[AlignmentUnit] = Field(default_factory=list)
     prosody: Optional[ProsodySummary] = None
     diagnostic_candidates: list[DiagnosticCandidate] = Field(default_factory=list)
+    uncertain_diagnostic_candidates: list[DiagnosticCandidate] = Field(default_factory=list)
     policy: EvidencePolicy = Field(default_factory=EvidencePolicy)
 
 
@@ -166,6 +167,10 @@ class PronunciationScore(BaseModel):
 class PronunciationAnalysisResponse(BaseModel):
     script: str
     predicted_text: Optional[str] = None
+    display_pronunciation_status: Literal["normal", "needs_attention"] = "needs_attention"
+    display_predicted_text: Optional[str] = None
+    display_predicted_phonemes: Optional[str] = None
+    raw_predicted_text: Optional[str] = None
     canonical_phonemes: str
     predicted_phonemes: str
     pronunciation_score: PronunciationScore
@@ -178,6 +183,7 @@ class PronunciationAnalysisResponse(BaseModel):
     alignments: list[AlignmentUnit] = Field(default_factory=list)
     prosody: Optional[ProsodySummary] = None
     diagnostic_candidates: list[DiagnosticCandidate] = Field(default_factory=list)
+    uncertain_diagnostic_candidates: list[DiagnosticCandidate] = Field(default_factory=list)
     llm_feedback: Optional[AcousticLLMFeedback] = None
     notes: list[str] = Field(default_factory=list)
 

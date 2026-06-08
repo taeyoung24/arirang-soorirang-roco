@@ -54,49 +54,59 @@ class GeminiFeedbackClient:
 
     @staticmethod
     def _build_prompt(evidence: AcousticEvidencePacket) -> str:
-        evidence_json = evidence.model_dump_json(exclude_none=True, indent=2)
+        evidence_json = json.dumps(
+            GeminiFeedbackClient._compact_evidence(evidence),
+            ensure_ascii=False,
+            separators=(",", ":"),
+        )
         feedback_language = evidence.policy.language
         instructions = {
-            "task": "Generate learner-facing Korean pronunciation feedback from structured phonetic evidence.",
+            "task": "Generate short learner-facing Korean pronunciation feedback from structured evidence.",
             "response_language": feedback_language,
-            "scope": [
-                "Use MDD phoneme mismatches as the primary error evidence.",
-                "Use phoneme_edits as the canonical mismatch summary.",
-                "If phoneme_edits shows one deletion or insertion, do not describe later aligned sounds as a cascade of substitutions.",
-                "When the same phoneme appears multiple times, use phoneme_edits.expected_index, syllable, and context to identify the occurrence.",
-                "Use acoustic measurements only as secondary context when they are explicitly supplied.",
-                "Do not create new pronunciation errors beyond the supplied diagnostic candidates.",
-            ],
             "requirements": [
                 "Use only the supplied evidence.",
-                "Do not infer hidden measurements.",
-                "Treat MDD phoneme mismatch and phoneme edit alignment as the primary evidence.",
-                "For foreign-accent feedback, describe the likely Korean listener perception, not medical or native-speaker claims.",
-                "The learner may be a non-native Korean speaker; do not push native-speed delivery.",
-                "If a long interior pause is present, describe the issue as pause/connection timing rather than general slow speech.",
-                "For prosodic timing, frame coaching as smoother connection and intelligibility, not speaking as fast as the TTS reference.",
-                "If diagnosis_code is stretched_aligned_unit, describe the target unit as held or stretched too long.",
-                "For stretched_aligned_unit, set issue.unit to the diagnostic target_unit when it is present.",
-                "Do not convert stretched_aligned_unit into a pause issue unless a reference_pause_comparison with pause_level medium or high is present.",
-                "Reference pause comparisons may include pause_level medium or high.",
-                "If pause_level is medium, describe it as a noticeable pause between words.",
-                "If pause_level is high, prioritize it as a main prosodic issue.",
-                "Do not describe medium pause_level as globally slow speech.",
-                "If alignment source is heuristic or audio reliability is low, lower the confidence.",
-                "If reliability is low, mention that uncertainty briefly.",
-                "Prioritize the top 1-3 issues.",
-                "If diagnostic_candidates is not empty, issues must contain at least one issue grounded in those diagnostics.",
-                "issue.diagnosis must be a short learner-facing phrase, not a diagnostic code.",
-                "Never copy snake_case values such as diagnosis_code into learner-facing fields.",
-                "Coaching should be short, concrete, and pronounceable by a learner.",
-                "For segmental issues, issue.unit must come from phoneme_edits.expected or phoneme_edits.actual.",
-                "For prosodic issues such as slow speech rate or long pauses, issue.unit may be null.",
-                f"Write all learner-facing text in this language code or language name: {feedback_language}.",
+                "Base issues on diagnostic_candidates and phoneme_edits.",
+                "For each issue, diagnosis must name what was wrong, such as the extra, missing, substituted, stretched, or paused sound.",
+                "For each issue, evidence must compare the target pronunciation with what was heard or decoded.",
+                "Do not copy snake_case diagnosis codes into learner-facing fields.",
+                "Return 1-3 concise issues with concrete coaching.",
+                f"Write learner-facing text in {feedback_language}.",
             ],
         }
         return (
             "You are a Korean pronunciation coach.\n"
             "Return JSON only and follow the provided schema.\n"
-            f"Instruction:\n{json.dumps(instructions, ensure_ascii=False, indent=2)}\n"
+            f"Instruction:\n{json.dumps(instructions, ensure_ascii=False, separators=(',', ':'))}\n"
             f"Evidence:\n{evidence_json}"
         )
+
+    @staticmethod
+    def _compact_evidence(evidence: AcousticEvidencePacket) -> dict:
+        payload = {
+            "target_text": evidence.script,
+            "predicted_text": evidence.predicted_text,
+            "target_phonemes": evidence.canonical_phonemes,
+            "predicted_phonemes": evidence.predicted_phonemes,
+            "phoneme_edits": [
+                edit.model_dump(exclude_none=True)
+                for edit in evidence.phoneme_edits[:3]
+            ],
+            "diagnostic_candidates": [
+                item.model_dump(exclude_none=True)
+                for item in evidence.diagnostic_candidates[:3]
+            ],
+            "feedback_language": evidence.policy.language,
+        }
+        if evidence.audio_quality.overall_reliability != "high":
+            payload["audio_quality"] = evidence.audio_quality.model_dump(exclude_none=True)
+        if evidence.prosody is not None:
+            payload["prosody"] = evidence.prosody.model_dump(
+                exclude_none=True,
+                exclude={
+                    "pause_intervals",
+                    "stretched_intervals",
+                    "reference_duration_comparisons",
+                    "reference_pause_comparisons",
+                },
+            )
+        return {key: value for key, value in payload.items() if value not in (None, [], {})}

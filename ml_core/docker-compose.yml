@@ -63,11 +63,30 @@ services:
       MDD_HOST: 0.0.0.0
       MDD_PORT: 8090
       MDD_ALIGNER_MODEL_ID: Qwen/Qwen3-ForcedAligner-0.6B
+      HF_HOME: /opt/hf-cache
       NVIDIA_VISIBLE_DEVICES: all
       NVIDIA_DRIVER_CAPABILITIES: compute,utility
+    volumes:
+      - hf-cache:/opt/hf-cache
     runtime: nvidia
     ipc: host
+    depends_on:
+      hf-cache-downloader:
+        condition: service_completed_successfully
     restart: unless-stopped
+
+  hf-cache-downloader:
+    build:
+      context: .
+      dockerfile: Dockerfile.aligner
+    environment:
+      HF_HOME: /opt/hf-cache
+    volumes:
+      - hf-cache:/opt/hf-cache
+    command:
+      - python
+      - -c
+      - "from huggingface_hub import snapshot_download; print(snapshot_download('Qwen/Qwen3-ForcedAligner-0.6B'))"
 
   minio:
     image: minio/minio:latest
@@ -85,3 +104,5 @@ services:
 
 volumes:
   minio-data:
+  hf-cache:
+    name: mdd-hf-cache

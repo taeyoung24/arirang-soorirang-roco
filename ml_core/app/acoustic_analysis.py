@@ -14,6 +14,7 @@ from app.acoustic_schemas import (
     AudioQualitySummary,
     EvidencePolicy,
     ForcedAlignmentResponse,
+    PronunciationScore,
     PronunciationAnalysisResponse,
 )
 from app.acoustic_feature_extractor import AcousticFeatureExtractor, AudioBuffer, create_default_feature_extractor
@@ -95,6 +96,14 @@ class AcousticAnalyzer:
             prosody,
             quality,
         )
+        pronunciation_score = self._score_pronunciation(
+            canonical=prediction.canonical_phonemes,
+            phoneme_edits=phoneme_edits,
+            target_scores=prediction.target_phoneme_scores,
+            prosody=prosody,
+            quality=quality,
+            diagnostic_count=len(diagnostics),
+        )
         if used_forced_alignment:
             notes = [
                 "Word and syllable timings come from Qwen3 forced alignment.",
@@ -112,6 +121,8 @@ class AcousticAnalyzer:
 
         evidence = AcousticEvidencePacket(
             script=prediction.script,
+            canonical_text=prediction.canonical_text,
+            predicted_text=prediction.predicted_text,
             canonical_phonemes=prediction.canonical_phonemes,
             predicted_phonemes=prediction.predicted_phonemes,
             model_score=prediction.model_score,
@@ -127,8 +138,10 @@ class AcousticAnalyzer:
         )
         response = PronunciationAnalysisResponse(
             script=prediction.script,
+            predicted_text=prediction.predicted_text,
             canonical_phonemes=prediction.canonical_phonemes,
             predicted_phonemes=prediction.predicted_phonemes,
+            pronunciation_score=pronunciation_score,
             model_score=prediction.model_score,
             predicted_phoneme_scores=prediction.predicted_phoneme_scores,
             target_phoneme_scores=prediction.target_phoneme_scores,
@@ -141,6 +154,74 @@ class AcousticAnalyzer:
             notes=notes,
         )
         return response, evidence
+
+    @staticmethod
+    def _score_pronunciation(
+        canonical: str,
+        phoneme_edits,
+        target_scores,
+        prosody: ProsodySummary,
+        quality: AudioQualitySummary,
+        diagnostic_count: int,
+    ) -> PronunciationScore:
+        scored_targets = [score for score in target_scores if score.edit_type != "insertion"]
+        if scored_targets:
+            segmental = 100.0 * sum(AcousticAnalyzer._target_score_value(score) for score in scored_targets) / len(scored_targets)
+        elif canonical:
+            segmental = 100.0 * max(0, len(canonical) - len(phoneme_edits)) / len(canonical)
+        else:
+            segmental = 0.0
+
+        prosody_score = AcousticAnalyzer._prosody_score(prosody)
+        audio_quality_score = AcousticAnalyzer._audio_quality_score(quality)
+        overall = 0.85 * segmental + 0.15 * prosody_score
+        if diagnostic_count:
+            overall -= min(12.0, diagnostic_count * 2.0)
+
+        note = (
+            "Heuristic 0-100 score from target phoneme confidence, timing/prosody evidence, "
+            "and diagnostic penalties. Audio quality is reported separately and does not affect the score. "
+            "It is not externally calibrated."
+        )
+        return PronunciationScore(
+            overall=round(max(0.0, min(100.0, overall)), 1),
+            segmental=round(max(0.0, min(100.0, segmental)), 1),
+            prosody=round(max(0.0, min(100.0, prosody_score)), 1),
+            audio_quality=round(audio_quality_score, 1),
+            note=note,
+        )
+
+    @staticmethod
+    def _target_score_value(score) -> float:
+        if score.edit_type == "match":
+            return score.confidence if score.confidence is not None else 1.0
+        if score.edit_type == "substitution":
+            return 0.35 * (score.confidence if score.confidence is not None else 0.5)
+        if score.edit_type == "deletion":
+            return 0.0
+        return 0.0
+
+    @staticmethod
+    def _prosody_score(prosody: ProsodySummary) -> float:
+        score = 100.0
+        if prosody.speech_duration_ratio is not None:
+            ratio = prosody.speech_duration_ratio
+            if ratio > 1.15:
+                score -= min(35.0, (ratio - 1.15) * 22.0)
+        score -= min(25.0, prosody.interior_pause_total_ms / 160.0)
+        score -= min(15.0, len(prosody.stretched_intervals) * 4.0)
+        if prosody.rate_reliability == "low":
+            score = max(score, 65.0)
+        return score
+
+    @staticmethod
+    def _audio_quality_score(quality: AudioQualitySummary) -> float:
+        base = {"high": 100.0, "medium": 92.0, "low": 75.0}[quality.overall_reliability]
+        if quality.clipping_detected:
+            base -= 8.0
+        if quality.snr_db is not None and quality.snr_db < 6.0:
+            base -= min(15.0, (6.0 - quality.snr_db) * 2.0)
+        return max(0.0, min(100.0, base))
 
     @classmethod
     def _decompose_hangul(cls, text: str) -> str:
@@ -240,7 +321,8 @@ class AcousticAnalyzer:
         if len(audio.samples) == 0:
             return AudioQualitySummary(overall_reliability="low")
         peak = float(np.max(np.abs(audio.samples)))
-        clipping_detected = peak >= 0.999
+        clipped_ratio = float(np.mean(np.abs(audio.samples) >= 0.999))
+        clipping_detected = peak >= 0.999 and clipped_ratio >= 0.01
         rms = float(np.sqrt(np.mean(np.square(audio.samples)) + 1e-9))
         tail = audio.samples[-min(len(audio.samples), audio.sample_rate // 3 or 1) :]
         noise_floor = float(np.sqrt(np.mean(np.square(tail)) + 1e-9))
@@ -248,9 +330,9 @@ class AcousticAnalyzer:
         zero_cross = np.mean(np.abs(np.diff(np.signbit(audio.samples))).astype(np.float32))
         voiced_ratio = max(0.0, min(1.0, 1.0 - float(zero_cross)))
         reliability = "high"
-        if clipping_detected or snr_db < 12.0:
+        if snr_db < 6.0:
             reliability = "low"
-        elif snr_db < 20.0:
+        elif clipping_detected or snr_db < 12.0:
             reliability = "medium"
         return AudioQualitySummary(
             snr_db=round(snr_db, 2),

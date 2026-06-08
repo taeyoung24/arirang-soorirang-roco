@@ -19,7 +19,6 @@ class PronunciationAnalysisService:
         prediction: PredictResponse,
         forced_alignment: ForcedAlignmentResponse | None = None,
         reference_alignment: ForcedAlignmentResponse | None = None,
-        include_llm_feedback: bool = True,
         feedback_language: str = "ko",
     ) -> PronunciationAnalysisResponse:
         response, evidence = self.analyzer.analyze(
@@ -27,12 +26,9 @@ class PronunciationAnalysisService:
             prediction=prediction,
             forced_alignment=forced_alignment,
             reference_alignment=reference_alignment,
-            include_llm_note=include_llm_feedback and self.gemini_client.enabled,
+            include_llm_note=self.gemini_client.enabled,
             feedback_language=feedback_language,
         )
-        if not include_llm_feedback:
-            response.notes.append("LLM feedback was not requested for this endpoint.")
-            return response
         if not self.gemini_client.enabled:
             response.notes.append("Gemini API key is not configured, so LLM feedback was skipped.")
             return response

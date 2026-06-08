@@ -114,6 +114,7 @@ export default function QuizView({ card, title = '', progress = '', onStageUnloc
           <PronounceArea
             cardId={card.card_id}
             targetText={card.pronunciation_target}
+            ttsUrl={card.tts_url}
             onFinish={onStageUnlock}
           />
         ) : (

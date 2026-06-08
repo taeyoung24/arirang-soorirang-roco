@@ -34,6 +34,7 @@ class Settings:
     tts_voice_id: str
     tts_speaking_rate: float
     tts_model: str
+    tts_asset_public_base_url: str
 
     @classmethod
     def from_env(cls) -> "Settings":
@@ -68,4 +69,5 @@ class Settings:
             tts_voice_id=os.getenv("MDD_TTS_VOICE_ID", "ko-KR-SunHiNeural"),
             tts_speaking_rate=float(os.getenv("MDD_TTS_SPEAKING_RATE", "1.0")),
             tts_model=os.getenv("MDD_TTS_MODEL", "edge-tts"),
+            tts_asset_public_base_url=os.getenv("MDD_TTS_ASSET_PUBLIC_BASE_URL", "").rstrip("/"),
         )

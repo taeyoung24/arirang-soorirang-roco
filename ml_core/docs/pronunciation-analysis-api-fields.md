@@ -1,14 +1,8 @@
 # Pronunciation Analysis API Fields
 
-This document explains the response fields for:
+This document explains the response fields for `POST /analyze-pronunciation-llm`.
 
-- `POST /analyze-pronunciation-basic`
-- `POST /analyze-pronunciation-llm`
-- `POST /reference-cache`
-- `POST /reference-cache/generate`
-- `GET /reference-cache/{cache_key}`
-
-By default, both endpoints return a compact response. Pass `debug=true` to include full alignments and phoneme scores.
+By default, the analysis endpoint returns a compact response. Pass `debug=true` to include full alignments and phoneme scores.
 
 ## Request Fields
 
@@ -24,37 +18,9 @@ By default, both endpoints return a compact response. Pass `debug=true` to inclu
 
 ## Reference Cache
 
-The reference cache stores TTS-generated answer audio and its Qwen forced alignment result in object storage. In Docker Compose this uses MinIO.
+The reference cache stores TTS-generated answer audio and its Qwen forced alignment result in object storage. In Docker Compose this uses MinIO. It is an internal implementation detail of `POST /analyze-pronunciation-llm`, not a public API surface.
 
-`POST /reference-cache` accepts:
-
-| Field | Required | Default | Description |
-| --- | --- | --- | --- |
-| `script` | yes | - | Target script used to generate the TTS reference. |
-| `audio` | yes | - | TTS reference audio, normally normalized WAV. |
-| `alignment_json` | yes | - | Qwen forced alignment response JSON for the TTS reference audio. |
-| `language` | no | `Korean` | Alignment language. |
-| `tts_provider` | no | `unknown` | TTS provider name. |
-| `tts_model` | no | `unknown` | TTS model or engine version. |
-| `voice_id` | no | `default` | TTS voice identifier. |
-| `speaking_rate` | no | `1.0` | TTS speaking rate used when generating the reference. |
-| `audio_format` | no | `wav_16khz_mono` | Normalized audio format. |
-| `aligner_model_id` | no | `Qwen/Qwen3-ForcedAligner-0.6B` | Aligner model used to create `alignment_json`. |
-| `alignment_resolution_ms` | no | `80` | Aligner timestamp resolution. |
-
-The cache key is a SHA-256 hash over normalized script, language, TTS provider/model/voice/rate, audio format, aligner model, aligner resolution, and cache schema version.
-
-Objects are stored as:
-
-```text
-tts-reference/{cache_key}/reference.wav
-tts-reference/{cache_key}/alignment.json
-tts-reference/{cache_key}/manifest.json
-```
-
-`GET /reference-cache/{cache_key}` returns the manifest if the cache entry exists.
-
-`POST /reference-cache/generate` accepts `script` and optional `language`. It generates a TTS reference audio file, runs Qwen forced alignment for that TTS audio, stores both objects in MinIO, and returns the manifest. The analysis endpoints call this path automatically when `use_tts_reference=true` and no `reference_cache_key` was supplied, or when the supplied key is not found.
+When `use_tts_reference=true`, the analysis endpoint creates or reuses a reference entry automatically and compares learner timing against the cached alignment.
 
 ## Top-Level Response Fields
 
@@ -63,6 +29,7 @@ tts-reference/{cache_key}/manifest.json
 | `script` | Original target sentence from the request. |
 | `canonical_phonemes` | Target phoneme sequence generated from `script` by G2P and Hangul decomposition. Punctuation is removed. |
 | `predicted_phonemes` | MDD model's predicted phoneme sequence. |
+| `pronunciation_score` | Always-returned 0-100 heuristic pronunciation score summary. |
 | `audio_quality` | Overall recording quality summary. |
 | `phoneme_edits` | Edit-aligned mismatch summary between canonical and predicted phonemes. This is the primary error source. |
 | `diagnostic_candidates` | Candidate pronunciation issues derived from `phoneme_edits` and supporting evidence. |
@@ -81,6 +48,21 @@ The following fields are compacted unless `debug=true`:
 | `model_score` | Removed in compact mode. |
 
 ## Important Confidence Types
+
+## `pronunciation_score`
+
+This top-level score is returned by `/analyze-pronunciation-llm` in both compact and debug responses.
+
+| Field | Description |
+| --- | --- |
+| `overall` | 0-100 combined score. Higher is better. |
+| `segmental` | 0-100 score from target phoneme confidence when available, with edit-alignment fallback. |
+| `prosody` | 0-100 timing/prosody score from speech duration ratio, pauses, and stretched intervals. |
+| `audio_quality` | 0-100 recording quality score derived from reliability, clipping, and SNR. This is reported separately and does not affect `overall`. |
+| `source` | Scoring implementation identifier. Currently `heuristic_v1`. |
+| `note` | Calibration and interpretation note. |
+
+The score is a deterministic heuristic intended for app display and rough ranking. `overall` combines segmental and prosody scores plus diagnostic penalties; it does not include audio quality. It is not an externally calibrated pronunciation grade.
 
 ## Error Behavior
 
@@ -282,7 +264,7 @@ Only returned by `/analyze-pronunciation-llm` when Gemini is configured.
 | `overall_confidence` | LLM presentation confidence. |
 | `next_practice_focus` | Suggested practice focus. |
 
-The LLM receives compact structured evidence, not raw audio. It is instructed not to invent errors outside `phoneme_edits` and `diagnostic_candidates`.
+The LLM receives compact structured evidence, not raw audio. The evidence includes the target script/canonical text, model-decoded predicted text, full canonical/predicted phoneme sequences, and compact top-diagnostic support fields. It is instructed to prioritize substantially different target-vs-predicted utterances before local phoneme coaching, and not to invent errors outside the supplied evidence.
 
 ## Recommended Client Usage
 

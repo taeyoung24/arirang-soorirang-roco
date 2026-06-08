@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { evaluatePronunciation } from 'src/api';
+import React, { useState, useEffect, useRef } from 'react';
+import { evaluatePronunciation, resolveMediaUrl } from 'src/api';
 import { PronounceButton, SimpleIconButton } from 'src/components/Button';
 import styles from './PronounceArea.module.css';
 
@@ -79,7 +79,7 @@ function AudioWaveform() {
   );
 }
 
-export default function PronounceArea({ cardId, targetText, onFinish }) {
+export default function PronounceArea({ cardId, targetText, ttsUrl, onFinish }) {
   const [step, setStep] = useState(1); // 1: 준비, 2: 녹음중, 3: 분석중, 4: 결과
   const [seconds, setSeconds] = useState(0);
   const [isExiting, setIsExiting] = useState(false);
@@ -87,6 +87,8 @@ export default function PronounceArea({ cardId, targetText, onFinish }) {
   const [audioChunks, setAudioChunks] = useState([]);
   const [result, setResult] = useState(null);
   const [errorMessage, setErrorMessage] = useState('');
+  const [isPlayingTts, setIsPlayingTts] = useState(false);
+  const ttsAudioRef = useRef(null);
 
   const transitionToStep = (nextStep) => {
     setIsExiting(true);
@@ -113,8 +115,39 @@ export default function PronounceArea({ cardId, targetText, onFinish }) {
       if (mediaRecorder?.stream) {
         mediaRecorder.stream.getTracks().forEach((track) => track.stop());
       }
+      if (ttsAudioRef.current) {
+        ttsAudioRef.current.pause();
+        ttsAudioRef.current = null;
+      }
     }
   }, [mediaRecorder]);
+
+  const playTts = async () => {
+    if (!ttsUrl || isPlayingTts) return;
+
+    setErrorMessage('');
+    try {
+      if (ttsAudioRef.current) {
+        ttsAudioRef.current.pause();
+      }
+
+      const audio = new Audio(resolveMediaUrl(ttsUrl));
+      ttsAudioRef.current = audio;
+      setIsPlayingTts(true);
+
+      audio.onended = () => setIsPlayingTts(false);
+      audio.onerror = () => {
+        setIsPlayingTts(false);
+        setErrorMessage('음성을 불러오지 못했습니다.');
+      };
+
+      await audio.play();
+    } catch (error) {
+      console.error('TTS 재생에 실패했습니다:', error);
+      setIsPlayingTts(false);
+      setErrorMessage('음성을 재생하지 못했습니다.');
+    }
+  };
 
   const formatTime = (secs) => {
     const m = Math.floor(secs / 60);
@@ -196,7 +229,11 @@ export default function PronounceArea({ cardId, targetText, onFinish }) {
             발음을 듣고 녹음을 시작하세요.
           </div>
           <div className={styles.centerContent}>
-            <PronounceButton word={targetText} onClick={() => console.log('Play sound')} />
+            <PronounceButton
+              word={targetText}
+              onClick={playTts}
+              disabled={!ttsUrl || isPlayingTts}
+            />
           </div>
           {errorMessage && <div className={styles.descText}>{errorMessage}</div>}
           <SimpleIconButton type="record" onClick={startRecording} />
@@ -234,8 +271,14 @@ export default function PronounceArea({ cardId, targetText, onFinish }) {
           <div className={styles.stepHeader}>
             “{targetText}”에 대한 발음 정확성
           </div>
-          <div className={styles.centerContentGap4}>
+          <div className={styles.resultContent}>
             <div className={styles.scoreText}>{result?.score ?? 0}점</div>
+            {result?.heard_text && (
+              <div className={styles.heardPanel}>
+                <span className={styles.heardLabel}>AI가 들은 발음</span>
+                <span className={styles.heardText}>“{result.heard_text}”</span>
+              </div>
+            )}
             <div className={styles.descText}>
               {result?.feedback || '분석 결과가 없습니다.'}
             </div>

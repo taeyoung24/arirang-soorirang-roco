@@ -121,6 +121,8 @@ class EvidencePolicy(BaseModel):
 
 class AcousticEvidencePacket(BaseModel):
     script: str
+    canonical_text: Optional[str] = None
+    predicted_text: Optional[str] = None
     canonical_phonemes: str
     predicted_phonemes: Optional[str] = None
     model_score: Optional[ModelScoreSummary] = None
@@ -152,10 +154,21 @@ class AcousticLLMFeedback(BaseModel):
     next_practice_focus: list[str] = Field(default_factory=list)
 
 
+class PronunciationScore(BaseModel):
+    overall: float = Field(ge=0.0, le=100.0)
+    segmental: float = Field(ge=0.0, le=100.0)
+    prosody: Optional[float] = Field(default=None, ge=0.0, le=100.0)
+    audio_quality: float = Field(ge=0.0, le=100.0)
+    source: Literal["heuristic_v1"] = "heuristic_v1"
+    note: str
+
+
 class PronunciationAnalysisResponse(BaseModel):
     script: str
+    predicted_text: Optional[str] = None
     canonical_phonemes: str
     predicted_phonemes: str
+    pronunciation_score: PronunciationScore
     model_score: Optional[ModelScoreSummary] = None
     predicted_phoneme_scores: list[PredictedPhonemeScore] = Field(default_factory=list)
     target_phoneme_scores: list[TargetPhonemeScore] = Field(default_factory=list)

@@ -13,11 +13,12 @@ export const PageButton = ({ label, onClick }) => {
   );
 };
 
-export const PronounceButton = ({ word, onClick }) => {
+export const PronounceButton = ({ word, onClick, disabled = false }) => {
   return (
     <button
       onClick={onClick}
       className={styles.pronounceButton}
+      disabled={disabled}
     >
       <div className={styles.pronounceButtonText}>{word}</div>
       <div className="relative">

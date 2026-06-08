@@ -97,6 +97,7 @@ class Choice(BaseModel):
 
     choice_id: str
     text: str
+    highlight: Optional[str] = None
 
 
 class LearningCard(BaseModel):
@@ -108,6 +109,7 @@ class LearningCard(BaseModel):
     sentence_id: Optional[str] = None
     polysemy_word: str
     prompt_sentence: str
+    highlight: Optional[str] = None
     choices: List[Choice]
     pronunciation_target: str
     tts_url: Optional[str] = None

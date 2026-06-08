@@ -8,6 +8,7 @@ import { GLOBAL_CONFIG } from 'src/settings'
 import { setThemeColor } from 'src/utils/theme'
 import styles from './IngamePage.module.css'
 import QuizView from './views/QuizView'
+import CircleBlockLoader from 'src/components/loaders/CircleBlockLoader'
 
 const SET_TITLE_KEYS = {
   set_school_01: 'demo_set_high_school',
@@ -184,7 +185,12 @@ export default function IngamePage() {
           status={isStageUnlocked ? 'unlocked' : 'locked'}
         />
 
-        {isLoading && renderMessage('불러오는 중')}
+        {isLoading && (
+          <div className={styles.loaderContainer}>
+            <CircleBlockLoader />
+            <p className={styles.loaderText}>{t('home_loading')}</p>
+          </div>
+        )}
         {!isLoading && errorMessage && renderMessage(errorMessage)}
         {!isLoading && !errorMessage && cards.length === 0 && renderMessage('학습 카드가 없습니다.')}
 

@@ -12,6 +12,8 @@
   transition: transform 0.15s ease;
   cursor: pointer;
   border: none;
+  position: relative;
+  overflow: hidden;
 }
 
 .button:active {
@@ -116,4 +118,87 @@
   display: flex;
   align-items: center;
   justify-content: center;
+}
+
+/* Fade Out / In 효과 */
+.fadeOut {
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s ease-in-out;
+}
+
+.fadeIn {
+  opacity: 1;
+  transition: opacity 0.25s ease-in-out;
+}
+
+/* 로딩 래퍼 */
+.loadingWrapper {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  pointer-events: none;
+}
+
+.loadingText {
+  color: var(--color-white-primary, #ffffff);
+  font-size: var(--font-size-h5, 18px);
+  font-weight: var(--font-weight-bold, 800);
+  font-family: var(--font-sans);
+  animation: bounceMini 1.2s infinite ease-in-out;
+}
+
+@keyframes bounceMini {
+
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+
+  50% {
+    transform: translateY(-3px);
+  }
+}
+
+/* 슬라이드 인/아웃 애니메이션 */
+.loadingSlideIn {
+  opacity: 1;
+  transform: translateY(0);
+  transition: transform 0.25s cubic-bezier(0.25, 1, 0.5, 1), opacity 0.2s ease-in-out;
+}
+
+.loadingSlideOut {
+  opacity: 0;
+  transform: translateY(-100%);
+  transition: transform 0.25s cubic-bezier(0.25, 1, 0.5, 1), opacity 0.2s ease-in-out;
+}
+
+/* 바람/속도선 효과 */
+.speedLine {
+  position: absolute;
+  top: -30px;
+  width: 1.5px;
+  height: 25px;
+  background: linear-gradient(to bottom, transparent, rgba(255, 255, 255, 0.35), transparent);
+  pointer-events: none;
+  animation: speedLineFlow 0.7s linear infinite;
+}
+
+@keyframes speedLineFlow {
+  0% {
+    transform: translateY(0);
+    opacity: 0;
+  }
+  15% {
+    opacity: 1;
+  }
+  85% {
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(110px);
+    opacity: 0;
+  }
 }

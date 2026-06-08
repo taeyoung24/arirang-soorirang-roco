@@ -33,5 +33,6 @@
   "pronounce_no_result": "분석 결과가 없습니다.",
   "setting_title": "설정",
   "setting_lang_label": "언어 설정",
-  "setting_save": "저장"
+  "setting_save": "저장",
+  "grading_in_progress": "채점하는 중"
 }

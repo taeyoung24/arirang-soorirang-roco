@@ -33,5 +33,6 @@
   "pronounce_no_result": "No analysis result.",
   "setting_title": "Settings",
   "setting_lang_label": "Language",
-  "setting_save": "Save"
+  "setting_save": "Save",
+  "grading_in_progress": "Grading..."
 }

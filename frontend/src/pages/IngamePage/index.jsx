@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom'
-import { getSetCards } from 'src/api'
+import { getRecommendedContents, getSetCards } from 'src/api'
 import Layout from 'src/components/Layout'
 import { IngameTopContainer } from 'src/components/TopContainer'
 import { GLOBAL_CONFIG } from 'src/settings'
@@ -43,7 +43,17 @@ export default function IngamePage() {
 
   const currentIndexRef = useRef(0)
   const scrollTimeoutRef = useRef(null)
-  const missingSetMessage = setId ? '' : '학습 세트를 먼저 선택하세요.'
+
+  const getRandomRecommendedSetId = useCallback(async () => {
+    const recommendedSets = await getRecommendedContents()
+    const playableSets = recommendedSets.filter((item) => item.set_id)
+
+    if (playableSets.length === 0) {
+      throw new Error('학습 가능한 추천 세트가 없습니다.')
+    }
+
+    return playableSets[Math.floor(Math.random() * playableSets.length)].set_id
+  }, [])
 
   useEffect(() => {
     document.body.style.backgroundColor = 'var(--color-yellow-primary)'
@@ -59,14 +69,13 @@ export default function IngamePage() {
   }, [])
 
   useEffect(() => {
-    if (!setId) return
-
     let isMounted = true
 
     async function loadSetCards() {
       try {
         setIsLoading(true)
-        const data = await getSetCards(setId)
+        const targetSetId = setId || await getRandomRecommendedSetId()
+        const data = await getSetCards(targetSetId)
         const filteredCards = selectedCardId
           ? data.cards.filter((card) => card.card_id === selectedCardId)
           : selectedWord
@@ -75,8 +84,8 @@ export default function IngamePage() {
 
         if (!isMounted) return
 
-        const translatedTitle = SET_TITLE_KEYS[setId]
-          ? t(SET_TITLE_KEYS[setId])
+        const translatedTitle = SET_TITLE_KEYS[targetSetId]
+          ? t(SET_TITLE_KEYS[targetSetId])
           : data.title
         const translatedWord = WORD_TITLE_KEYS[selectedWord]
           ? t(WORD_TITLE_KEYS[selectedWord])
@@ -107,7 +116,7 @@ export default function IngamePage() {
     return () => {
       isMounted = false
     }
-  }, [setId, selectedWord, selectedCardId, i18n.language, t])
+  }, [setId, selectedWord, selectedCardId, i18n.language, t, getRandomRecommendedSetId])
 
   const handleBack = () => {
     setIsExiting(true)
@@ -176,10 +185,10 @@ export default function IngamePage() {
         />
 
         {isLoading && renderMessage('불러오는 중')}
-        {!isLoading && (missingSetMessage || errorMessage) && renderMessage(missingSetMessage || errorMessage)}
-        {!isLoading && !missingSetMessage && !errorMessage && cards.length === 0 && renderMessage('학습 카드가 없습니다.')}
+        {!isLoading && errorMessage && renderMessage(errorMessage)}
+        {!isLoading && !errorMessage && cards.length === 0 && renderMessage('학습 카드가 없습니다.')}
 
-        {!isLoading && !missingSetMessage && !errorMessage && cards.length > 0 && (
+        {!isLoading && !errorMessage && cards.length > 0 && (
           <div
             onScroll={handleScroll}
             className={`${styles.scrollArea} ${

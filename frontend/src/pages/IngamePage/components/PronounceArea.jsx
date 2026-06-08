@@ -159,6 +159,19 @@ export default function PronounceArea({ cardId, targetText, ttsUrl, onFinish }) 
     transitionToStep(3);
     setErrorMessage('');
 
+    // NOTE: [테스트용 임시 코드] 실제 발음 분석 API 호출 생략하고 즉시 통과 처리 (26. 6. 8., 정태영)
+    // setTimeout(() => {
+    //   const mockResult = {
+    //     score: 95,
+    //     heard_text: targetText,
+    //     feedback: "참 잘하셨습니다! (테스트용 자동 패스)"
+    //   };
+    //   setResult(mockResult);
+    //   transitionToStep(4);
+    //   onFinish?.(mockResult);
+    // }, 500);
+
+    // API 호출 코드
     try {
       const audioBlob = new Blob(chunks.length ? chunks : [''], { type: 'audio/webm' });
       const formData = new FormData();
@@ -174,6 +187,7 @@ export default function PronounceArea({ cardId, targetText, ttsUrl, onFinish }) 
       setErrorMessage(error.message);
       transitionToStep(1);
     }
+
   };
 
   const startRecording = async () => {

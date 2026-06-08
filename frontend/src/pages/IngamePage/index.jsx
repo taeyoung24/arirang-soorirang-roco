@@ -27,6 +27,7 @@ export default function IngamePage() {
 
   const currentIndexRef = useRef(0)
   const rafRef = useRef(null)
+  const scrollTimeoutRef = useRef(null)
   const missingSetMessage = setId ? '' : '학습 세트를 먼저 선택하세요.'
 
   useEffect(() => {
@@ -36,6 +37,9 @@ export default function IngamePage() {
     return () => {
       document.body.style.backgroundColor = ''
       setThemeColor(GLOBAL_CONFIG.colorBg)
+      if (scrollTimeoutRef.current) {
+        clearTimeout(scrollTimeoutRef.current)
+      }
     }
   }, [])
 
@@ -106,11 +110,13 @@ export default function IngamePage() {
   }
 
   const handleScroll = useCallback((e) => {
-    if (rafRef.current) return
-
     const target = e.target
-    rafRef.current = requestAnimationFrame(() => {
-      rafRef.current = null
+
+    if (scrollTimeoutRef.current) {
+      clearTimeout(scrollTimeoutRef.current)
+    }
+
+    scrollTimeoutRef.current = setTimeout(() => {
       const { scrollTop, clientHeight } = target
       const newIndex = Math.round(scrollTop / clientHeight)
 
@@ -123,7 +129,7 @@ export default function IngamePage() {
         setCurrentIndex(newIndex)
         setIsStageUnlocked(true)
       }
-    })
+    }, 100) // 100ms 디바운스 적용
   }, [])
 
   const renderMessage = (message) => (
@@ -140,7 +146,7 @@ export default function IngamePage() {
   return (
     <Layout className={`${styles.layout} ${styles.fadeIn} ${isExiting ? styles.fadeOut : ''}`}>
       {isBouncing && <div className={styles.topAmbientGlow} />}
-      <div className={styles.mainContainer}>
+      <div className={`${styles.mainContainer} ${isBouncing ? styles.bounceHint : ''}`}>
         <IngameTopContainer
           onBack={handleBack}
           onHelp={() => { }}
@@ -158,7 +164,7 @@ export default function IngamePage() {
               isStageUnlocked ? styles.scrollUnlocked : styles.scrollLocked
             }`}
           >
-            <div className={`${styles.bounceWrapper} ${isBouncing ? styles.bounceHint : ''}`}>
+            <div className={styles.bounceWrapper}>
               {Array.from({ length: stageCount }).map((_, index) => (
                 <div key={index} className={styles.stageItem}>
                   {currentStep === 'quiz' && (

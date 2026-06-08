@@ -1,6 +1,10 @@
 .pronounceArea {
   width: 20rem;
   height: 20rem;
+  max-height: 20rem;
+  flex-grow: 1;
+  flex-shrink: 1;
+  min-height: 0;
   position: relative;
   background-color: var(--color-bg);
   border-radius: var(--radius-global-round);
@@ -11,7 +15,7 @@
 
 .stepContainer {
   width: 20rem;
-  height: 20rem;
+  height: 100%;
   padding: 1.75rem;
   position: absolute;
   inset: 0;

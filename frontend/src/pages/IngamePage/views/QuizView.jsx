@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import { resolveAssetUrl, submitCardAnswer } from 'src/api'
 import AnswerButton from '../components/AnswerButton'
 import PronounceArea from '../components/PronounceArea'
@@ -19,6 +20,7 @@ const sentenceToParts = (sentence = '', word = '') => {
 }
 
 export default function QuizView({ card, title = '', progress = '', onStageUnlock }) {
+  const { t } = useTranslation()
   const [selectedChoiceId, setSelectedChoiceId] = useState(null)
   const [wrongChoiceIds, setWrongChoiceIds] = useState([])
   const [correctChoiceId, setCorrectChoiceId] = useState(null)
@@ -88,7 +90,7 @@ export default function QuizView({ card, title = '', progress = '', onStageUnloc
       <div className={styles.topArea}>
         <div className={styles.textArea}>
           <div className={styles.title}>
-            같은 의미로 사용된 문장을 고르세요.
+            {t('quiz_instruction')}
           </div>
           {(title || progress) && (
             <div className={styles.normalText}>

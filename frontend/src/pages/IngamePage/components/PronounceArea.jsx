@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { useTranslation } from 'react-i18next';
 import { evaluatePronunciation, resolveMediaUrl } from 'src/api';
 import { PronounceButton, SimpleIconButton } from 'src/components/Button';
 import styles from './PronounceArea.module.css';
@@ -80,6 +81,7 @@ function AudioWaveform() {
 }
 
 export default function PronounceArea({ cardId, targetText, ttsUrl, onFinish }) {
+  const { t } = useTranslation();
   const [step, setStep] = useState(1); // 1: 준비, 2: 녹음중, 3: 분석중, 4: 결과
   const [seconds, setSeconds] = useState(0);
   const [isExiting, setIsExiting] = useState(false);
@@ -240,7 +242,7 @@ export default function PronounceArea({ cardId, targetText, ttsUrl, onFinish }) 
       {step === 1 && (
         <div className={`${styles.stepContainer} ${styles.fadeIn} ${isExiting ? styles.fadeOut : ''}`}>
           <div className={styles.stepHeader}>
-            발음을 듣고 녹음을 시작하세요.
+            {t('pronounce_step1_instruction')}
           </div>
           <div className={styles.centerContent}>
             <PronounceButton
@@ -257,7 +259,7 @@ export default function PronounceArea({ cardId, targetText, ttsUrl, onFinish }) 
       {step === 2 && (
         <div className={`${styles.stepContainer} ${styles.fadeIn} ${isExiting ? styles.fadeOut : ''}`}>
           <div className={styles.stepHeader}>
-            따라 말해보세요.
+            {t('pronounce_step2_instruction')}
           </div>
           <div className={styles.centerContent}>
             <AudioWaveform />
@@ -271,7 +273,7 @@ export default function PronounceArea({ cardId, targetText, ttsUrl, onFinish }) 
         <div className={`${styles.stepContainer} ${styles.fadeIn} ${isExiting ? styles.fadeOut : ''}`}>
           <div className={styles.centerContent}>
             <div className={styles.stepHeader}>
-              음성을 분석하는 중입니다.
+              {t('pronounce_step3_instruction')}
             </div>
             <div className={styles.aiLoadingBar}>
               <div className={styles.aiWave} />
@@ -283,18 +285,18 @@ export default function PronounceArea({ cardId, targetText, ttsUrl, onFinish }) 
       {step === 4 && (
         <div className={`${styles.stepContainer} ${styles.fadeIn} ${isExiting ? styles.fadeOut : ''}`}>
           <div className={styles.stepHeader}>
-            “{targetText}”에 대한 발음 정확성
+            {t('pronounce_accuracy', { targetText })}
           </div>
           <div className={styles.resultContent}>
-            <div className={styles.scoreText}>{result?.score ?? 0}점</div>
+            <div className={styles.scoreText}>{t('score_format', { score: result?.score ?? 0 })}</div>
             {result?.heard_text && (
               <div className={styles.heardPanel}>
-                <span className={styles.heardLabel}>AI가 들은 발음</span>
+                <span className={styles.heardLabel}>{t('pronounce_ai_heard')}</span>
                 <span className={styles.heardText}>“{result.heard_text}”</span>
               </div>
             )}
             <div className={styles.descText}>
-              {result?.feedback || '분석 결과가 없습니다.'}
+              {result?.feedback || t('pronounce_no_result')}
             </div>
           </div>
 

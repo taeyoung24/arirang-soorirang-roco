@@ -1,0 +1,133 @@
+.layout {
+  height: 770px;
+  position: relative;
+  overflow: hidden;
+}
+
+.mainContainer {
+  width: 20rem;
+  height: 718px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: center;
+  gap: 1.5rem;
+}
+
+.mainContainer > * {
+  opacity: 0;
+  animation: fadeInUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.mainContainer > :nth-child(1) { animation-delay: 0.05s; }
+.mainContainer > :nth-child(2) { animation-delay: 0.13s; }
+.mainContainer > :nth-child(3) { animation-delay: 0.21s; }
+
+
+
+.title {
+  align-self: stretch;
+  display: flex;
+  justify-content: flex-start;
+  color: var(--color-text);
+  font-size: var(--font-size-h2);
+  font-weight: var(--font-weight-bold);
+  font-family: var(--font-sans);
+  margin-top: 0.5rem;
+}
+
+.settingList {
+  align-self: stretch;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.settingItem {
+  align-self: stretch;
+  padding: 1.25rem;
+  background-color: var(--color-white-primary);
+  border-radius: var(--radius-global-round);
+  outline: var(--spacing-border-main) solid var(--color-text);
+  outline-offset: -1.2px;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.settingItemLabel {
+  color: var(--color-text);
+  font-size: var(--font-size-h4);
+  font-weight: var(--font-weight-bold);
+  font-family: var(--font-sans);
+}
+
+.languageOptions {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.langButton {
+  flex: 1;
+  height: 40px;
+  border-radius: var(--radius-global-round);
+  border: var(--spacing-border-main) solid var(--color-text);
+  background-color: var(--color-bg);
+  color: var(--color-text);
+  font-size: var(--font-size-h5);
+  font-weight: var(--font-weight-semibold);
+  font-family: var(--font-sans);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.langButton:hover {
+  background-color: var(--color-bg-softdark);
+}
+
+.langButton.active {
+  background-color: var(--color-yellow-primary);
+  font-weight: var(--font-weight-bold);
+}
+
+.bottomArea {
+  position: absolute;
+  bottom: 2.5rem;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 20rem;
+}
+
+.buttonWrapper {
+  align-self: stretch;
+  display: flex;
+  justify-content: center;
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(15px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.fadeOut {
+  animation: fadeOut 0.5s ease-in-out forwards;
+}
+
+@keyframes fadeOut {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}

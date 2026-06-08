@@ -36,7 +36,7 @@ export default function QuizView({ card, title = '', progress = '', onStageUnloc
 
   if (!card) {
     return (
-      <div className={styles.topArea}>
+      <div className={styles.contentWrapper}>
         <div className={styles.textArea}>
           <div className={styles.title}>학습 카드가 없습니다.</div>
         </div>
@@ -92,59 +92,57 @@ export default function QuizView({ card, title = '', progress = '', onStageUnloc
     : questionParts
 
   return (
-    <>
-      <div className={styles.topArea}>
-        <div className={styles.textArea}>
-          <div className={styles.title}>
-            {t('quiz_instruction')}
-          </div>
-          {(title || progress) && (
-            <div className={styles.normalText}>
-              {title} {progress}
-            </div>
-          )}
+    <div className={styles.contentWrapper}>
+      <div className={styles.textArea}>
+        <div className={styles.title}>
+          {t('quiz_instruction')}
         </div>
-
-        <div className={styles.questionWrapper}>
-          <span className={styles.normalText}>“</span>
-          {displayParts.map((part, index) => {
-            if (part.type === 'highlight') {
-              return (
-                <div key={index} className={styles.highlightBlock}>
-                  <span className={styles.highlightText}>{part.text}</span>
-                </div>
-              )
-            }
-            return <span key={index} className={styles.normalText}>{part.text}</span>
-          })}
-          <span className={styles.normalText}>”</span>
-        </div>
-
-        {correctChoiceId ? (
-          <PronounceArea
-            cardId={card.card_id}
-            targetText={pronunciationTarget}
-            ttsUrl={card.tts_url}
-            onFinish={onStageUnlock}
-          />
-        ) : (
-          <div className={styles.imageWrapper}>
-            {!isImageLoaded && <ImageSkeleton />}
-            <img
-              className={`${styles.feedImage} ${isImageLoaded ? styles.imageLoaded : ''}`}
-              src={resolveAssetUrl(card.image_url)}
-              alt="feed"
-              onLoad={() => setIsImageLoaded(true)}
-            />
-          </div>
-        )}
-
-        {errorMessage && (
+        {(title || progress) && (
           <div className={styles.normalText}>
-            {errorMessage}
+            {title} {progress}
           </div>
         )}
       </div>
+
+      <div className={styles.questionWrapper}>
+        <span className={styles.normalText}>“</span>
+        {displayParts.map((part, index) => {
+          if (part.type === 'highlight') {
+            return (
+              <div key={index} className={styles.highlightBlock}>
+                <span className={styles.highlightText}>{part.text}</span>
+              </div>
+            )
+          }
+          return <span key={index} className={styles.normalText}>{part.text}</span>
+        })}
+        <span className={styles.normalText}>”</span>
+      </div>
+
+      {correctChoiceId ? (
+        <PronounceArea
+          cardId={card.card_id}
+          targetText={pronunciationTarget}
+          ttsUrl={card.tts_url}
+          onFinish={onStageUnlock}
+        />
+      ) : (
+        <div className={styles.imageWrapper}>
+          {!isImageLoaded && <ImageSkeleton />}
+          <img
+            className={`${styles.feedImage} ${isImageLoaded ? styles.imageLoaded : ''}`}
+            src={resolveAssetUrl(card.image_url)}
+            alt="feed"
+            onLoad={() => setIsImageLoaded(true)}
+          />
+        </div>
+      )}
+
+      {errorMessage && (
+        <div className={styles.normalText}>
+          {errorMessage}
+        </div>
+      )}
 
       <div data-testid="footer" className={styles.footer}>
         {card.choices.map((choice) => (
@@ -156,6 +154,6 @@ export default function QuizView({ card, title = '', progress = '', onStageUnloc
           />
         ))}
       </div>
-    </>
+    </div>
   )
 }

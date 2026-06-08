@@ -60,6 +60,7 @@ from db_models import (
 )
 from pronunciation_client import (
     PronunciationAnalysisError,
+    PronunciationServiceUnavailableError,
     analyze_pronunciation,
     build_pronunciation_result,
 )
@@ -549,6 +550,25 @@ async def submit_card_answer(
 # =============================================================================
 
 
+def build_pronunciation_fallback_result(card_id: str):
+    return PronunciationResult(
+        card_id=card_id,
+        score=0,
+        feedback=(
+            "발음 분석 서비스가 준비되지 않아 점수 평가를 건너뛰었습니다. "
+            "녹음은 완료되었으니 다음 문장으로 이어서 연습해 주세요."
+        ),
+        heard_text=None,
+        display_pronunciation_status="분석 서비스 준비 중",
+        raw_heard_text=None,
+        raw_predicted_phonemes=None,
+        feedback_issues=[],
+        next_practice_focus=["발음 분석 서비스가 연결되면 다시 평가해 보세요."],
+        pronunciation_status="UNAVAILABLE",
+        is_card_completed=True,
+    )
+
+
 @app.post("/api/v1/cards/{card_id}/pronunciation", response_model=PronunciationResponse)
 async def evaluate_pronunciation(
     card_id: str,
@@ -604,6 +624,14 @@ async def evaluate_pronunciation(
             feedback_issues,
             next_practice_focus,
         ) = build_pronunciation_result(analysis)
+    except PronunciationServiceUnavailableError:
+        touch_recent_learning_record(db, card_id)
+        db.commit()
+        return PronunciationResponse(
+            success=True,
+            data=build_pronunciation_fallback_result(card_id),
+            message=None,
+        )
     except PronunciationAnalysisError as exc:
         return PronunciationResponse(
             success=False,

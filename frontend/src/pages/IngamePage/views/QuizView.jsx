@@ -72,24 +72,24 @@ export default function QuizView({ card, title = '', progress = '', onStageUnloc
   }
 
   const getButtonStatus = (choice) => {
-    if (choice.choice_id === correctChoiceId) return 'Correct'
-    if (wrongChoiceIds.includes(choice.choice_id)) return 'Incorrect'
-    if (!isAnswered) return choice.choice_id === selectedChoiceId ? 'Selected' : 'Default'
-    if (choice.choice_id === selectedChoiceId) return 'Selected-Incorrect'
+    if (correctChoiceId) {
+      return choice.choice_id === correctChoiceId ? 'Correct' : 'Disable'
+    }
+    if (isSubmitting && choice.choice_id === selectedChoiceId) {
+      return 'Selected'
+    }
+    if (wrongChoiceIds.includes(choice.choice_id)) {
+      return 'Incorrect'
+    }
 
-    return 'Disable'
+    return 'Default'
   }
 
   const selectedChoice = card.choices.find((choice) => choice.choice_id === selectedChoiceId)
   const correctChoice = card.choices.find((choice) => choice.choice_id === correctChoiceId)
   const pronunciationTarget = card.prompt_sentence
   const questionParts = sentenceToParts(card.prompt_sentence, card.highlight || card.polysemy_word)
-  const selectedChoiceParts = selectedChoice
-    ? sentenceToParts(selectedChoice.text, selectedChoice.highlight || card.polysemy_word)
-    : questionParts
-  const displayParts = wrongChoiceIds.includes(selectedChoiceId)
-    ? selectedChoiceParts
-    : questionParts
+  const displayParts = questionParts
 
   return (
     <div className={styles.contentWrapper}>

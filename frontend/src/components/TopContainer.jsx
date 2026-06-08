@@ -42,8 +42,8 @@ export const IngameTopContainer = ({ onBack, onHelp, status = 'locked' }) => {
         </div>
       </div>
 
-      {/* Help Button */}
-      <SimpleIconButton type="help" onClick={onHelp} />
+      {/* Dummy space for layout balance */}
+      <div style={{ width: '52px' }} />
 
 
     </div>

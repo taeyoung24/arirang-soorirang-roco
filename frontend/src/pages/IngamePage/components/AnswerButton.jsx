@@ -1,7 +1,9 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import styles from './AnswerButton.module.css';
 
 export default function AnswerButton({ parts, status = 'Default', onClick }) {
+  const { t } = useTranslation();
   let bgClass = styles.bgDefault;
   let opacityClass = '';
   let textColorClass = styles.textDefault;
@@ -63,15 +65,14 @@ export default function AnswerButton({ parts, status = 'Default', onClick }) {
       break;
   }
 
+  const isSelected = status === 'Selected';
+
   return (
     <button 
       onClick={onClick}
       className={`${styles.button} ${bgClass} ${opacityClass}`}
     >
-
-
-
-      <div className={styles.contentContainer}>
+      <div className={`${styles.contentContainer} ${isSelected ? styles.fadeOut : styles.fadeIn}`}>
         <div className={styles.textWrapper}>
           {parts.map((part, index) => {
             if (part.type === 'highlight') {
@@ -87,10 +88,18 @@ export default function AnswerButton({ parts, status = 'Default', onClick }) {
           })}
         </div>
       </div>
-      <div className={styles.iconWrapper}>
+      <div className={`${styles.iconWrapper} ${isSelected ? styles.fadeOut : styles.fadeIn}`}>
         <div className={styles.iconInner}>
           {iconSvg}
         </div>
+      </div>
+
+      <div className={`${styles.loadingWrapper} ${isSelected ? styles.loadingSlideIn : styles.loadingSlideOut}`}>
+        <div className={styles.speedLine} style={{ left: '10%', animationDelay: '0s' }} />
+        <div className={styles.speedLine} style={{ left: '22%', animationDelay: '0.4s' }} />
+        <div className={styles.speedLine} style={{ right: '22%', animationDelay: '0.2s' }} />
+        <div className={styles.speedLine} style={{ right: '10%', animationDelay: '0.6s' }} />
+        <span className={styles.loadingText}>{t('grading_in_progress')}</span>
       </div>
     </button>
   );

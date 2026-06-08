@@ -1,8 +1,10 @@
 import React, { useEffect, useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
 import { getCategories, getCategorySets } from 'src/api'
 import Layout from 'src/components/Layout'
 import { SearchTopContainer } from 'src/components/TopContainer'
+import CircleBlockLoader from 'src/components/loaders/CircleBlockLoader'
 import styles from './SelectionPage.module.css'
 
 const FilterChip = ({ label, active, onClick }) => (
@@ -56,6 +58,7 @@ const ResultSection = ({ title, items, onItemClick }) => {
 
 export default function SelectionPage() {
   const navigate = useNavigate()
+  const { t } = useTranslation()
   const [isExiting, setIsExiting] = useState(false)
   const [categories, setCategories] = useState([])
   const [setsByCategory, setSetsByCategory] = useState({})
@@ -169,8 +172,9 @@ export default function SelectionPage() {
         <div className={styles.resultsArea}>
 
           {isLoading ? (
-            <div className={styles.noInfoText}>
-              불러오는 중
+            <div className={styles.loaderContainer}>
+              <CircleBlockLoader />
+              <p className={styles.loaderText}>{t('home_loading')}</p>
             </div>
           ) : results.length > 0 ? (
             results.map((section) => (

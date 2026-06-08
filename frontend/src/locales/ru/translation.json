@@ -33,5 +33,6 @@
   "pronounce_no_result": "Нет результатов анализа.",
   "setting_title": "Настройки",
   "setting_lang_label": "Язык",
-  "setting_save": "Сохранить"
+  "setting_save": "Сохранить",
+  "grading_in_progress": "Проверка..."
 }

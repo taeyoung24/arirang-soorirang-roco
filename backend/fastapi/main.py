@@ -81,6 +81,10 @@ app.add_middleware(
     allow_origins=[
         "http://localhost:5173",
         "http://127.0.0.1:5173",
+        "http://localhost:5174",
+        "http://127.0.0.1:5174",
+        "http://localhost:5175",
+        "http://127.0.0.1:5175",
     ],
     allow_credentials=True,
     allow_methods=["*"],
@@ -188,10 +192,25 @@ def get_cards_for_set(db: Session, set_id: str):
         "set_test_01": "일상 회화",
     }
 
+    all_sentence_texts = set()
+    for quiz in set_quizzes:
+        all_sentence_texts.add(quiz.prompt_sentence)
+        for choice in quiz.choices:
+            all_sentence_texts.add(choice.text)
+
+    sentence_highlights = {
+        s.content: s.highlight
+        for s in db.query(SentenceDB).filter(SentenceDB.content.in_(all_sentence_texts)).all()
+    }
+
     cards = []
     for quiz in set_quizzes:
         choices = [
-            Choice(choice_id=choice.choice_id, text=choice.text)
+            Choice(
+                choice_id=choice.choice_id,
+                text=choice.text,
+                highlight=sentence_highlights.get(choice.text),
+            )
             for choice in sorted(quiz.choices, key=lambda choice: choice.choice_id)
         ]
         random.shuffle(choices)
@@ -201,6 +220,7 @@ def get_cards_for_set(db: Session, set_id: str):
                 sentence_id=quiz.sentence_id,
                 polysemy_word=quiz.polysemy_word,
                 prompt_sentence=quiz.prompt_sentence,
+                highlight=sentence_highlights.get(quiz.prompt_sentence),
                 choices=choices,
                 pronunciation_target=quiz.pronunciation_target,
                 tts_url=quiz.tts_url,

@@ -24,6 +24,10 @@ class PronunciationAnalysisError(RuntimeError):
     pass
 
 
+class PronunciationServiceUnavailableError(PronunciationAnalysisError):
+    pass
+
+
 def _convert_webm_to_wav(webm_bytes: bytes) -> bytes:
     with tempfile.NamedTemporaryFile(suffix=".webm", delete=False) as f_in:
         f_in.write(webm_bytes)
@@ -51,7 +55,9 @@ def _convert_webm_to_wav(webm_bytes: bytes) -> bytes:
 
 async def analyze_pronunciation(audio_bytes, filename, target_text):
     if not MDD_API_BASE_URL:
-        raise PronunciationAnalysisError("MDD_API_BASE_URL 환경변수가 설정되어 있지 않습니다.")
+        raise PronunciationServiceUnavailableError(
+            "발음 분석 서비스가 아직 연결되지 않았습니다."
+        )
 
     endpoint = PRONUNCIATION_ANALYSIS_ENDPOINT
     if not endpoint.startswith("/"):
@@ -88,7 +94,9 @@ async def analyze_pronunciation(audio_bytes, filename, target_text):
         detail = _extract_detail(exc.response)
         raise PronunciationAnalysisError(_user_facing_error_message(detail)) from exc
     except httpx.HTTPError as exc:
-        raise PronunciationAnalysisError(f"ml_core 발음 분석 서비스 연결 실패: {exc}") from exc
+        raise PronunciationServiceUnavailableError(
+            "발음 분석 서비스가 아직 연결되지 않았습니다."
+        ) from exc
 
 
 def build_pronunciation_result(analysis):

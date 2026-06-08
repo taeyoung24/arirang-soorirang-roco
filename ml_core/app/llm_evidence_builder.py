@@ -13,7 +13,12 @@ class LLMEvidenceBuilder:
     def build(self, evidence: AcousticEvidencePacket, max_diagnostics: int = 3) -> AcousticEvidencePacket:
         diagnostics = self._top_diagnostics(evidence.diagnostic_candidates, max_diagnostics)
         target_units = {item.target_unit for item in diagnostics if item.target_unit}
-        phoneme_edits = self._relevant_edits(evidence.phoneme_edits, target_units, max_diagnostics)
+        segmental_target_units = {
+            item.target_unit
+            for item in diagnostics
+            if item.category == "segmental" and item.target_unit
+        }
+        phoneme_edits = self._relevant_edits(evidence.phoneme_edits, segmental_target_units, max_diagnostics)
         return AcousticEvidencePacket(
             script=evidence.script,
             canonical_text=evidence.canonical_text,

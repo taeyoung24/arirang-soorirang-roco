@@ -18,6 +18,30 @@ NO_RECOGNIZABLE_SPEECH_MARKERS = (
     "No recognizable speech was detected in the audio.",
     "Predicted phoneme sequence is empty.",
 )
+SUPPORTED_FEEDBACK_LANGUAGES = {"ko", "en", "ru"}
+FALLBACK_FEEDBACK_TEXT = {
+    "ko": {
+        "default_issue": "발음에서 개선할 부분이 감지되었습니다.",
+        "practice_unit": "{unit} 부분을 다시 연습해 보세요. {diagnosis}",
+        "completed": "발음 분석이 완료되었습니다.",
+        "coaching_unit": "{unit} 소리를 정확히 내는 연습을 해보세요.",
+        "coaching_general": "천천히 다시 녹음해서 발음 차이를 확인해 보세요.",
+    },
+    "en": {
+        "default_issue": "The analysis found a pronunciation point to improve.",
+        "practice_unit": "Practice the {unit} part again. {diagnosis}",
+        "completed": "Pronunciation analysis is complete.",
+        "coaching_unit": "Practice producing the {unit} sound clearly.",
+        "coaching_general": "Record again slowly and compare the pronunciation difference.",
+    },
+    "ru": {
+        "default_issue": "Анализ выявил момент в произношении, который можно улучшить.",
+        "practice_unit": "Потренируйте часть {unit} еще раз. {diagnosis}",
+        "completed": "Анализ произношения завершен.",
+        "coaching_unit": "Потренируйтесь четко произносить звук {unit}.",
+        "coaching_general": "Запишите еще раз медленно и сравните разницу в произношении.",
+    },
+}
 
 
 class PronunciationAnalysisError(RuntimeError):
@@ -53,7 +77,18 @@ def _convert_webm_to_wav(webm_bytes: bytes) -> bytes:
         _os.unlink(output_path)
 
 
-async def analyze_pronunciation(audio_bytes, filename, target_text):
+def _normalize_feedback_language(value):
+    if not isinstance(value, str):
+        return "ko"
+
+    language = value.strip().lower()
+    if "-" in language:
+        language = language.split("-", 1)[0]
+
+    return language if language in SUPPORTED_FEEDBACK_LANGUAGES else "ko"
+
+
+async def analyze_pronunciation(audio_bytes, filename, target_text, feedback_language="ko"):
     if not MDD_API_BASE_URL:
         raise PronunciationServiceUnavailableError(
             "발음 분석 서비스가 아직 연결되지 않았습니다."
@@ -73,7 +108,7 @@ async def analyze_pronunciation(audio_bytes, filename, target_text):
     data = {
         "script": target_text,
         "language": "Korean",
-        "feedback_language": "ko",
+        "feedback_language": _normalize_feedback_language(feedback_language),
         "use_tts_reference": "true",
         "debug": "false",
     }
@@ -99,13 +134,14 @@ async def analyze_pronunciation(audio_bytes, filename, target_text):
         ) from exc
 
 
-def build_pronunciation_result(analysis):
+def build_pronunciation_result(analysis, feedback_language="ko"):
     score = analysis.get("pronunciation_score", {}).get("overall")
     if score is None:
         raise PronunciationAnalysisError("ml_core 응답에 pronunciation_score.overall이 없습니다.")
 
-    feedback = _extract_feedback(analysis)
-    feedback_issues = _extract_feedback_issues(analysis)
+    normalized_feedback_language = _normalize_feedback_language(feedback_language)
+    feedback = _extract_feedback(analysis, normalized_feedback_language)
+    feedback_issues = _extract_feedback_issues(analysis, normalized_feedback_language)
     practice_focus = _extract_next_practice_focus(analysis)
     heard_text = _extract_heard_text(analysis)
     display_status = _extract_display_pronunciation_status(analysis)
@@ -123,55 +159,73 @@ def build_pronunciation_result(analysis):
     )
 
 
-def _extract_feedback(analysis):
+def _feedback_text(language, key, **kwargs):
+    template = FALLBACK_FEEDBACK_TEXT.get(language, FALLBACK_FEEDBACK_TEXT["ko"])[key]
+    return template.format(**kwargs)
+
+
+def _extract_feedback(analysis, feedback_language="ko"):
     llm_feedback = analysis.get("llm_feedback") or {}
     if llm_feedback.get("summary"):
         return llm_feedback["summary"]
 
-    issues = _extract_feedback_issues(analysis)
+    issues = _extract_feedback_issues(analysis, feedback_language)
     if issues:
         issue = issues[0]
         unit = issue.get("unit")
-        diagnosis = issue.get("diagnosis") or "발음에서 개선할 부분이 감지되었습니다."
+        diagnosis = issue.get("diagnosis") or _feedback_text(feedback_language, "default_issue")
         if unit:
-            return f"{unit} 부분을 다시 연습해 보세요. {diagnosis}"
+            return _feedback_text(
+                feedback_language,
+                "practice_unit",
+                unit=unit,
+                diagnosis=diagnosis,
+            )
         return diagnosis
 
     score = analysis.get("pronunciation_score", {})
     if score.get("note"):
         return score["note"]
 
-    return "발음 분석이 완료되었습니다."
+    return _feedback_text(feedback_language, "completed")
 
 
-def _extract_feedback_issues(analysis):
+def _extract_feedback_issues(analysis, feedback_language="ko"):
     llm_feedback = analysis.get("llm_feedback") or {}
     issues = llm_feedback.get("issues") or []
     if issues:
-        return [_normalize_feedback_issue(issue) for issue in issues if isinstance(issue, dict)]
+        return [
+            _normalize_feedback_issue(issue, feedback_language)
+            for issue in issues
+            if isinstance(issue, dict)
+        ]
 
     diagnostics = analysis.get("diagnostic_candidates") or []
-    return [_issue_from_diagnostic(item) for item in diagnostics[:3] if isinstance(item, dict)]
+    return [
+        _issue_from_diagnostic(item, feedback_language)
+        for item in diagnostics[:3]
+        if isinstance(item, dict)
+    ]
 
 
-def _normalize_feedback_issue(issue):
+def _normalize_feedback_issue(issue, feedback_language="ko"):
     return {
         "unit": issue.get("unit"),
         "category": issue.get("category"),
-        "diagnosis": issue.get("diagnosis") or "발음에서 개선할 부분이 감지되었습니다.",
+        "diagnosis": issue.get("diagnosis") or _feedback_text(feedback_language, "default_issue"),
         "evidence": issue.get("evidence"),
         "coaching": issue.get("coaching"),
         "confidence": issue.get("confidence"),
     }
 
 
-def _issue_from_diagnostic(item):
+def _issue_from_diagnostic(item, feedback_language="ko"):
     target = item.get("target_unit")
-    rationale = item.get("rationale") or "발음에서 개선할 부분이 감지되었습니다."
+    rationale = item.get("rationale") or _feedback_text(feedback_language, "default_issue")
     if target:
-        coaching = f"{target} 소리를 정확히 내는 연습을 해보세요."
+        coaching = _feedback_text(feedback_language, "coaching_unit", unit=target)
     else:
-        coaching = "천천히 다시 녹음해서 발음 차이를 확인해 보세요."
+        coaching = _feedback_text(feedback_language, "coaching_general")
     return {
         "unit": target,
         "category": item.get("category"),

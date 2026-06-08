@@ -21,6 +21,11 @@ class Settings:
     aligner_timeout_seconds: float
     aligner_language: str
     aligner_model_id: str
+    whisper_model: str
+    whisper_device: str
+    whisper_compute_type: str
+    whisper_language: str
+    whisper_beam_size: int
     gemini_api_key: str
     gemini_model: str
     gemini_timeout_seconds: float
@@ -56,6 +61,11 @@ class Settings:
             aligner_timeout_seconds=float(os.getenv("MDD_ALIGNER_TIMEOUT_SECONDS", "120")),
             aligner_language=os.getenv("MDD_ALIGNER_LANGUAGE", "Korean"),
             aligner_model_id=os.getenv("MDD_ALIGNER_MODEL_ID", "Qwen/Qwen3-ForcedAligner-0.6B"),
+            whisper_model=os.getenv("MDD_WHISPER_MODEL", "small"),
+            whisper_device=os.getenv("MDD_WHISPER_DEVICE", "cuda"),
+            whisper_compute_type=os.getenv("MDD_WHISPER_COMPUTE_TYPE", "int8_float16"),
+            whisper_language=os.getenv("MDD_WHISPER_LANGUAGE", "ko"),
+            whisper_beam_size=int(os.getenv("MDD_WHISPER_BEAM_SIZE", "5")),
             gemini_api_key=os.getenv("MDD_GEMINI_API_KEY", ""),
             gemini_model=os.getenv("MDD_GEMINI_MODEL", "gemini-2.5-flash"),
             gemini_timeout_seconds=float(os.getenv("MDD_GEMINI_TIMEOUT_SECONDS", "30")),

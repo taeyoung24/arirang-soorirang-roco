@@ -1,26 +1,25 @@
-# MDD Service
+# Whisper Pronunciation Service
 
-MDD 모델 `checkpoint_mdd_sjr.pt`를 사용해서 추론을 제공하는 분리형 서비스입니다.
+Whisper 전사 결과를 target script와 비교해 발음 평가를 제공하는 `ml_core` 서비스입니다. 기존 MDD/fairseq 음소 디코더는 이 브랜치에서 API 경로와 compose 실행 구성에서 제거되었습니다.
 
 ## 구조
 
 - `app/server.py`: 외부 API 게이트웨이
-- `app/inference_server.py`: 내부 추론 서비스
+- `app/whisper_client.py`: `faster-whisper` 기반 ASR 클라이언트
+- `app/whisper_pronunciation_analysis_service.py`: Whisper 전사 일치도, prosody, audio quality 기반 발음 분석
 - `app/aligner_server.py`: Qwen3 강제정렬 서비스
-- `app/pipeline.py`: 전처리, manifest 생성, 후처리
-- `app/fairseq_runner.py`: fairseq 모델을 프로세스 시작 시 한 번만 로드하는 in-process runner
-- `app/acoustic_schemas.py`: 음향 분석 + LLM 해석용 구조화 스키마 초안
-- `assets/dict.phn.txt`: 추론용 phoneme dictionary
-- `docker-compose.yml`: `api` + `inference` + `aligner` 컨테이너 실행 정의
+- `app/acoustic_schemas.py`: 음향 분석 + LLM 해석용 구조화 스키마
+- `docker-compose.yml`: `api` + `aligner` + `minio` 컨테이너 실행 정의
 
 ## 입력 계약
 
-이 서비스는 API 입력으로 원문 문장을 받습니다. 서버 내부에서 `g2p -> 자모 분해`를 수행한 뒤 원래 MDD 모델과 비교합니다.
+이 서비스는 API 입력으로 target script와 사용자 음성을 받습니다. 서버는 Whisper 전사 결과를 정규화한 target script와 비교하고, 일치 정도를 segmental 점수의 주 근거로 사용합니다. 기존처럼 `canonical_phonemes`/`predicted_phonemes` 필드는 API 호환을 위해 한글 자모 분해 문자열로 채웁니다.
 
 예:
 
 - 원문: `옷을 입어요`
-- 서버 내부 canonical phonemes 예시: `ㅇㅗㅅㅇㅡㄹㅇㅣㅂㅇㅓㅇㅛ`
+- Whisper 전사: `옷을 입어요`
+- canonical/predicted phonemes 예시: `ㅇㅗㅅㅇㅡㄹㅇㅣㅂㅇㅓㅇㅛ`
 
 ## 실행
 
@@ -28,33 +27,15 @@ MDD 모델 `checkpoint_mdd_sjr.pt`를 사용해서 추론을 제공하는 분리
 docker compose up --build
 ```
 
-외부 API 포트는 `8000`입니다. `inference` 컨테이너는 내부 네트워크에서만 `8080`으로 열립니다.
+외부 API 포트는 `8000`입니다. Whisper 모델은 API 컨테이너에서 로드하며, 기본 모델은 `small`입니다.
 
-현재 기본 경로는 공식 CUDA 베이스 위에서 원본 MDD 추론 환경을 재현하는 방식입니다. 다음 항목을 원본 이미지와 맞추는 데 초점을 둡니다.
+## Whisper 설정
 
-- 공식 CUDA 베이스 위에 `conda env(main)` 구성
-- `Python 3.9.12`
-- 원본 이미지에서 추출한 패키지 버전 락 기반 설치
-- `fairseq` commit `a075481d0de112aee2d79f40ac3ab0eca37214d8`
-- `flashlight` egg를 site-packages에 원본과 유사한 형태로 배치
-
-원본 이미지에서 추출한 런타임 메모는 [docs/original-image-runtime.md](/C:/Users/dobi/Desktop/study/arirang-soorirang-roco/ml_core/docs/original-image-runtime.md:1)에 정리했습니다.
-현재 컨테이너는 `flashlight` 네이티브 라이브러리 탐색과 `examples.speech_recognition` import를 위해 `LD_LIBRARY_PATH`, `PYTHONPATH`를 함께 사용합니다.
-원본 이미지에서 실제 런타임 명세를 덤프하려면 아래 스크립트를 실행하면 됩니다.
-
-```powershell
-.\scripts\extract-original-runtime.ps1
-```
-
-결과는 `ml_core/docs/original-image-dump/` 아래에 저장됩니다. 재구성 절차 개요는 [docs/original-image-rebuild-plan.md](/C:/Users/dobi/Desktop/study/arirang-soorirang-roco/ml_core/docs/original-image-rebuild-plan.md:1)에 정리했습니다.
-음향 분석 확장 설계 초안은 [docs/acoustic-analysis-llm-design.md](/C:/Users/dobi/Desktop/study/arirang-soorirang-roco/ml_core/docs/acoustic-analysis-llm-design.md:1)에 정리했습니다.
-현재 브랜치의 실제 구현 범위와 검증 상태는 [docs/acoustic-analysis-implementation-status.md](/C:/Users/dobi/Desktop/study/arirang-soorirang-roco/ml_core/docs/acoustic-analysis-implementation-status.md:1)에 정리했습니다.
-
-## 모델 파일 준비
-
-- 모델 가중치 파일 `checkpoint_mdd_sjr.pt`는 Git으로 추적하지 않습니다.
-- 실행 전에 모델 파일을 `ml_core/models/checkpoint_mdd_sjr.pt` 경로에 직접 배치해야 합니다.
-- 현재 `docker-compose.yml`은 `./models`를 컨테이너의 `/opt/mdd/checkpoints`로 마운트합니다.
+- `MDD_WHISPER_MODEL` 기본값: `small`
+- `MDD_WHISPER_DEVICE` 기본값: `cuda`
+- `MDD_WHISPER_COMPUTE_TYPE` 기본값: `int8_float16`
+- `MDD_WHISPER_LANGUAGE` 기본값: `ko`
+- `MDD_WHISPER_BEAM_SIZE` 기본값: `5`
 
 ## API
 
@@ -83,36 +64,27 @@ curl -X POST http://localhost:8000/tts-assets/generate `
   -F "language=Korean"
 ```
 
-응답의 `cache_key`, `object_bucket`, `audio_object_key`를 backend DB에 저장하면 됩니다. 같은 `text`, `language`, `provider`, `model`, `voice_id`, `speaking_rate`, `audio_format` 조합이 이미 MinIO에 있으면 새로 생성하지 않고 기존 위치를 반환합니다.
-
 현재 분석 API는 다음 단계를 수행합니다.
 
-- 기존 MDD 추론으로 `predicted_phonemes` 생성
+- Whisper 전사로 `predicted_text` 생성
+- target script와 Whisper transcript를 정규화한 뒤 문자 단위 일치도 계산
 - `Qwen/Qwen3-ForcedAligner-0.6B`로 word/character timestamp 정렬
-- 정렬 결과를 바탕으로 음절/단어 구간 생성
 - `use_tts_reference=true`이면 TTS reference를 자동 생성/캐싱하고, cached TTS reference alignment와 사용자 timing을 비교해 늘어짐/중간 공백 후보 생성
-- in-process fairseq backend에서는 hypothesis decoder score를 `model_score`로 노출
-- 앱 표시용 0-100 휴리스틱 종합 점수를 `pronunciation_score`로 항상 노출
-- MDD 음소 mismatch를 중심으로 오류 후보 생성
-- `MDD_GEMINI_API_KEY`가 있으면 원문/예측 문장과 전체 음소열을 기준으로, 상위 진단 관련 evidence를 보조 근거로 압축해 Gemini API 피드백 생성
+- 앱 표시용 0-100 휴리스틱 종합 점수를 `pronunciation_score`로 노출
+- Whisper 전사 불일치, prosody, audio quality를 중심으로 오류 후보 생성
+- `MDD_GEMINI_API_KEY`가 있으면 구조화 evidence를 기준으로 Gemini API 피드백 생성
 
 `language`는 forced aligner에 넘기는 발화 언어이며 기본값은 `Korean`입니다.
 `feedback_language`는 LLM 피드백 언어이며 기본값은 `ko`입니다. 예: `ko`, `en`, `ja`, `zh-CN`, `Spanish`.
-`debug`는 상세 응답 여부이며 기본값은 `false`입니다. `debug=true`이면 전체 alignment와 phoneme score를 포함합니다.
+`debug`는 상세 응답 여부이며 기본값은 `false`입니다.
 
 주의:
 
 - 강제정렬은 별도 `aligner` 컨테이너에서 수행됩니다.
 - 분석 API는 강제정렬에 실패하면 fallback 분석을 반환하지 않고 오류를 반환합니다.
-- 발음 오류 판정은 MDD phoneme edit alignment를 우선합니다.
-- `pronunciation_score.overall`은 target phoneme confidence, timing/prosody, diagnostic penalty를 합친 휴리스틱 점수입니다. `audio_quality` 점수는 별도로 표시되며 overall에는 반영되지 않습니다.
-- `model_score`는 calibrated GOP가 아니라 decoder hypothesis score이므로, 음소별 confidence로 쓰려면 추가 calibration/후처리가 필요합니다.
-
-## CLI
-
-```powershell
-.venv\Scripts\python.exe main.py .\sample.wav "옷을 입어요"
-```
+- Whisper는 음소 단위 MDD 모델이 아니므로 segmental 평가는 전사 일치도 기반 휴리스틱입니다.
+- `pronunciation_score.overall`은 Whisper transcript agreement와 timing/prosody evidence를 합친 휴리스틱 점수입니다. `audio_quality` 점수는 별도로 표시되며 overall에는 반영되지 않습니다.
+- `model_score`는 Whisper confidence proxy이며 calibrated pronunciation confidence가 아닙니다.
 
 ## Gemini 설정
 
@@ -138,9 +110,8 @@ curl -X POST http://localhost:8000/tts-assets/generate `
 
 ## 주의
 
-- `api` 컨테이너는 timing/prosody 분석과 Gemini 해석을 담당합니다.
-- `inference` 컨테이너가 모델을 시작 시 한 번 로드한 뒤 요청마다 재사용합니다.
+- `api` 컨테이너는 Whisper ASR, timing/prosody 분석과 Gemini 해석을 담당합니다.
+- 기본 Whisper 실행은 GPU `cuda` + `int8_float16`입니다.
+- `api` 컨테이너는 `nvidia-cublas-cu12`와 `nvidia-cudnn-cu12` wheel 런타임을 사용합니다.
 - `aligner` 컨테이너가 Qwen3 forced aligner를 시작 시 로드한 뒤 요청마다 재사용합니다.
-- 현재 compose는 `inference` 서비스에 `runtime: nvidia`를 사용합니다.
-- 현재 compose는 `aligner` 서비스에도 `runtime: nvidia`를 사용합니다.
-- 호스트 NVIDIA 드라이버가 컨테이너 CUDA와 맞지 않으면 CPU로 돌거나 실패할 수 있습니다.
+- 현재 compose는 `api`와 `aligner` 서비스에 GPU 런타임을 사용합니다.

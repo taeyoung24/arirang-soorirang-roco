@@ -9,9 +9,10 @@ from app.acoustic_analysis import AcousticAnalyzer
 from app.acoustic_schemas import ForcedAlignmentResponse, PronunciationAnalysisResponse
 from app.aligner_client import AlignerClient
 from app.config import Settings
+from app.diagnostic_engine import DiagnosticEngine
 from app.gemini_client import GeminiFeedbackClient
-from app.inference_client import InferenceClient
-from app.pronunciation_analysis_service import PronunciationAnalysisService
+from app.whisper_client import WhisperClient
+from app.whisper_pronunciation_analysis_service import WhisperPronunciationAnalysisService
 from app.reference_cache import ReferenceCacheManifest, ReferenceCacheRequest, create_reference_cache_store
 from app.schemas import HealthResponse
 from app.tts_asset_cache import TTSAssetManifest, TTSAssetRequest, create_tts_asset_store
@@ -19,20 +20,27 @@ from app.tts_reference import EdgeTTSReferenceGenerator, create_tts_reference_ge
 
 
 settings = Settings.from_env()
-client = InferenceClient(settings.inference_base_url, settings.inference_timeout_seconds)
+whisper_client = WhisperClient(
+    model_name=settings.whisper_model,
+    device=settings.whisper_device,
+    compute_type=settings.whisper_compute_type,
+    language=settings.whisper_language,
+    beam_size=settings.whisper_beam_size,
+)
 aligner_client = AlignerClient(settings.aligner_base_url, settings.aligner_timeout_seconds)
 reference_cache = create_reference_cache_store(settings)
 tts_asset_store = create_tts_asset_store(settings)
 tts_reference_generator = create_tts_reference_generator(settings)
-analysis_service = PronunciationAnalysisService(
+analysis_service = WhisperPronunciationAnalysisService(
     analyzer=AcousticAnalyzer(),
+    diagnostic_engine=DiagnosticEngine(),
     gemini_client=GeminiFeedbackClient(
         api_key=settings.gemini_api_key,
         model=settings.gemini_model,
         timeout_seconds=settings.gemini_timeout_seconds,
     ),
 )
-app = FastAPI(title="MDD Service", version="0.1.0")
+app = FastAPI(title="Whisper Pronunciation Service", version="0.2.0")
 
 
 def _extract_upstream_detail(exc: httpx.HTTPStatusError):
@@ -64,14 +72,12 @@ def _align_or_raise(audio_bytes: bytes, original_filename: str, text: str, langu
 
 @app.get("/health", response_model=HealthResponse, response_model_exclude_none=True)
 def healthcheck() -> HealthResponse:
-    inference_status, _ = client.health()
+    whisper_status, _ = whisper_client.health()
     aligner_status, _ = aligner_client.health()
     reference_cache_status, reference_cache_error = reference_cache.health()
     return HealthResponse(
         status="ok",
         service_mode="api",
-        inference_base_url=settings.inference_base_url,
-        inference_status=inference_status,
         aligner_base_url=settings.aligner_base_url,
         aligner_status=aligner_status,
         aligner_model_id=settings.aligner_model_id,
@@ -82,6 +88,9 @@ def healthcheck() -> HealthResponse:
         reference_cache_error=reference_cache_error,
         tts_provider=settings.tts_provider,
         tts_voice_id=settings.tts_voice_id,
+        asr_backend="faster_whisper",
+        asr_status=whisper_status,
+        whisper_model=settings.whisper_model,
     )
 
 
@@ -172,7 +181,11 @@ async def _analyze_pronunciation(
 ) -> PronunciationAnalysisResponse:
     try:
         payload = await audio.read()
-        prediction = client.predict(payload, audio.filename or "input.wav", script)
+        transcription = await asyncio.to_thread(
+            whisper_client.transcribe,
+            payload,
+            audio.filename or "input.wav",
+        )
         forced_alignment = _align_or_raise(
             audio_bytes=payload,
             original_filename=audio.filename or "input.wav",
@@ -180,31 +193,22 @@ async def _analyze_pronunciation(
             language=(language or settings.aligner_language),
         )
         reference_alignment = None
-        reference_prediction = None
-        reference_prediction_cache_key = None
         if reference_cache_key:
             reference_alignment = reference_cache.get_alignment(reference_cache_key)
-            reference_prediction_cache_key = reference_cache_key
             if reference_alignment is None:
                 if not use_tts_reference:
                     raise HTTPException(status_code=404, detail="reference cache alignment not found")
                 reference_manifest = await asyncio.to_thread(_get_or_create_tts_reference, script, language)
-                reference_prediction_cache_key = reference_manifest.cache_key
                 reference_alignment = reference_cache.get_alignment(reference_manifest.cache_key)
         elif use_tts_reference:
             reference_manifest = await asyncio.to_thread(_get_or_create_tts_reference, script, language)
-            reference_prediction_cache_key = reference_manifest.cache_key
             reference_alignment = reference_cache.get_alignment(reference_manifest.cache_key)
-        if reference_prediction_cache_key:
-            reference_audio = reference_cache.get_audio(reference_prediction_cache_key)
-            if reference_audio is not None:
-                reference_prediction = client.predict(reference_audio, "tts-reference.wav", script)
         response = analysis_service.analyze(
             payload,
-            prediction,
+            script=script,
+            transcription=transcription,
             forced_alignment=forced_alignment,
             reference_alignment=reference_alignment,
-            reference_prediction=reference_prediction,
             feedback_language=feedback_language,
         )
         if not debug:
@@ -215,7 +219,7 @@ async def _analyze_pronunciation(
     except httpx.HTTPStatusError as exc:
         raise HTTPException(status_code=exc.response.status_code, detail=_extract_upstream_detail(exc)) from exc
     except httpx.HTTPError as exc:
-        raise HTTPException(status_code=502, detail=f"inference service unavailable: {exc}") from exc
+        raise HTTPException(status_code=502, detail=f"upstream service unavailable: {exc}") from exc
     except RuntimeError as exc:
         raise HTTPException(status_code=503, detail=str(exc)) from exc
 

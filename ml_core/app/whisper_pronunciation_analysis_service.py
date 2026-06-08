@@ -21,6 +21,22 @@ from app.schemas import ModelScoreSummary
 from app.whisper_client import WhisperTranscription
 
 
+NO_DIAGNOSTIC_SUMMARY = {
+    "ko": "뚜렷한 발음 오류가 감지되지 않았습니다.",
+    "en": "No clear pronunciation errors were detected.",
+    "ru": "Явных ошибок произношения не обнаружено.",
+}
+
+
+def _normalize_feedback_language(value: str) -> str:
+    language = (value or "ko").strip().lower().split("-", 1)[0]
+    return language if language in NO_DIAGNOSTIC_SUMMARY else "ko"
+
+
+def _no_diagnostic_summary(feedback_language: str) -> str:
+    return NO_DIAGNOSTIC_SUMMARY[_normalize_feedback_language(feedback_language)]
+
+
 class WhisperPronunciationAnalysisService:
     def __init__(
         self,
@@ -134,7 +150,7 @@ class WhisperPronunciationAnalysisService:
         llm_evidence = self.llm_evidence_builder.build(evidence)
         if not llm_evidence.diagnostic_candidates:
             response.llm_feedback = AcousticLLMFeedback(
-                summary="뚜렷한 발음 오류가 감지되지 않았습니다.",
+                summary=_no_diagnostic_summary(evidence.policy.language),
                 issues=[],
                 overall_confidence="medium",
                 next_practice_focus=[],

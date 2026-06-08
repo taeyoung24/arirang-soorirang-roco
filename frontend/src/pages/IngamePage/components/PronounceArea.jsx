@@ -81,7 +81,7 @@ function AudioWaveform() {
 }
 
 export default function PronounceArea({ cardId, targetText, ttsUrl, onFinish }) {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const [step, setStep] = useState(1); // 1: 준비, 2: 녹음중, 3: 분석중, 4: 결과
   const [seconds, setSeconds] = useState(0);
   const [isExiting, setIsExiting] = useState(false);
@@ -178,6 +178,7 @@ export default function PronounceArea({ cardId, targetText, ttsUrl, onFinish }) 
       const audioBlob = new Blob(chunks.length ? chunks : [''], { type: 'audio/webm' });
       const formData = new FormData();
       formData.append('target_text', targetText);
+      formData.append('feedback_language', i18n.resolvedLanguage || i18n.language || 'ko');
       formData.append('audio_file', audioBlob, `${cardId}.webm`);
       const pronunciationResult = await evaluatePronunciation(cardId, formData);
 

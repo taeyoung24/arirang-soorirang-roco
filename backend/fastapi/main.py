@@ -578,20 +578,46 @@ async def submit_card_answer(
 # =============================================================================
 
 
-def build_pronunciation_fallback_result(card_id: str):
+def build_pronunciation_fallback_result(card_id: str, feedback_language: str = "ko"):
+    language = feedback_language.strip().lower().split("-", 1)[0]
+    fallback_messages = {
+        "ko": {
+            "feedback": (
+                "발음 분석 서비스가 준비되지 않아 점수 평가를 건너뛰었습니다. "
+                "녹음은 완료되었으니 다음 문장으로 이어서 연습해 주세요."
+            ),
+            "status": "분석 서비스 준비 중",
+            "focus": "발음 분석 서비스가 연결되면 다시 평가해 보세요.",
+        },
+        "en": {
+            "feedback": (
+                "Pronunciation analysis is not ready, so scoring was skipped. "
+                "Your recording is complete; continue practicing with the next sentence."
+            ),
+            "status": "Analysis service is not ready",
+            "focus": "Try again when the pronunciation analysis service is connected.",
+        },
+        "ru": {
+            "feedback": (
+                "Сервис анализа произношения пока не готов, поэтому оценка была пропущена. "
+                "Запись завершена; продолжайте практику со следующим предложением."
+            ),
+            "status": "Сервис анализа пока не готов",
+            "focus": "Попробуйте снова, когда сервис анализа произношения будет подключен.",
+        },
+    }
+    messages = fallback_messages.get(language, fallback_messages["ko"])
+
     return PronunciationResult(
         card_id=card_id,
         score=0,
-        feedback=(
-            "발음 분석 서비스가 준비되지 않아 점수 평가를 건너뛰었습니다. "
-            "녹음은 완료되었으니 다음 문장으로 이어서 연습해 주세요."
-        ),
+        feedback=messages["feedback"],
         heard_text=None,
-        display_pronunciation_status="분석 서비스 준비 중",
+        display_pronunciation_status=messages["status"],
         raw_heard_text=None,
         raw_predicted_phonemes=None,
         feedback_issues=[],
-        next_practice_focus=["발음 분석 서비스가 연결되면 다시 평가해 보세요."],
+        next_practice_focus=[messages["focus"]],
         pronunciation_status="UNAVAILABLE",
         is_card_completed=True,
     )
@@ -601,6 +627,7 @@ def build_pronunciation_fallback_result(card_id: str):
 async def evaluate_pronunciation(
     card_id: str,
     target_text: str = Form(...),
+    feedback_language: str = Form("ko"),
     audio_file: UploadFile = File(...),
     db: Session = Depends(get_db),
 ):
@@ -641,6 +668,7 @@ async def evaluate_pronunciation(
             audio_bytes=audio_bytes,
             filename=audio_file.filename or f"{card_id}.webm",
             target_text=target_text,
+            feedback_language=feedback_language,
         )
         (
             score,
@@ -651,13 +679,16 @@ async def evaluate_pronunciation(
             raw_predicted_phonemes,
             feedback_issues,
             next_practice_focus,
-        ) = build_pronunciation_result(analysis)
+        ) = build_pronunciation_result(analysis, feedback_language=feedback_language)
     except PronunciationServiceUnavailableError:
         touch_recent_learning_record(db, card_id)
         db.commit()
         return PronunciationResponse(
             success=True,
-            data=build_pronunciation_fallback_result(card_id),
+            data=build_pronunciation_fallback_result(
+                card_id,
+                feedback_language=feedback_language,
+            ),
             message=None,
         )
     except PronunciationAnalysisError as exc:

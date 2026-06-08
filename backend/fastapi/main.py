@@ -19,9 +19,10 @@ PostgreSQL DB 기반으로 동작하며, 발음/저장 단어 API는 아직 UI �
 데이터 기반으로 동작합니다.
 """
 
+import random
 from datetime import datetime, timezone
 
-from fastapi import FastAPI, UploadFile, File, Form, Depends
+from fastapi import FastAPI, UploadFile, File, Form, Depends, Response
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from sqlalchemy.orm import Session
@@ -174,6 +175,7 @@ def get_cards_for_set(db: Session, set_id: str):
         .order_by(QuizDB.card_order)
         .all()
     )
+    random.shuffle(set_quizzes)
 
     title_mapping = {
         "set_school_01": "고등학교",
@@ -183,7 +185,7 @@ def get_cards_for_set(db: Session, set_id: str):
         "set_cafe_01": "카페",
         "set_pc_game_01": "PC 게임",
         "set_university_01": "대학교",
-        "set_test_01": "테스트",
+        "set_test_01": "일상 회화",
     }
 
     cards = []
@@ -192,6 +194,7 @@ def get_cards_for_set(db: Session, set_id: str):
             Choice(choice_id=choice.choice_id, text=choice.text)
             for choice in sorted(quiz.choices, key=lambda choice: choice.choice_id)
         ]
+        random.shuffle(choices)
         cards.append(
             LearningCard(
                 card_id=quiz.card_id,
@@ -250,38 +253,61 @@ def touch_recent_learning_record(db: Session, card_id: str):
         record.last_viewed_at = now
 
 
+def build_recent_card(quiz: QuizDB, last_viewed_at: datetime) -> RecentCard:
+    return RecentCard(
+        card_id=quiz.card_id,
+        set_id=quiz.set_id,
+        word=quiz.polysemy_word,
+        image_url=quiz.image_url or CARD_IMAGE_PLACEHOLDER,
+        last_viewed_at=last_viewed_at.isoformat(),
+    )
+
+
 def get_recent_cards_from_db(db: Session):
     records = (
         db.query(RecentLearningRecordDB)
         .join(QuizDB, RecentLearningRecordDB.card_id == QuizDB.card_id)
         .order_by(RecentLearningRecordDB.last_viewed_at.desc())
-        .limit(6)
+        .limit(50)
         .all()
     )
 
-    if records:
-        return [
-                RecentCard(
-                    card_id=record.quiz.card_id,
-                    set_id=record.quiz.set_id,
-                    word=record.quiz.polysemy_word,
-                    image_url=record.quiz.image_url or CARD_IMAGE_PLACEHOLDER,
-                    last_viewed_at=record.last_viewed_at.isoformat(),
-                )
-            for record in records
-        ]
+    recent_cards = []
+    seen_words = set()
 
-    quizzes = db.query(QuizDB).order_by(QuizDB.card_id).limit(6).all()
-    return [
-            RecentCard(
-                card_id=quiz.card_id,
-                set_id=quiz.set_id,
-                word=quiz.polysemy_word,
-                image_url=quiz.image_url or CARD_IMAGE_PLACEHOLDER,
-                last_viewed_at=datetime.now(timezone.utc).isoformat(),
-            )
-        for quiz in quizzes
-    ]
+    if records:
+        for record in records:
+            word = record.quiz.polysemy_word
+            if word in seen_words:
+                continue
+
+            seen_words.add(word)
+            recent_cards.append(build_recent_card(record.quiz, record.last_viewed_at))
+
+            if len(recent_cards) >= 6:
+                return recent_cards
+
+        if recent_cards:
+            return recent_cards
+
+    fallback_time = datetime.now(timezone.utc)
+    quizzes = (
+        db.query(QuizDB)
+        .order_by(QuizDB.card_order, QuizDB.card_id)
+        .all()
+    )
+
+    for quiz in quizzes:
+        if quiz.polysemy_word in seen_words:
+            continue
+
+        seen_words.add(quiz.polysemy_word)
+        recent_cards.append(build_recent_card(quiz, fallback_time))
+
+        if len(recent_cards) >= 6:
+            break
+
+    return recent_cards
 
 
 # =============================================================================
@@ -404,7 +430,11 @@ async def get_category_sets(category_id: str, db: Session = Depends(get_db)):
 
 
 @app.get("/api/v1/sets/{set_id}/cards", response_model=SetCardsResponse)
-async def get_set_cards(set_id: str, db: Session = Depends(get_db)):
+async def get_set_cards(
+    set_id: str,
+    response: Response,
+    db: Session = Depends(get_db),
+):
     """
     학습 카드 목록 조회 API
 
@@ -414,6 +444,7 @@ async def get_set_cards(set_id: str, db: Session = Depends(get_db)):
     실제 데이터에서 동적으로 생성합니다.
     """
 
+    response.headers["Cache-Control"] = "no-store"
     data = get_cards_for_set(db, set_id)
 
     if data is None:

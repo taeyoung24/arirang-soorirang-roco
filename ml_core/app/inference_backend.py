@@ -142,11 +142,29 @@ class Wav2Vec2InferenceBackend:
         if not transcription:
             raise RuntimeError("wav2vec2 produced empty transcription.")
 
+        transcription = self._normalize_asr_output(transcription)
         phonemes = self._to_phonemes(transcription)
         if not phonemes:
             raise RuntimeError("wav2vec2 transcription yielded no phonemes after G2P.")
 
         return InferenceResult(raw_line=phonemes)
+
+    _ASR_NORMALIZATION = [
+        ("주십시오", "줘"),
+        ("하십시오", "해"),
+        ("주세요", "줘"),
+        ("하세요", "해"),
+        ("보세요", "봐"),
+        ("오세요", "와"),
+        ("있어요", "있어"),
+        ("없어요", "없어"),
+        ("해요", "해"),
+    ]
+
+    def _normalize_asr_output(self, text: str) -> str:
+        for formal, colloquial in self._ASR_NORMALIZATION:
+            text = text.replace(formal, colloquial)
+        return text
 
     def _to_phonemes(self, text: str) -> str:
         g2p_text = self._g2p(text)

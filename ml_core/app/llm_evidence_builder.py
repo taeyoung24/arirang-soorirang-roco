@@ -18,7 +18,13 @@ class LLMEvidenceBuilder:
             for item in diagnostics
             if item.category == "segmental" and item.target_unit
         }
-        phoneme_edits = self._relevant_edits(evidence.phoneme_edits, segmental_target_units, max_diagnostics)
+        has_segmental_diagnostic = any(item.category == "segmental" for item in diagnostics)
+        phoneme_edits = self._relevant_edits(
+            evidence.phoneme_edits,
+            segmental_target_units,
+            max_diagnostics,
+            include_all=has_segmental_diagnostic and not segmental_target_units,
+        )
         return AcousticEvidencePacket(
             script=evidence.script,
             canonical_text=evidence.canonical_text,
@@ -56,6 +62,7 @@ class LLMEvidenceBuilder:
     ) -> list[DiagnosticCandidate]:
         severity_rank = {"low": 1, "medium": 2, "high": 3}
         evidence_rank = {
+            "whisper_transcript_agreement": 3,
             "phoneme_edit_alignment": 2,
             "predicted_phoneme_mismatch": 2,
             "qwen_forced_alignment_syllable_rate": 2,
@@ -82,7 +89,10 @@ class LLMEvidenceBuilder:
         edits: list[PhonemeEdit],
         target_units: set[str],
         max_edits: int,
+        include_all: bool = False,
     ) -> list[PhonemeEdit]:
+        if include_all:
+            return edits[:max_edits]
         if not target_units:
             return []
         result = [
@@ -137,6 +147,4 @@ class LLMEvidenceBuilder:
     def _should_include_prosody(self, prosody: ProsodySummary | None, diagnostics: list[DiagnosticCandidate]) -> bool:
         if prosody is None:
             return False
-        if self._has_prosodic_diagnostic(diagnostics):
-            return True
-        return any(item.pause_level is not None for item in prosody.reference_pause_comparisons)
+        return self._has_prosodic_diagnostic(diagnostics)

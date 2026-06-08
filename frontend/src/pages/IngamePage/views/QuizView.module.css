@@ -6,6 +6,8 @@
   justify-content: flex-start;
   align-items: center;
   gap: 0.625rem;
+  flex: 1;
+  min-height: 0;
 }
 
 .textArea {
@@ -15,6 +17,7 @@
   flex-direction: column;
   justify-content: space-between;
   align-items: center;
+  flex-shrink: 0;
 }
 
 .title {
@@ -36,6 +39,7 @@
   gap: 0.25rem;
   flex-wrap: wrap;
   align-content: center;
+  flex-shrink: 0;
 }
 
 .normalText {
@@ -67,7 +71,10 @@
   position: relative;
   align-self: stretch;
   height: 20rem;
-  flex-shrink: 0;
+  max-height: 20rem;
+  flex-grow: 1;
+  flex-shrink: 1;
+  min-height: 0;
 }
 
 .feedImage {

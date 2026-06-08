@@ -1,6 +1,7 @@
 .layout {
   background-color: var(--color-yellow-primary);
   height: 100vh;
+  height: 100dvh; /* 모바일 동적 뷰포트 주소창 대응 */
   display: flex;
   flex-direction: column;
   justify-content: flex-start;

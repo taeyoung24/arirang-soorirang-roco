@@ -160,33 +160,33 @@ export default function PronounceArea({ cardId, targetText, ttsUrl, onFinish }) 
     setErrorMessage('');
 
     // NOTE: [테스트용 임시 코드] 실제 발음 분석 API 호출 생략하고 즉시 통과 처리 (26. 6. 8., 정태영)
-    setTimeout(() => {
-      const mockResult = {
-        score: 95,
-        heard_text: targetText,
-        feedback: "참 잘하셨습니다! (테스트용 자동 패스)"
-      };
-      setResult(mockResult);
-      transitionToStep(4);
-      onFinish?.(mockResult);
-    }, 500);
+    // setTimeout(() => {
+    //   const mockResult = {
+    //     score: 95,
+    //     heard_text: targetText,
+    //     feedback: "참 잘하셨습니다! (테스트용 자동 패스)"
+    //   };
+    //   setResult(mockResult);
+    //   transitionToStep(4);
+    //   onFinish?.(mockResult);
+    // }, 500);
 
     // API 호출 코드
-    // try {
-    //   const audioBlob = new Blob(chunks.length ? chunks : [''], { type: 'audio/webm' });
-    //   const formData = new FormData();
-    //   formData.append('target_text', targetText);
-    //   formData.append('audio_file', audioBlob, `${cardId}.webm`);
-    //   const pronunciationResult = await evaluatePronunciation(cardId, formData);
+    try {
+      const audioBlob = new Blob(chunks.length ? chunks : [''], { type: 'audio/webm' });
+      const formData = new FormData();
+      formData.append('target_text', targetText);
+      formData.append('audio_file', audioBlob, `${cardId}.webm`);
+      const pronunciationResult = await evaluatePronunciation(cardId, formData);
 
-    //   setResult(pronunciationResult);
-    //   transitionToStep(4);
-    //   onFinish?.(pronunciationResult);
-    // } catch (error) {
-    //   console.error('발음 평가에 실패했습니다:', error);
-    //   setErrorMessage(error.message);
-    //   transitionToStep(1);
-    // }
+      setResult(pronunciationResult);
+      transitionToStep(4);
+      onFinish?.(pronunciationResult);
+    } catch (error) {
+      console.error('발음 평가에 실패했습니다:', error);
+      setErrorMessage(error.message);
+      transitionToStep(1);
+    }
 
   };
 

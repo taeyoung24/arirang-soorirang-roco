@@ -118,7 +118,10 @@ function HomePage() {
             id: item.card_id,
             title: item.word,
             image: resolveAssetUrl(item.image_url),
-            onClick: () => handleTransition(`/ingame/${item.set_id}`, 'var(--color-yellow-primary)'),
+            onClick: () => handleTransition(
+              `/ingame/${item.set_id}?card=${encodeURIComponent(item.card_id)}`,
+              'var(--color-yellow-primary)'
+            ),
           }))
         )
       } catch (error) {

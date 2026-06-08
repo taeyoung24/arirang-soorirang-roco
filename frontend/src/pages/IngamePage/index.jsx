@@ -13,6 +13,7 @@ export default function IngamePage() {
   const { setId } = useParams()
   const [searchParams] = useSearchParams()
   const selectedWord = searchParams.get('word') || ''
+  const selectedCardId = searchParams.get('card') || ''
 
   const [currentStep] = useState('quiz')
   const [isStageUnlocked, setIsStageUnlocked] = useState(false)
@@ -47,7 +48,9 @@ export default function IngamePage() {
       try {
         setIsLoading(true)
         const data = await getSetCards(setId)
-        const filteredCards = selectedWord
+        const filteredCards = selectedCardId
+          ? data.cards.filter((card) => card.card_id === selectedCardId)
+          : selectedWord
           ? data.cards.filter((card) => card.polysemy_word === selectedWord)
           : data.cards
 
@@ -78,7 +81,7 @@ export default function IngamePage() {
     return () => {
       isMounted = false
     }
-  }, [setId, selectedWord])
+  }, [setId, selectedWord, selectedCardId])
 
   const handleBack = () => {
     setIsExiting(true)

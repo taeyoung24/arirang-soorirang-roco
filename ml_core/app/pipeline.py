@@ -226,12 +226,13 @@ class MDDPipeline:
                 ))
 
         total_expected = max(1, len(canonical))
+        weighted_penalty = substitutions * 1.0 + deletions * 1.0 + insertions * 0.3
         summary = Summary(
             total_issues=len(issues),
             substitutions=substitutions,
             insertions=insertions,
             deletions=deletions,
-            accuracy=round(max(0.0, 1.0 - (len(issues) / total_expected)), 4),
+            accuracy=round(max(0.0, 1.0 - (weighted_penalty / total_expected)), 4),
         )
         return issues, summary
 

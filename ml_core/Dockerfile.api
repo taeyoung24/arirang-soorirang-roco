@@ -6,6 +6,7 @@ ENV PIP_NO_CACHE_DIR=1
 ENV MDD_SERVICE_MODE=api
 ENV MDD_HOST=0.0.0.0
 ENV MDD_PORT=8000
+ENV LD_LIBRARY_PATH=/usr/local/lib/python3.11/site-packages/nvidia/cublas/lib:/usr/local/lib/python3.11/site-packages/nvidia/cudnn/lib:${LD_LIBRARY_PATH}
 
 WORKDIR /opt/mdd/service
 

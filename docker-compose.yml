@@ -62,8 +62,12 @@ services:
       - "${MDD_API_HOST_PORT:-18080}:8000"
     environment:
       MDD_SERVICE_MODE: api
-      MDD_INFERENCE_BASE_URL: http://ml-inference:8080
-      MDD_INFERENCE_TIMEOUT_SECONDS: 120
+      MDD_WHISPER_MODEL: ${MDD_WHISPER_MODEL:-small}
+      MDD_WHISPER_DEVICE: ${MDD_WHISPER_DEVICE:-cuda}
+      MDD_WHISPER_COMPUTE_TYPE: ${MDD_WHISPER_COMPUTE_TYPE:-int8_float16}
+      MDD_WHISPER_LANGUAGE: ${MDD_WHISPER_LANGUAGE:-ko}
+      MDD_WHISPER_BEAM_SIZE: ${MDD_WHISPER_BEAM_SIZE:-5}
+      HF_HOME: /opt/hf-cache
       MDD_ALIGNER_BASE_URL: http://ml-aligner:8090
       MDD_ALIGNER_TIMEOUT_SECONDS: 120
       MDD_ALIGNER_LANGUAGE: Korean
@@ -81,6 +85,9 @@ services:
       MDD_TTS_VOICE_ID: ${MDD_TTS_VOICE_ID:-ko-KR-SunHiNeural}
       MDD_TTS_SPEAKING_RATE: ${MDD_TTS_SPEAKING_RATE:-1.0}
       MDD_TTS_ASSET_PUBLIC_BASE_URL: ${MDD_TTS_ASSET_PUBLIC_BASE_URL:-/ml}
+    volumes:
+      - hf-cache:/opt/hf-cache
+    gpus: all
     depends_on:
       - ml-minio
     healthcheck:
@@ -91,27 +98,6 @@ services:
     networks:
       - default
       - proxy-net
-    restart: unless-stopped
-
-  ml-inference:
-    build:
-      context: ./ml_core
-      dockerfile: Dockerfile.inference
-    container_name: mdd-inference
-    environment:
-      MDD_SERVICE_MODE: inference
-      MDD_MODEL_PATH: /opt/mdd/checkpoints/checkpoint_mdd_sjr.pt
-      MDD_INFER_SCRIPT_PATH: /opt/fairseq/examples/speech_recognition/infer.py
-      MDD_DICT_PATH: /opt/mdd/service/assets/dict.phn.txt
-      MDD_TEMP_ROOT: /tmp/mdd-inference
-      PYTHONPATH: /opt/fairseq
-      LD_LIBRARY_PATH: /opt/conda/envs/main/lib/python3.9/site-packages/flashlight-1.0.0-py3.9-linux-x86_64.egg:/usr/local/nvidia/lib:/usr/local/nvidia/lib64
-      NVIDIA_VISIBLE_DEVICES: all
-      NVIDIA_DRIVER_CAPABILITIES: compute,utility
-    volumes:
-      - "./ml_core/models:/opt/mdd/checkpoints:ro"
-    gpus: all
-    ipc: host
     restart: unless-stopped
 
   ml-aligner:

@@ -22,6 +22,9 @@ class HealthResponse(BaseModel):
     reference_cache_error: Optional[str] = None
     tts_provider: Optional[str] = None
     tts_voice_id: Optional[str] = None
+    asr_backend: Optional[str] = None
+    asr_status: Optional[str] = None
+    whisper_model: Optional[str] = None
 
 
 class PronunciationIssue(BaseModel):

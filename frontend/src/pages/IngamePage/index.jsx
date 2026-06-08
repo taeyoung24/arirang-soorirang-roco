@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom'
 import { getSetCards } from 'src/api'
 import Layout from 'src/components/Layout'
@@ -8,8 +9,23 @@ import { setThemeColor } from 'src/utils/theme'
 import styles from './IngamePage.module.css'
 import QuizView from './views/QuizView'
 
+const SET_TITLE_KEYS = {
+  set_school_01: 'demo_set_high_school',
+  set_test_01: 'demo_set_daily_conversation',
+}
+
+const WORD_TITLE_KEYS = {
+  말: 'demo_word_mal',
+  타다: 'demo_word_tada',
+  맞다: 'demo_word_matda',
+  차: 'demo_word_cha',
+  쓰다: 'demo_word_sseuda',
+  배: 'demo_word_bae',
+}
+
 export default function IngamePage() {
   const navigate = useNavigate()
+  const { t, i18n } = useTranslation()
   const { setId } = useParams()
   const [searchParams] = useSearchParams()
   const selectedWord = searchParams.get('word') || ''
@@ -26,7 +42,6 @@ export default function IngamePage() {
   const [errorMessage, setErrorMessage] = useState('')
 
   const currentIndexRef = useRef(0)
-  const rafRef = useRef(null)
   const scrollTimeoutRef = useRef(null)
   const missingSetMessage = setId ? '' : '학습 세트를 먼저 선택하세요.'
 
@@ -60,9 +75,16 @@ export default function IngamePage() {
 
         if (!isMounted) return
 
+        const translatedTitle = SET_TITLE_KEYS[setId]
+          ? t(SET_TITLE_KEYS[setId])
+          : data.title
+        const translatedWord = WORD_TITLE_KEYS[selectedWord]
+          ? t(WORD_TITLE_KEYS[selectedWord])
+          : selectedWord
+
         setSetData({
           ...data,
-          title: selectedWord ? `${data.title} · ${selectedWord}` : data.title,
+          title: selectedWord ? `${translatedTitle} · ${translatedWord}` : translatedTitle,
           cards: filteredCards,
         })
         setStageCount(1)
@@ -85,7 +107,7 @@ export default function IngamePage() {
     return () => {
       isMounted = false
     }
-  }, [setId, selectedWord, selectedCardId])
+  }, [setId, selectedWord, selectedCardId, i18n.language, t])
 
   const handleBack = () => {
     setIsExiting(true)

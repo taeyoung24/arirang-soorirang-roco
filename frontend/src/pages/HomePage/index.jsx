@@ -2,8 +2,6 @@ import { useCallback, useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import {
-  getRecentContents,
-  getRecommendedContents,
   resolveAssetUrl,
 } from 'src/api'
 import mascot from 'src/assets/landing-mascot.svg'
@@ -58,7 +56,7 @@ function ContentSection({ label, bg, cards }) {
 
 function HomePage() {
   const navigate = useNavigate()
-  const { t } = useTranslation()
+  const { t, i18n } = useTranslation()
   const [isExiting, setIsExiting] = useState(false)
   const [recommendedCards, setRecommendedCards] = useState([])
   const [recentCards, setRecentCards] = useState([])
@@ -84,60 +82,114 @@ function HomePage() {
   useEffect(() => {
     let isMounted = true
 
-    async function loadHomeContents() {
+    function loadHomeContents() {
       try {
-        const [recommended, recent] = await Promise.all([
-          getRecommendedContents(),
-          getRecentContents(),
-        ])
-
         if (!isMounted) return
 
-        const recommendedOrder = [
-          'set_hospital_01',
-          'set_school_01',
-          'set_bank_01',
-          'set_cafe_01',
-          'set_hanging_with_01',
-          'set_pc_game_01',
-        ]
-        const orderedRecommended = [...recommended].sort((a, b) => {
-          const aIndex = recommendedOrder.indexOf(a.set_id)
-          const bIndex = recommendedOrder.indexOf(b.set_id)
-          return (aIndex === -1 ? 99 : aIndex) - (bIndex === -1 ? 99 : bIndex)
-        })
-
         setRecommendedCards(
-          orderedRecommended.slice(0, 6).map((item) => ({
-            id: item.set_id,
-            title: item.title,
-            image: resolveAssetUrl(item.thumbnail_url),
-            onClick: () => handleTransition(`/ingame/${item.set_id}`, 'var(--color-yellow-primary)'),
-          }))
+          [
+            {
+              id: 'demo_recommended_school',
+              title: t('demo_set_high_school'),
+              image: winterMascot,
+              onClick: () => handleTransition('/ingame/set_school_01', 'var(--color-yellow-primary)'),
+            },
+            {
+              id: 'demo_recommended_basic',
+              title: t('demo_set_daily_conversation'),
+              image: normalMascot,
+              onClick: () => handleTransition('/ingame/set_test_01', 'var(--color-yellow-primary)'),
+            },
+            {
+              id: 'demo_recommended_cafe',
+              title: t('demo_set_cafe'),
+              image: resolveAssetUrl('/sentence_images/84f541d7.png'),
+              onClick: () => handleTransition(
+                '/ingame/set_test_01?word=%EC%B0%A8',
+                'var(--color-yellow-primary)'
+              ),
+            },
+            {
+              id: 'demo_recommended_friends',
+              title: t('demo_set_hanging_out'),
+              image: resolveAssetUrl('/sentence_images/0098f302.png'),
+              onClick: () => handleTransition(
+                '/ingame/set_test_01?word=%EB%A7%9E%EB%8B%A4',
+                'var(--color-yellow-primary)'
+              ),
+            },
+            {
+              id: 'demo_recommended_move',
+              title: t('demo_set_transportation'),
+              image: resolveAssetUrl('/sentence_images/a303d7dd.png'),
+              onClick: () => handleTransition(
+                '/ingame/set_test_01?word=%ED%83%80%EB%8B%A4',
+                'var(--color-yellow-primary)'
+              ),
+            },
+          ]
         )
         setRecentCards(
-          recent.slice(0, 6).map((item) => ({
-            id: item.card_id,
-            title: item.word,
-            image: resolveAssetUrl(item.image_url),
-            onClick: () => handleTransition(
-              `/ingame/${item.set_id}?card=${encodeURIComponent(item.card_id)}`,
-              'var(--color-yellow-primary)'
-            ),
-          }))
+          [
+            {
+              id: 'demo_recent_mal',
+              title: t('demo_word_mal'),
+              image: resolveAssetUrl('/sentence_images/db02d205.png'),
+              onClick: () => handleTransition(
+                '/ingame/set_test_01?card=card_db02d205',
+                'var(--color-yellow-primary)'
+              ),
+            },
+            {
+              id: 'demo_recent_tada_ride',
+              title: t('demo_word_tada'),
+              image: resolveAssetUrl('/sentence_images/a303d7dd.png'),
+              onClick: () => handleTransition(
+                '/ingame/set_test_01?card=card_a303d7dd',
+                'var(--color-yellow-primary)'
+              ),
+            },
+            {
+              id: 'demo_recent_tada_award',
+              title: t('demo_word_tada'),
+              image: resolveAssetUrl('/sentence_images/0d335015.png'),
+              onClick: () => handleTransition(
+                '/ingame/set_test_01?card=card_0d335015',
+                'var(--color-yellow-primary)'
+              ),
+            },
+            {
+              id: 'demo_recent_matda',
+              title: t('demo_word_matda'),
+              image: resolveAssetUrl('/sentence_images/0098f302.png'),
+              onClick: () => handleTransition(
+                '/ingame/set_test_01?card=card_0098f302',
+                'var(--color-yellow-primary)'
+              ),
+            },
+            {
+              id: 'demo_recent_cha',
+              title: t('demo_word_cha'),
+              image: resolveAssetUrl('/sentence_images/84f541d7.png'),
+              onClick: () => handleTransition(
+                '/ingame/set_test_01?card=card_84f541d7',
+                'var(--color-yellow-primary)'
+              ),
+            },
+          ]
         )
       } catch (error) {
         if (!isMounted) return
 
         console.error('홈 콘텐츠를 불러오지 못했습니다:', error)
         setRecommendedCards([
-          { id: 'fallback_hospital', title: '병원', image: normalMascot },
-          { id: 'fallback_school', title: '고등학교', image: winterMascot },
-          { id: 'fallback_bank', title: '은행', image: normalMascot },
+          { id: 'fallback_school', title: t('demo_set_high_school'), image: winterMascot },
+          { id: 'fallback_basic', title: t('demo_set_daily_conversation'), image: normalMascot },
+          { id: 'fallback_cafe', title: t('demo_set_cafe'), image: normalMascot },
         ])
         setRecentCards([
-          { id: 'fallback_recent_1', title: '쓰다', image: normalMascot },
-          { id: 'fallback_recent_2', title: '눈', image: winterMascot },
+          { id: 'fallback_recent_1', title: t('demo_word_sseuda'), image: normalMascot },
+          { id: 'fallback_recent_2', title: t('demo_word_bae'), image: winterMascot },
         ])
       } finally {
         if (isMounted) setIsLoading(false)
@@ -149,7 +201,7 @@ function HomePage() {
     return () => {
       isMounted = false
     }
-  }, [handleTransition])
+  }, [handleTransition, i18n.language, t])
 
   return (
     <Layout className={`${styles.layout} ${isExiting ? styles.fadeOut : ''}`}>

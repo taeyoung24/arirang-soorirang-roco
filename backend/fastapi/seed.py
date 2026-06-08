@@ -48,7 +48,7 @@ SET_TITLE = {
     "set_cafe_01": "카페",
     "set_pc_game_01": "PC 게임",
     "set_university_01": "대학교",
-    "set_test_01": "테스트",
+    "set_test_01": "일상 회화",
 }
 
 SET_THUMBNAIL_MAPPING = {

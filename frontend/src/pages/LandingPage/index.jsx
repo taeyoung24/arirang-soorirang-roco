@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
 import ariImg from 'src/assets/landing-frame-ari.png'
 import shadowImg from 'src/assets/landing-frame-shadow.png'
 import sooriImg from 'src/assets/landing-frame-soori.png'
@@ -12,6 +13,7 @@ import styles from './LandingPage.module.css'
 
 function LandingPage() {
   const navigate = useNavigate()
+  const { t } = useTranslation()
   const [isExiting, setIsExiting] = useState(false)
 
   useEffect(() => {
@@ -46,17 +48,17 @@ function LandingPage() {
       <div className={styles.bottomArea}>
         <div className={styles.termsContainer}>
           <div className={styles.termsTextWrapper}>
-            <span className={styles.termsText}>시작하기 버튼을 누르면 </span>
-            <span className={styles.termsLink}>이용약관</span>
-            <span className={styles.termsText}> 및 </span>
-            <span className={styles.termsLink}>개인정보 처리방침</span>
-            <span className={styles.termsText}>에 동의하는 것으로 간주합니다.</span>
+            <span className={styles.termsText}>{t('terms_prefix')}</span>
+            <span className={styles.termsLink}>{t('terms_link_service')}</span>
+            <span className={styles.termsText}>{t('terms_and')}</span>
+            <span className={styles.termsLink}>{t('terms_link_privacy')}</span>
+            <span className={styles.termsText}>{t('terms_suffix')}</span>
           </div>
         </div>
 
         <div className={styles.buttonWrapper}>
           <PageButton
-            label="로그인 없이 시작"
+            label={t('btn_start_without_login')}
             onClick={() => {
               setIsExiting(true)
               document.body.style.backgroundColor = 'var(--color-bg)'

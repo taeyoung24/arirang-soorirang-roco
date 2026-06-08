@@ -4,6 +4,7 @@ import IngamePage from 'src/pages/IngamePage'
 import LandingPage from 'src/pages/LandingPage'
 import SavesPage from 'src/pages/SavesPage'
 import SelectionPage from 'src/pages/SelectionPage'
+import SettingPage from 'src/pages/SettingPage'
 
 function App() {
   return (
@@ -15,6 +16,7 @@ function App() {
         <Route path="/ingame" element={<IngamePage />} />
         <Route path="/ingame/:setId" element={<IngamePage />} />
         <Route path="/saves" element={<SavesPage />} />
+        <Route path="/setting" element={<SettingPage />} />
       </Routes>
     </BrowserRouter>
   );

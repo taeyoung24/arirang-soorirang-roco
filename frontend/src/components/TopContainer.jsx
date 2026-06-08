@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { SimpleIconButton } from './Button';
 import styles from './TopContainer.module.css';
 
 
 export const IngameTopContainer = ({ onBack, onHelp, status = 'locked' }) => {
+  const { t } = useTranslation();
   const isLocked = status === 'locked';
   const [animate, setAnimate] = useState(false);
 
@@ -36,7 +38,7 @@ export const IngameTopContainer = ({ onBack, onHelp, status = 'locked' }) => {
           )}
         </div>
         <div className={styles.statusText}>
-          {isLocked ? "스테이지 잠김" : "스테이지 완료"}
+          {isLocked ? t('ingame_stage_locked') : t('ingame_stage_unlocked')}
         </div>
       </div>
 
@@ -74,7 +76,7 @@ export const SearchTopContainer = ({ onBack, onSearch }) => {
   );
 };
 
-export const HomeTopContainer = ({ mascotSrc, onHelp }) => {
+export const HomeTopContainer = ({ mascotSrc, onMenu }) => {
   return (
     <div className={styles.homeContainer}>
       {/* Mascot Area */}
@@ -82,10 +84,26 @@ export const HomeTopContainer = ({ mascotSrc, onHelp }) => {
         <img src={mascotSrc} alt="mascot" className={styles.mascotImg} />
       </div>
 
-      {/* Help Button */}
-      <SimpleIconButton type="help" onClick={onHelp} />
+      {/* Hamburger Button */}
+      <SimpleIconButton type="hamburger" onClick={onMenu} />
 
 
+    </div>
+  );
+};
+
+export const SettingTopContainer = ({ onBack }) => {
+  const { t } = useTranslation();
+  return (
+    <div className={styles.container}>
+      {/* Back Button */}
+      <SimpleIconButton type="back" onClick={onBack} />
+
+      {/* Title */}
+      <div className={styles.statusText}>{t('setting_title')}</div>
+
+      {/* Dummy space for balance (aligning with simpleIconButton width) */}
+      <div style={{ width: '52px' }} />
     </div>
   );
 };

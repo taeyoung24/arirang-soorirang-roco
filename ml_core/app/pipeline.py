@@ -57,7 +57,7 @@ class MDDPipeline:
                 if jong:
                     result.append(jong)
             else:
-                    result.append(char)
+                result.append(char)
         return "".join(result)
 
     @classmethod
@@ -142,37 +142,33 @@ class MDDPipeline:
 
     def _convert_audio(self, src_path: Path, dst_path: Path) -> int:
         if not shutil.which("sox"):
-            raise MDDInferenceError("sox executable not found.")
+            raise MDDInferenceError("sox executable not found on host machine.")
 
         command = [
-            "sox",
-            "-G",
-            "-v",
-            "0.99",
+            "sox", "-G", "-v", "0.99",
             str(src_path),
-            "-c",
-            "1",
-            "-b",
-            "16",
-            "-r",
-            "16000",
+            "-c", "1", "-b", "16", "-r", "16000",
             str(dst_path),
         ]
         process = subprocess.run(command, capture_output=True, text=True)
         if process.returncode != 0:
-            raise MDDInferenceError(f"sox failed: {process.stderr.strip()}")
+            raise MDDInferenceError(f"sox processing failed: {process.stderr.strip()}")
         return soundfile.info(dst_path).frames
 
     def _prepare_manifest(self, workdir: Path, file_name: str, num_frames: int, canonical_phonemes: str) -> Path:
         manifest_dir = workdir / "manifest"
         sound_dir = workdir / "sound_16k"
-        (manifest_dir / "test.tsv").write_text(
-            f"{sound_dir}\n{file_name}\t{num_frames}\n",
-            encoding="utf-8",
-        )
+        
+        (manifest_dir / "test.tsv").write_text(f"{sound_dir}\n{file_name}\t{num_frames}\n", encoding="utf-8")
         (manifest_dir / "test.wrd").write_text(canonical_phonemes + "\n", encoding="utf-8")
         (manifest_dir / "test.phn").write_text(self.phoneme_to_label_line(canonical_phonemes), encoding="utf-8")
-        shutil.copyfile(self.settings.dict_path, manifest_dir / "dict.phn.txt")
+        
+        if self.settings.mdd_backend != "wav2vec2":
+            dict_src = Path(self.settings.dict_path)
+            if not dict_src.exists():
+                raise MDDInferenceError(f"Fairseq dictionary file missing: {dict_src}")
+            shutil.copyfile(dict_src, manifest_dir / "dict.phn.txt")
+        
         return manifest_dir
 
     def _run_inference(self, manifest_dir: Path, results_dir: Path) -> InferenceResult:
@@ -194,10 +190,7 @@ class MDDPipeline:
             normalized_decoder_score=round(normalized, 4),
             token_count=token_count,
             score_source=result.score_source,
-            note=(
-                "This is a decoder hypothesis score, not calibrated phoneme-level GOP. "
-                "Use it as model evidence only after backend-specific calibration."
-            ),
+            note="This is a decoder hypothesis score, not calibrated phoneme-level GOP.",
         )
 
     @staticmethod
@@ -213,38 +206,24 @@ class MDDPipeline:
     def _build_issues(canonical: str, predicted: str) -> tuple[list[PronunciationIssue], Summary]:
         edits = Levenshtein.editops(canonical, predicted)
         issues: list[PronunciationIssue] = []
-        substitutions = 0
-        insertions = 0
-        deletions = 0
+        substitutions, insertions, deletions = 0, 0, 0
 
         for edit_type, canonical_index, predicted_index in edits:
             if edit_type == "replace":
                 substitutions += 1
-                issues.append(
-                    PronunciationIssue(
-                        issue_type="substitution",
-                        expected=canonical[canonical_index],
-                        actual=predicted[predicted_index],
-                    )
-                )
+                issues.append(PronunciationIssue(
+                    issue_type="substitution", expected=canonical[canonical_index], actual=predicted[predicted_index]
+                ))
             elif edit_type == "insert":
                 insertions += 1
-                issues.append(
-                    PronunciationIssue(
-                        issue_type="insertion",
-                        expected="",
-                        actual=predicted[predicted_index],
-                    )
-                )
+                issues.append(PronunciationIssue(
+                    issue_type="insertion", expected="", actual=predicted[predicted_index]
+                ))
             else:
                 deletions += 1
-                issues.append(
-                    PronunciationIssue(
-                        issue_type="deletion",
-                        expected=canonical[canonical_index],
-                        actual="",
-                    )
-                )
+                issues.append(PronunciationIssue(
+                    issue_type="deletion", expected=canonical[canonical_index], actual=""
+                ))
 
         total_expected = max(1, len(canonical))
         summary = Summary(
@@ -260,9 +239,11 @@ class MDDPipeline:
         normalized_script = re.sub(r"\s+", " ", script.strip())
         if not normalized_script:
             raise ValueError("script must not be empty.")
+            
         g2p_text = self.g2p(normalized_script)
         normalized = self.normalize_canonical_phonemes(g2p_text)
         workdir = self._build_workdir()
+        
         source_suffix = Path(original_filename or "input.wav").suffix or ".wav"
         source_path = workdir / f"input{source_suffix}"
         converted_name = "input.wav"
@@ -271,10 +252,18 @@ class MDDPipeline:
         try:
             source_path.write_bytes(audio_bytes)
             num_frames = self._convert_audio(source_path, converted_path)
-            manifest_dir = self._prepare_manifest(workdir, converted_name, num_frames, normalized)
+            
+            # Keep manifest structural builds aligned with backend demands
+            if hasattr(self.inference_backend, "_processor"): 
+                # Optimization for Wav2Vec2 types to directly hit manifest locations
+                manifest_dir = workdir / "manifest"
+            else:
+                manifest_dir = self._prepare_manifest(workdir, converted_name, num_frames, normalized)
+                
             inference_result = self._run_inference(manifest_dir, workdir / "results")
             predicted = self._parse_prediction(inference_result.raw_line)
             issues, summary = self._build_issues(normalized, predicted)
+            
             return PredictResponse(
                 script=script,
                 canonical_phonemes=normalized,

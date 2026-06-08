@@ -1,0 +1,88 @@
+# Inference runs natively on Mac (MPS). Start it separately:
+#   cd ml_core
+#   MDD_BACKEND=wav2vec2 MDD_DEVICE=mps uvicorn app.inference_server:app --port 8080 --reload
+
+services:
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile.api
+    container_name: mdd-api-dev
+    ports:
+      - "8000:8000"
+    environment:
+      MDD_SERVICE_MODE: api
+      MDD_INFERENCE_BASE_URL: http://host.docker.internal:8080
+      MDD_INFERENCE_TIMEOUT_SECONDS: 180
+      MDD_ALIGNER_BASE_URL: http://aligner:8090
+      MDD_ALIGNER_TIMEOUT_SECONDS: 120
+      MDD_ALIGNER_LANGUAGE: Korean
+      MDD_GEMINI_API_KEY: ${MDD_GEMINI_API_KEY:-}
+      MDD_GEMINI_MODEL: ${MDD_GEMINI_MODEL:-gemini-2.5-flash}
+      MDD_OBJECT_STORAGE_ENABLED: "true"
+      MDD_OBJECT_STORAGE_ENDPOINT: minio:9000
+      MDD_OBJECT_STORAGE_ACCESS_KEY: ${MDD_OBJECT_STORAGE_ACCESS_KEY:-mddadmin}
+      MDD_OBJECT_STORAGE_SECRET_KEY: ${MDD_OBJECT_STORAGE_SECRET_KEY:-mddadmin123}
+      MDD_OBJECT_STORAGE_BUCKET: ${MDD_OBJECT_STORAGE_BUCKET:-mdd-reference-cache}
+      MDD_OBJECT_STORAGE_SECURE: "false"
+      MDD_TTS_PROVIDER: edge
+      MDD_TTS_VOICE_ID: ko-KR-SunHiNeural
+      MDD_TTS_ASSET_PUBLIC_BASE_URL: /ml
+    depends_on:
+      - aligner
+      - minio
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    restart: unless-stopped
+
+  aligner:
+    build:
+      context: .
+      dockerfile: Dockerfile.aligner.arm64
+    container_name: mdd-aligner-dev
+    ports:
+      - "8090:8090"
+    environment:
+      MDD_SERVICE_MODE: aligner
+      MDD_HOST: 0.0.0.0
+      MDD_PORT: 8090
+      MDD_ALIGNER_MODEL_ID: Qwen/Qwen3-ForcedAligner-0.6B
+      HF_HOME: /opt/hf-cache
+    volumes:
+      - hf-cache:/opt/hf-cache
+    depends_on:
+      hf-cache-downloader:
+        condition: service_completed_successfully
+    restart: unless-stopped
+
+  hf-cache-downloader:
+    build:
+      context: .
+      dockerfile: Dockerfile.aligner.arm64
+    environment:
+      HF_HOME: /opt/hf-cache
+    volumes:
+      - hf-cache:/opt/hf-cache
+    command:
+      - python
+      - -c
+      - "from huggingface_hub import snapshot_download; print(snapshot_download('Qwen/Qwen3-ForcedAligner-0.6B'))"
+
+  minio:
+    image: minio/minio:latest
+    container_name: mdd-minio-dev
+    command: server /data --console-address ":9001"
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    environment:
+      MINIO_ROOT_USER: ${MDD_OBJECT_STORAGE_ACCESS_KEY:-mddadmin}
+      MINIO_ROOT_PASSWORD: ${MDD_OBJECT_STORAGE_SECRET_KEY:-mddadmin123}
+    volumes:
+      - minio-data:/data
+    restart: unless-stopped
+
+volumes:
+  minio-data:
+  hf-cache:
+    name: mdd-hf-cache

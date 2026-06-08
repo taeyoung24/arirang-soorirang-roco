@@ -1,0 +1,27 @@
+FROM python:3.11-slim
+
+ENV PYTHONDONTWRITEBYTECODE=1
+ENV PYTHONUNBUFFERED=1
+ENV PIP_NO_CACHE_DIR=1
+ENV MDD_SERVICE_MODE=aligner
+ENV MDD_HOST=0.0.0.0
+ENV MDD_PORT=8090
+ENV MDD_ALIGNER_MODEL_ID=Qwen/Qwen3-ForcedAligner-0.6B
+
+WORKDIR /opt/mdd/service
+
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends libsndfile1 \
+    && rm -rf /var/lib/apt/lists/*
+
+RUN pip install --upgrade pip \
+    && pip install torch torchaudio --index-url https://download.pytorch.org/whl/cpu
+
+COPY requirements.aligner.txt ./
+RUN pip install -r requirements.aligner.txt
+
+COPY app ./app
+
+EXPOSE 8090
+
+CMD ["uvicorn", "app.aligner_server:app", "--host", "0.0.0.0", "--port", "8090"]

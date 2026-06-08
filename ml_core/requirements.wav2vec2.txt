@@ -1,0 +1,33 @@
+# ==============================================================================
+# System Prerequisites (Must be provisioned on host / Docker layer)
+# macOS:       brew install mecab mecab-ipadic
+# Ubuntu/Debian: apt-get update && apt-get install -y mecab libmecab-dev mecab-ipadic-utf8
+#
+# Engine Prerequisites (Install manually or via multi-stage layer before this file):
+# CPU/MPS:     pip install torch==2.5.1 torchaudio==2.5.1
+# CUDA 12.1:   pip install torch==2.5.1 torchaudio==2.5.1 --index-url https://download.pytorch.org/whl/cu121
+# ==============================================================================
+
+# --- Core ML & Audio Processing Stack ---
+transformers>=4.40.0,<4.50.0
+accelerate>=0.29.0,<1.0.0
+soundfile~=0.12.1
+numpy>=2.1.0,<2.2.0
+scipy>=1.13.0,<1.16.0
+# --- Korean Phonetics & G2P Tokenization Engine ---
+g2pk2==0.0.3
+jamo==0.4.1
+python-mecab-ko==1.3.7
+python-mecab-ko-dic==2.1.1.post2
+
+# --- Web Infrastructure Layer ---
+fastapi>=0.115.0,<0.137.0
+uvicorn[standard]>=0.30.0,<0.49.0
+python-multipart~=0.0.20
+httpx~=0.28.1
+pydantic>=2.8.0,<3.0.0
+
+# --- Algorithmic & Cloud I/O Core ---
+Levenshtein>=0.26.1
+edge-tts~=7.2.8
+minio~=7.2.20

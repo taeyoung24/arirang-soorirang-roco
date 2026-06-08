@@ -35,6 +35,10 @@ class Settings:
     tts_speaking_rate: float
     tts_model: str
     tts_asset_public_base_url: str
+    # wav2vec2 backend
+    mdd_backend: str
+    wav2vec2_model_id: str
+    mdd_device:str
 
     @classmethod
     def from_env(cls) -> "Settings":
@@ -70,4 +74,7 @@ class Settings:
             tts_speaking_rate=float(os.getenv("MDD_TTS_SPEAKING_RATE", "1.0")),
             tts_model=os.getenv("MDD_TTS_MODEL", "edge-tts"),
             tts_asset_public_base_url=os.getenv("MDD_TTS_ASSET_PUBLIC_BASE_URL", "").rstrip("/"),
+            mdd_backend=os.getenv("MDD_BACKEND", "fairseq"),
+            wav2vec2_model_id=os.getenv("MDD_WAV2VEC2_MODEL_ID", "kresnik/wav2vec2-large-xlsr-korean"),
+            mdd_device=os.getenv("MDD_DEVICE", "auto"),
         )

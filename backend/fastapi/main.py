@@ -259,40 +259,19 @@ def get_recent_cards_from_db(db: Session):
     )
 
     if records:
-        recent_cards = []
-        seen_words = set()
-
-        for record in records:
-            word = record.quiz.polysemy_word
-            if word in seen_words:
-                continue
-
-            seen_words.add(word)
-            recent_cards.append(
+        return [
                 RecentCard(
                     card_id=record.quiz.card_id,
                     set_id=record.quiz.set_id,
-                    word=word,
+                    word=record.quiz.polysemy_word,
                     image_url=record.quiz.image_url or CARD_IMAGE_PLACEHOLDER,
                     last_viewed_at=record.last_viewed_at.isoformat(),
                 )
-            )
-
-            if len(recent_cards) >= 6:
-                break
-
-        return recent_cards
+            for record in records
+        ]
 
     quizzes = db.query(QuizDB).order_by(QuizDB.card_id).limit(6).all()
-    recent_cards = []
-    seen_words = set()
-
-    for quiz in quizzes:
-        if quiz.polysemy_word in seen_words:
-            continue
-
-        seen_words.add(quiz.polysemy_word)
-        recent_cards.append(
+    return [
             RecentCard(
                 card_id=quiz.card_id,
                 set_id=quiz.set_id,
@@ -300,9 +279,8 @@ def get_recent_cards_from_db(db: Session):
                 image_url=quiz.image_url or CARD_IMAGE_PLACEHOLDER,
                 last_viewed_at=datetime.now(timezone.utc).isoformat(),
             )
-        )
-
-    return recent_cards
+        for quiz in quizzes
+    ]
 
 
 # =============================================================================

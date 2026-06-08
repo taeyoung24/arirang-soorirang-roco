@@ -17,6 +17,7 @@ from tts_client import generate_tts_url
 
 BASE_DIR = Path(__file__).resolve().parents[2]
 DATA_DIR = BASE_DIR / "content_data" / "data"
+SENTENCE_IMAGE_DIR = BASE_DIR / "frontend" / "public" / "sentence_images"
 
 CATEGORY_INFO = {
     "school": {"name_ko": "고등학교", "name_en": "High school"},
@@ -70,6 +71,17 @@ WORD_IMAGE_MAPPING = {
     "쓰다": "/assets/cards/bird-write.png",
     "눈": "/assets/cards/placeholder.png",
 }
+
+SENTENCE_IMAGE_BASE_URL = "/sentence_images"
+
+
+def build_sentence_image_url(sentence_id):
+    if not sentence_id:
+        return None
+    image_path = SENTENCE_IMAGE_DIR / f"{sentence_id}.png"
+    if not image_path.exists():
+        return None
+    return f"{SENTENCE_IMAGE_BASE_URL}/{sentence_id}.png"
 
 
 def load_json(filename):
@@ -278,7 +290,8 @@ def build_quizzes_from_sentences(meanings, sentences, quiz_overrides):
                 "correct_choice_id": "c1",
                 "pronunciation_target": pronunciation_target,
                 "tts_url": correct_pool[0].get("tts_url"),
-                "image_url": override.get("image_url")
+                "image_url": build_sentence_image_url(prompt_id)
+                or override.get("image_url")
                 or WORD_IMAGE_MAPPING.get(word, "/assets/cards/placeholder.png"),
                 "card_order": card_order_by_set[set_id],
                 "set_id": set_id,

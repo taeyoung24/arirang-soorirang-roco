@@ -14,6 +14,7 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 COPY backend/fastapi ./
 COPY content_data/data /app/content_data/data
+COPY frontend/public/sentence_images /app/frontend/public/sentence_images
 
 EXPOSE 8000
 

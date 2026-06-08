@@ -35,6 +35,7 @@ const resolveFrontendAsset = (url) => {
 
 export const resolveAssetUrl = (url) => {
   if (!url) return ''
+  if (url.startsWith('/sentence_images/')) return url
   const frontendAsset = resolveFrontendAsset(url)
   if (frontendAsset) return frontendAsset
   if (/^https?:\/\//.test(url)) return url

@@ -77,9 +77,9 @@ export default function QuizView({ card, title = '', progress = '', onStageUnloc
   const selectedChoice = card.choices.find((choice) => choice.choice_id === selectedChoiceId)
   const correctChoice = card.choices.find((choice) => choice.choice_id === correctChoiceId)
   const pronunciationTarget = correctChoice?.text || card.pronunciation_target
-  const questionParts = sentenceToParts(card.prompt_sentence, card.polysemy_word)
+  const questionParts = sentenceToParts(card.prompt_sentence, card.highlight || card.polysemy_word)
   const selectedChoiceParts = selectedChoice
-    ? sentenceToParts(selectedChoice.text, card.polysemy_word)
+    ? sentenceToParts(selectedChoice.text, selectedChoice.highlight || card.polysemy_word)
     : questionParts
   const displayParts = wrongChoiceIds.includes(selectedChoiceId)
     ? selectedChoiceParts
@@ -142,7 +142,7 @@ export default function QuizView({ card, title = '', progress = '', onStageUnloc
         {card.choices.map((choice) => (
           <AnswerButton
             key={choice.choice_id}
-            parts={sentenceToParts(choice.text, card.polysemy_word)}
+            parts={sentenceToParts(choice.text, choice.highlight || card.polysemy_word)}
             status={getButtonStatus(choice)}
             onClick={() => handleAnswerClick(choice)}
           />

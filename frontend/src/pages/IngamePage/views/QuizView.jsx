@@ -76,7 +76,7 @@ export default function QuizView({ card, title = '', progress = '', onStageUnloc
 
   const selectedChoice = card.choices.find((choice) => choice.choice_id === selectedChoiceId)
   const correctChoice = card.choices.find((choice) => choice.choice_id === correctChoiceId)
-  const pronunciationTarget = correctChoice?.text || card.pronunciation_target
+  const pronunciationTarget = card.prompt_sentence
   const questionParts = sentenceToParts(card.prompt_sentence, card.highlight || card.polysemy_word)
   const selectedChoiceParts = selectedChoice
     ? sentenceToParts(selectedChoice.text, selectedChoice.highlight || card.polysemy_word)

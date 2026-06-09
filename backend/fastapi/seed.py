@@ -270,7 +270,7 @@ def build_quizzes_from_sentences(meanings, sentences, quiz_overrides):
 
         card_order_by_set[set_id] += 1
         choices = [correct_pool[0], *distractors[:3]]
-        pronunciation_target = correct_pool[0].get("content", "")
+        pronunciation_target = prompt.get("content", "")
 
         generated.append(
             {
@@ -289,7 +289,7 @@ def build_quizzes_from_sentences(meanings, sentences, quiz_overrides):
                 ],
                 "correct_choice_id": "c1",
                 "pronunciation_target": pronunciation_target,
-                "tts_url": correct_pool[0].get("tts_url"),
+                "tts_url": prompt.get("tts_url"),
                 "image_url": build_sentence_image_url(prompt_id)
                 or override.get("image_url")
                 or WORD_IMAGE_MAPPING.get(word, "/assets/cards/placeholder.png"),
